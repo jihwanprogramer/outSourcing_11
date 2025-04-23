@@ -21,6 +21,7 @@ public abstract class Base {
 	@CreatedDate
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
 	@Column(updatable = false)
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
 	private LocalDateTime createdAt = LocalDateTime.now();
 
 	@LastModifiedDate
@@ -34,4 +35,5 @@ public abstract class Base {
 	public void timeWhenDeleted() {
 		this.deletedAt = LocalDateTime.now();
 	} //삭제 시간 설정용 메서드입니당
+
 }
