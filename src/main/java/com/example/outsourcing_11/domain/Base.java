@@ -30,4 +30,5 @@ public abstract class Base {
 	public void timeWhenDeleted() {
 		this.deletedAt = LocalDateTime.now();
 	} //삭제 시간 설정용 메서드입니당
+
 }
