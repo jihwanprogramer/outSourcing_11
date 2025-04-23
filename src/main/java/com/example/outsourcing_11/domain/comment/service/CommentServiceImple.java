@@ -33,7 +33,7 @@ public class CommentServiceImple implements CommentService {
 
 	@Override
 	public ResponseCommentDto updateComment(Long commentId, RequestCommentDto dto) {
-		//본인 댓글이 아닌경우 수정 불가
+		
 		Comment findcomment = commentRepository.findByOrThrowElse(commentId);
 		findcomment = new Comment(dto);
 		return new ResponseCommentDto(findcomment);
