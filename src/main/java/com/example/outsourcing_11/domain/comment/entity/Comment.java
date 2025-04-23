@@ -16,6 +16,7 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 
 import com.example.outsourcing_11.domain.Base;
+import com.example.outsourcing_11.domain.comment.dto.RequestCommentDto;
 
 @Getter
 @Entity
@@ -27,6 +28,7 @@ public class Comment extends Base {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Comment parent;
+
 	@OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Comment> childrenComment = new ArrayList<>();
 
@@ -43,6 +45,17 @@ public class Comment extends Base {
 	private int rating;
 
 	private int isDeleted;
+
+	public Comment() {
+
+	}
+
+	public Comment(RequestCommentDto dto) {
+
+		this.content = dto.getContent();
+		this.imageUrl = dto.getImageUrl();
+		this.rating = dto.getRating();
+	}
 
 	public void updateDeleteStatus(int isDeleted) {
 		this.isDeleted = isDeleted;
