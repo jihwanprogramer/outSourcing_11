@@ -1,4 +1,4 @@
-package com.example.outsourcing_11.global.common;
+package com.example.outsourcing_11.common;
 
 public enum Status {
 	EXIST(true), NON_EXIST(false);

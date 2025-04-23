@@ -1,4 +1,4 @@
-package com.example.outsourcing_11.global.util;
+package com.example.outsourcing_11.util;
 
 import java.util.Date;
 

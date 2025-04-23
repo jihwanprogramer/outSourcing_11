@@ -1,4 +1,4 @@
-package com.example.outsourcing_11.global;
+package com.example.outsourcing_11.common;
 
 import java.util.HashMap;
 import java.util.Map;
