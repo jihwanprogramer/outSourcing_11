@@ -9,8 +9,8 @@ import jakarta.persistence.Table;
 
 import lombok.Getter;
 
+import com.example.outsourcing_11.common.Status;
 import com.example.outsourcing_11.domain.Base;
-import com.example.outsourcing_11.global.common.Status;
 
 @Getter
 @Entity
@@ -52,7 +52,7 @@ public class User extends Base {
 	}
 
 	public User() {
-		
+
 	}
 
 	// 현재 boolean status를 enum 형태로 반환 (가독성/비즈니스 로직용)

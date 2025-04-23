@@ -1,4 +1,4 @@
-package com.example.outsourcing_11.global.config;
+package com.example.outsourcing_11.config;
 
 import org.springframework.stereotype.Component;
 

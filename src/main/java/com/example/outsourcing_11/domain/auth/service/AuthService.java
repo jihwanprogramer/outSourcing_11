@@ -3,16 +3,16 @@ package com.example.outsourcing_11.domain.auth.service;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Service;
+import com.example.outsourcing_11.common.exception.user.DuplicateUserException;
+import com.example.outsourcing_11.common.exception.user.InvalidLoginException;
+import com.example.outsourcing_11.common.exception.user.UserNotFoundException;
+import com.example.outsourcing_11.config.PasswordEncoder;
 import com.example.outsourcing_11.domain.auth.dto.LoginRequestDto;
 import com.example.outsourcing_11.domain.auth.dto.SignUpRequestDto;
 import com.example.outsourcing_11.domain.auth.dto.SignUpResponseDto;
-import com.example.outsourcing_11.domain.auth.exception.DuplicateUserException;
-import com.example.outsourcing_11.domain.auth.exception.InvalidLoginException;
-import com.example.outsourcing_11.domain.auth.exception.UserNotFoundException;
 import com.example.outsourcing_11.domain.user.entity.User;
 import com.example.outsourcing_11.domain.user.repository.UserRepository;
-import com.example.outsourcing_11.global.config.PasswordEncoder;
-import com.example.outsourcing_11.global.util.JwtUtil;
+import com.example.outsourcing_11.util.JwtUtil;
 
 @Service
 @RequiredArgsConstructor
