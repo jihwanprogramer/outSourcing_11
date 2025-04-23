@@ -3,18 +3,23 @@ package com.example.outsourcing_11.domain.auth.service;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Service;
+import com.example.outsourcing_11.domain.auth.dto.LoginRequestDto;
 import com.example.outsourcing_11.domain.auth.dto.SignUpRequestDto;
 import com.example.outsourcing_11.domain.auth.dto.SignUpResponseDto;
 import com.example.outsourcing_11.domain.auth.exception.DuplicateUserException;
+import com.example.outsourcing_11.domain.auth.exception.InvalidLoginException;
+import com.example.outsourcing_11.domain.auth.exception.UserNotFoundException;
 import com.example.outsourcing_11.domain.user.entity.User;
 import com.example.outsourcing_11.domain.user.repository.UserRepository;
 import com.example.outsourcing_11.global.config.PasswordEncoder;
+import com.example.outsourcing_11.global.util.JwtUtil;
 
 @Service
 @RequiredArgsConstructor
 public class AuthService {
 	private final UserRepository userRepository;
 	private final PasswordEncoder passwordEncoder;
+	private final JwtUtil jwtUtil;
 
 	public SignUpResponseDto signUp(SignUpRequestDto requestDto) {
 		if (userRepository.findByEmail(requestDto.getEmail()).isPresent()) {
@@ -39,5 +44,17 @@ public class AuthService {
 			requestDto.getAddress(),
 			requestDto.getRoel(),
 			user.getCreatedAt());
+	}
+
+	// 로그인 (Access Token 발급)
+	public String login(LoginRequestDto requestDto) {
+		User user = userRepository.findByEmail(requestDto.getEmail())
+			.orElseThrow(() -> new UserNotFoundException("일치하는 유저를 찾을 수 없음"));
+
+		if (!passwordEncoder.matches(requestDto.getPassword(), user.getPassword())) {
+			throw new InvalidLoginException("비밀번호가 일치하지 않음");
+		}
+
+		return jwtUtil.generateAccessToken(user.getId(), user.getName());
 	}
 }

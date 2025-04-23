@@ -10,15 +10,17 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import com.example.outsourcing_11.domain.auth.exception.DuplicateUserException;
+import com.example.outsourcing_11.domain.auth.exception.InvalidLoginException;
+import com.example.outsourcing_11.domain.auth.exception.UserNotFoundException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-	// // 사용자를 찾을 수 없을 때 (예: ID가 없는 경우)
-	// @ExceptionHandler(UserNotFoundException.class)
-	// public ResponseEntity<String> handleUserNotFoundException(UserNotFoundException ex) {
-	// 	return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
-	// }
+	// 사용자를 찾을 수 없을 때 (예: ID가 없는 경우)
+	@ExceptionHandler(UserNotFoundException.class)
+	public ResponseEntity<String> handleUserNotFoundException(UserNotFoundException ex) {
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+	}
 
 	// @Valid 관련 오류 처리 -> 메세지만 띄움
 	@ExceptionHandler(MethodArgumentNotValidException.class)
@@ -38,11 +40,11 @@ public class GlobalExceptionHandler {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
 	}
 
-	// // 로그인 실패 401
-	// @ExceptionHandler(InvalidLoginException.class)
-	// public ResponseEntity<String> handleInvalidLogin(InvalidLoginException ex) {
-	// 	return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
-	// }
+	// 로그인 실패 401
+	@ExceptionHandler(InvalidLoginException.class)
+	public ResponseEntity<String> handleInvalidLogin(InvalidLoginException ex) {
+		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
+	}
 	//
 	// // 사용자 입력 오류 400
 	// @ExceptionHandler(InvalidUserInputException.class)
