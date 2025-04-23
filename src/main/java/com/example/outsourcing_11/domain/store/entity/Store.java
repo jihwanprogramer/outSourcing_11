@@ -2,6 +2,7 @@ package com.example.outsourcing_11.domain.store.entity;
 
 import java.time.LocalDateTime;
 
+import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
@@ -11,9 +12,15 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 import com.example.outsourcing_11.domain.Base;
 import com.example.outsourcing_11.domain.user.entity.User;
 
+@Getter
+@Entity
+@NoArgsConstructor
 public class Store extends Base {
 
 	@Id
@@ -24,27 +31,36 @@ public class Store extends Base {
 	private LocalDateTime openTime;
 	private LocalDateTime closeTime;
 	private int minimumOrderPrice;
+	private String address;
 
 	@Enumerated(EnumType.STRING)
 	private StoreStatus status;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "user_id")
-	private User user;
+	@JoinColumn(name = "owner_id")
+	private User owner;
 
-	public Store(String name, LocalDateTime openTime, LocalDateTime closeTime, int minimumOrderPrice,
+	public Store(String name, String address, LocalDateTime openTime, LocalDateTime closeTime, int minimumOrderPrice,
 		StoreStatus status,
-		User user) {
+		User owner) {
 		this.name = name;
+		this.address = address;
 		this.openTime = openTime;
 		this.closeTime = closeTime;
 		this.minimumOrderPrice = minimumOrderPrice;
 		this.status = status;
-		this.user = user;
+		this.owner = owner;
 	}
 
 	public void close() {
 		this.status = StoreStatus.CLOSED;
+	}
+
+	public void update(String name, LocalDateTime openTime, LocalDateTime closeTime, int minimumOrderPrice) {
+		this.name = name;
+		this.openTime = openTime;
+		this.closeTime = closeTime;
+		this.minimumOrderPrice = minimumOrderPrice;
 	}
 
 }
