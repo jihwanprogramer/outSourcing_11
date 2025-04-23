@@ -1,4 +1,4 @@
-package com.example.outsourcing_11.domain;
+package com.example.outsourcing_11.common;
 
 import java.time.LocalDateTime;
 

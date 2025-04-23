@@ -9,8 +9,8 @@ import jakarta.persistence.Table;
 
 import lombok.Getter;
 
+import com.example.outsourcing_11.common.Base;
 import com.example.outsourcing_11.common.Status;
-import com.example.outsourcing_11.domain.Base;
 
 @Getter
 @Entity

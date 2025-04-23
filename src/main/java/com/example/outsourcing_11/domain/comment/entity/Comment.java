@@ -15,7 +15,7 @@ import jakarta.persistence.Table;
 
 import lombok.Getter;
 
-import com.example.outsourcing_11.domain.Base;
+import com.example.outsourcing_11.common.Base;
 import com.example.outsourcing_11.domain.comment.dto.RequestCommentDto;
 
 @Getter
