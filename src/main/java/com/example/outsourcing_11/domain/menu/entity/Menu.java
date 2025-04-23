@@ -1,4 +1,4 @@
-package com.example.outsourcing_11.menu.entity;
+package com.example.outsourcing_11.domain.menu.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
