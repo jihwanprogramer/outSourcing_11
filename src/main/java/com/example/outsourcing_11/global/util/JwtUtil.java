@@ -13,12 +13,12 @@ public class JwtUtil {
 	private final String secretKey = "thisIsASecretKeyThatIsAtLeast32BytesLong!";  // 실제 서비스에서는 외부 환경변수로 관리
 
 	// JWT 토큰 생성 (유저 id 포함)
-	public String generateAccessToken(Long userId, String username) {
+	public String generateAccessToken(Long userId, String userName) {
 		return Jwts.builder()
 			.setSubject(String.valueOf(userId))  // 유저의 PK 값 (Long -> String으로 변환)
-			.claim("username", username)
+			.claim("userName", userName)
 			.setIssuedAt(new Date())
-			.setExpiration(new Date(System.currentTimeMillis() + 3600000)) // 1시간
+			.setExpiration(new Date(System.currentTimeMillis() + 300000)) // 1시간
 			.signWith(Keys.hmacShaKeyFor(secretKey.getBytes()), SignatureAlgorithm.HS256)
 			.compact();
 	}

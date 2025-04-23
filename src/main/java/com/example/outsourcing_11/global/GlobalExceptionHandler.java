@@ -16,7 +16,7 @@ import com.example.outsourcing_11.domain.auth.exception.UserNotFoundException;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-	// 사용자를 찾을 수 없을 때 (예: ID가 없는 경우)
+	// 사용자를 찾을 수 없을 때 404(예: ID가 없는 경우)
 	@ExceptionHandler(UserNotFoundException.class)
 	public ResponseEntity<String> handleUserNotFoundException(UserNotFoundException ex) {
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
@@ -45,13 +45,7 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<String> handleInvalidLogin(InvalidLoginException ex) {
 		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
 	}
-	//
-	// // 사용자 입력 오류 400
-	// @ExceptionHandler(InvalidUserInputException.class)
-	// public ResponseEntity<String> handleInvalidUserInput(InvalidUserInputException ex) {
-	// 	return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-	// }
-	//
+
 	// // 본인 계정에만 접근 가능 403
 	// @ExceptionHandler(UnauthorizedAccessException.class)
 	// public ResponseEntity<String> handleUnauthorizedAccess(UnauthorizedAccessException ex) {
