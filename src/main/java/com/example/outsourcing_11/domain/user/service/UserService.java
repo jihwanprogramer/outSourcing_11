@@ -32,7 +32,8 @@ public class UserService {
 
 	public UserResponseDto findUserById(Long userId) {
 		User findUser = userRepository.findByIdOrElseThrow(userId);
-		if (findUser.getDeletedAt() != null && !findUser.getStatus().getValue()) {
+		if (findUser.getDeletedAt() != null && !findUser.getStatusEnum().getValue()) {
+
 			throw new UserNotFoundException("사용자를 찾을 수 없습니다.");
 		}
 
@@ -41,6 +42,7 @@ public class UserService {
 	}
 
 	public UserResponseDto findLoginUserById(HttpServletRequest request) {
+		// 1. 헤더에서 토큰 추출
 		//  헤더에서 토큰 추출
 		String token = request.getHeader("Authorization");
 		if (!jwtUtil.validateToken(token)) {
@@ -50,7 +52,7 @@ public class UserService {
 		Long userId = jwtUtil.extractUserId(token);
 		User findUser = userRepository.findByIdOrElseThrow(userId);
 
-		if (findUser.getDeletedAt() != null && !findUser.getStatus().getValue()) {
+		if (findUser.getDeletedAt() != null && !findUser.getStatusEnum().getValue()) {
 			throw new UserNotFoundException("사용자를 찾을 수 없습니다.");
 		}
 

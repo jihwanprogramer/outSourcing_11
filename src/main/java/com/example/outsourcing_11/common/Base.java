@@ -19,8 +19,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 public abstract class Base {
 
 	@CreatedDate
-	@Column(updatable = false)
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+	@Column(updatable = false)
 	private LocalDateTime createdAt = LocalDateTime.now();
 
 	@LastModifiedDate
