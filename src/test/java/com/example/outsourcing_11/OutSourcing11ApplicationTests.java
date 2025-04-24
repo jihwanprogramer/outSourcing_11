@@ -18,8 +18,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDateTime;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-
 @SpringBootTest
 class OutSourcing11ApplicationTests {
 
