@@ -1,6 +1,4 @@
-package com.example.outsourcing_11.domain.auth.dto;
-
-import java.time.LocalDateTime;
+package com.example.outsourcing_11.domain.user.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,12 +9,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class SignUpResponseDto {
-
+public class UserResponseDto {
 	private String userName;
 	private String email;
 	private String phone;
 	private String address;
 	private String role;
-	private LocalDateTime createAt;
+	// private final Store store; 사장님일 경우 가지고있는 가게도 같이 조회예정
 }
