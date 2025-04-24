@@ -34,7 +34,7 @@ class MenuAdminControllerTest {
     private ObjectMapper objectMapper;
 
     @Test
-    void createMenu() throws Exception {
+    void 메뉴_생성_성공() throws Exception {
         MenuSaveRequestDto dto = new MenuSaveRequestDto(
             Category.MAIN_MENU,
             "김밥",
@@ -66,9 +66,31 @@ class MenuAdminControllerTest {
             .andExpect(jsonPath("$.menuStatus").value("AVAILABLE"));
     }
 
+    @Test
+    void 메뉴_생성_실패_가게없음() throws Exception {
+        MenuSaveRequestDto dto = new MenuSaveRequestDto(
+            Category.MAIN_MENU,
+            "김밥",
+            "주문시 조리",
+            new BigDecimal("3500"),
+            MenuStatus.AVAILABLE
+        );
+
+        // 가게가 존재하지 않으면 예외 발생
+        Mockito.when(menuAdminServiceImpl.createMenu(Mockito.eq(999L), Mockito.any(MenuSaveRequestDto.class)))
+            .thenThrow(new NullPointerException("해당 가게를 찾을 수 없습니다."));
+
+        mockMvc.perform(post("/admin/999/menus")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dto)))
+            .andExpect(status().isInternalServerError())
+            .andExpect(jsonPath("$.message").value("해당 가게를 찾을 수 없습니다."));  // 응답 메시지 확인
+    }
+
 
     @Test
     void updateMenu() {
+
     }
 
     @Test
