@@ -45,7 +45,7 @@ public class StoreService {
 	public ResponseEntity<StoreResponseDto> createStore(String token, StoreRequestDto requestDto) {
 
 		User user = getCurrentUser(token);
-		validateOwnerRole(user);
+		validateOwnerRole(token);
 		int storeCount = storeRepository.countByOwnerAndStatus(user, StoreStatus.OPEN);
 		if (storeCount >= 3) {
 			throw new StoreCustomException(StoreErrorCode.LIMIT_THREE);
