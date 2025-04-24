@@ -16,7 +16,7 @@ public class StoreRequestDto {
 	private String name;
 	private LocalDateTime openTime;
 	private LocalDateTime closeTime;
-	private int minimumOrderPrice;
+	private int minOrderPrice;
 	private String address;
 	private StoreCategory category;
 }

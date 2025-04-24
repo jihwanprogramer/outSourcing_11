@@ -5,6 +5,8 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import com.example.outsourcing_11.domain.store.entity.StoreStatus;
+
 /**
  * 가게 단건조회( 메뉴리스트, 공지까지 포함)
  */
@@ -17,6 +19,6 @@ public class StoreDetailDto {
 	private String closeTime;
 	private int minOrderPrice;
 	private String notice;
-	private String status;
+	private StoreStatus status;
 	private List<MenuDto> menus;
 }
