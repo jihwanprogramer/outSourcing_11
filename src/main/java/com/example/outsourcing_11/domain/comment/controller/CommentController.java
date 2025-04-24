@@ -19,37 +19,48 @@ import com.example.outsourcing_11.domain.comment.dto.RequestCommentDto;
 import com.example.outsourcing_11.domain.comment.dto.ResponseCommentDto;
 import com.example.outsourcing_11.domain.comment.service.CommentServiceImple;
 
-@RequestMapping("stores/")
+@RequestMapping
 @RestController
 @RequiredArgsConstructor
 public class CommentController {
 
 	private static CommentServiceImple commentServiceImple;
 
-	@PostMapping
-	public ResponseEntity<ResponseCommentDto> creatComment(@RequestBody RequestCommentDto dto) {
+	@PostMapping("stores/{storeId}/orders/{orderId}/comment")
+	public ResponseEntity<ResponseCommentDto> creatComment(
+		@PathVariable Long storeId,
+		@PathVariable Long orderId,
+		@RequestBody RequestCommentDto dto) {
 
-		return new ResponseEntity<ResponseCommentDto>(commentServiceImple.createComment(dto), HttpStatus.CREATED);
+		return new ResponseEntity<ResponseCommentDto>(commentServiceImple.createComment(storeId, orderId, dto),
+			HttpStatus.CREATED);
 	}
 
-	@GetMapping
+	@GetMapping("stores/{storeId}/orders/{orderId}/comment")
 	public ResponseEntity<List<ResponseCommentDto>> getComment(
+		@PathVariable Long storeId,
+		@PathVariable Long orderId,
 		@RequestParam int min,
 		@RequestParam int max) {
 
 		return new ResponseEntity<>(commentServiceImple.findCommentsByRatingRange(min, max), HttpStatus.OK);
 	}
 
-	@PutMapping
+	@PutMapping("stores/{storeId}/orders/{orderId}/comment/{commentId}")
 	public ResponseEntity<ResponseCommentDto> putComment(
+		@PathVariable Long storeId,
+		@PathVariable Long orderId,
 		@PathVariable Long commentId,
 		@RequestBody RequestCommentDto dto) {
 
 		return new ResponseEntity<>(commentServiceImple.updateComment(commentId, dto), HttpStatus.OK);
 	}
 
-	@DeleteMapping
-	public ResponseEntity<Void> deleteComment(@PathVariable Long commentId) {
+	@DeleteMapping("stores/{storeId}/orders/{orderId}/comment/{commentId}")
+	public ResponseEntity<Void> deleteComment(
+		@PathVariable Long storeId,
+		@PathVariable Long orderId,
+		@PathVariable Long commentId) {
 		commentServiceImple.deleteComment(commentId);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}

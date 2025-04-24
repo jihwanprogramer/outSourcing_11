@@ -2,12 +2,14 @@ package com.example.outsourcing_11.domain.comment.service;
 
 import java.util.List;
 
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import com.example.outsourcing_11.domain.comment.dto.RequestCommentDto;
 import com.example.outsourcing_11.domain.comment.dto.ResponseCommentDto;
 
 public interface CommentService {
-	ResponseCommentDto createComment(@RequestBody RequestCommentDto dto);
+	ResponseCommentDto createComment(@PathVariable Long storeId, @PathVariable Long orderId,
+		@RequestBody RequestCommentDto dto);
 
 	List<ResponseCommentDto> findCommentsByRatingRange(int min, int max);
 

@@ -36,8 +36,8 @@ public class Comment extends Base {
 	// @ManyToOne(fetch = FetchType.LAZY)
 	// private Order order;
 	//
-	// @ManyToOne(fetch = FetchType.LAZY)
-	// private User user;
+	@ManyToOne(fetch = FetchType.LAZY)
+	private User user;
 
 	private String content;
 
@@ -45,7 +45,7 @@ public class Comment extends Base {
 
 	private int rating;
 
-	private int isDeleted;
+	private boolean isDeleted;
 
 	public Comment() {
 
@@ -58,7 +58,7 @@ public class Comment extends Base {
 		this.rating = dto.getRating();
 	}
 
-	public void updateDeleteStatus(int isDeleted) {
+	public void updateDeleteStatus(boolean isDeleted) {
 		this.isDeleted = isDeleted;
 	}
 
