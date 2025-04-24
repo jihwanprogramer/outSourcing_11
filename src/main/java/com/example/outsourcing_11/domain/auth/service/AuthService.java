@@ -55,7 +55,7 @@ public class AuthService {
 		if (!passwordEncoder.matches(requestDto.getPassword(), user.getPassword())) {
 			throw new InvalidLoginException("비밀번호가 일치하지 않습니다.");
 		}
-		if (user.getDeletedAt() == null || !user.getStatus().getValue()) {
+		if (user.getDeletedAt() != null || !user.getStatus().getValue()) {
 			throw new UnauthorizedAccessException("탈퇴한 회원 정보입니다.");
 		}
 
