@@ -1,21 +1,25 @@
 package com.example.outsourcing_11.domain.store.repository;
 
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
 import com.example.outsourcing_11.domain.store.entity.Store;
+import com.example.outsourcing_11.domain.store.entity.StoreCategory;
 import com.example.outsourcing_11.domain.store.entity.StoreStatus;
 import com.example.outsourcing_11.domain.user.entity.User;
-import org.springframework.data.jpa.repository.JpaRepository;
-
-import java.util.List;
 
 public interface StoreRepository extends JpaRepository<Store, Long> {
 
-    default Store finByIdOrElseThrow(Long storeId) {
-        return findById(storeId).orElseThrow(() -> new NullPointerException("존재하지 않는 가게입니다"));
-    }
+	List<Store> findByCategoryAndStatus(StoreCategory category, StoreStatus status);
 
-    List<Store> findByNameContainingAndStatus(String name, StoreStatus status);
+	default Store finByIdOrElseThrow(Long storeId) {
+		return findById(storeId).orElseThrow(() -> new NullPointerException("존재하지 않는 가게입니다"));
+	}
 
-    List<Store> findByOwnerAndStatus(User owner, StoreStatus status);
+	List<Store> findByNameContainingAndStatus(String name, StoreStatus status);
+
+	// List<Store> findByOwnerAndDeletedAtNull(User owner, StoreStatus status);
+	List<Store> findByOwnerAndStatus(User owner, StoreStatus status);
 
     int countByOwnerAndStatus(User owner, StoreStatus status);
 
