@@ -32,7 +32,7 @@ public class AuthService {
 			requestDto.getEmail(),
 			encodedPassword,
 			requestDto.getPhone(),
-			requestDto.getRoel(),
+			requestDto.getRole(),
 			requestDto.getAddress()
 		);
 		userRepository.save(user);
@@ -42,7 +42,7 @@ public class AuthService {
 			requestDto.getEmail(),
 			requestDto.getPhone(),
 			requestDto.getAddress(),
-			requestDto.getRoel(),
+			requestDto.getRole(),
 			user.getCreatedAt());
 	}
 

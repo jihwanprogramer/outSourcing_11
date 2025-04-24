@@ -42,6 +42,13 @@ public class User extends Base {
 	@Column(name = "status", nullable = false, columnDefinition = "TINYINT(1) DEFAULT 1")
 	private boolean status = Status.EXIST.getValue();
 
+	// @OneToMany(mappedBy = "")
+	// private final List<Store> stores; 사장님일 경우 가지고있는 가게도 같이 조회예정
+
+	public User() {
+
+	}
+
 	public User(String name, String email, String password, String phone, String role, String address) {
 		this.name = name;
 		this.email = email;
@@ -49,10 +56,6 @@ public class User extends Base {
 		this.phone = phone;
 		this.role = role;
 		this.address = address;
-	}
-
-	public User() {
-
 	}
 
 	// 현재 boolean status를 enum 형태로 반환 (가독성/비즈니스 로직용)

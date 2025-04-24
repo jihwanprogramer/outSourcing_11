@@ -31,5 +31,5 @@ public class SignUpRequestDto {
 	private final String address;
 
 	@NotBlank
-	private final String roel;
+	private final String role;
 }

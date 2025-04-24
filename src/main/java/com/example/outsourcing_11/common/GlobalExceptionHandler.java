@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import com.example.outsourcing_11.common.exception.user.DuplicateUserException;
 import com.example.outsourcing_11.common.exception.user.InvalidLoginException;
+import com.example.outsourcing_11.common.exception.user.UnauthorizedException;
 import com.example.outsourcing_11.common.exception.user.UserNotFoundException;
 
 @RestControllerAdvice
@@ -43,6 +44,12 @@ public class GlobalExceptionHandler {
 	// 로그인 실패 401
 	@ExceptionHandler(InvalidLoginException.class)
 	public ResponseEntity<String> handleInvalidLogin(InvalidLoginException ex) {
+		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
+	}
+
+	// 유효하지않은 토큰
+	@ExceptionHandler(UnauthorizedException.class)
+	public ResponseEntity<String> handleInvalidLogin(UnauthorizedException ex) {
 		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
 	}
 
