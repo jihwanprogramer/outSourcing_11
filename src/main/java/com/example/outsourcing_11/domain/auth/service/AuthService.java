@@ -22,8 +22,8 @@ public class AuthService {
 	private final JwtUtil jwtUtil;
 
 	public SignUpResponseDto signUp(SignUpRequestDto requestDto) {
-		if (userRepository.findByEmail(requestDto.getEmail()).isPresent()) {
-			throw new DuplicateUserException("이미 존재하는 사용자 이메일입니다.");
+		if (userRepository.existsByEmail(requestDto.getEmail())) {
+			throw new DuplicateUserException("이미 존재하는 사용자 이메일입니다");
 		}
 
 		String encodedPassword = passwordEncoder.encode(requestDto.getPassword());
@@ -55,6 +55,6 @@ public class AuthService {
 			throw new InvalidLoginException("비밀번호가 일치하지 않음");
 		}
 
-		return jwtUtil.generateAccessToken(user.getId(), user.getName());
+		return jwtUtil.generateAccessToken(user.getId(), user.getName(), user.getEmail(), user.getRole());
 	}
 }
