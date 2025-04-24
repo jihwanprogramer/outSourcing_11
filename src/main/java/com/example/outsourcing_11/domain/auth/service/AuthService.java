@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.example.outsourcing_11.common.exception.user.DuplicateUserException;
 import com.example.outsourcing_11.common.exception.user.InvalidLoginException;
+import com.example.outsourcing_11.common.exception.user.UnauthorizedAccessException;
 import com.example.outsourcing_11.common.exception.user.UserNotFoundException;
 import com.example.outsourcing_11.config.PasswordEncoder;
 import com.example.outsourcing_11.domain.auth.dto.LoginRequestDto;
@@ -53,6 +54,9 @@ public class AuthService {
 
 		if (!passwordEncoder.matches(requestDto.getPassword(), user.getPassword())) {
 			throw new InvalidLoginException("비밀번호가 일치하지 않습니다.");
+		}
+		if (user.getDeletedAt() != null || !user.getStatus().getValue()) {
+			throw new UnauthorizedAccessException("탈퇴한 회원 정보입니다.");
 		}
 
 		return jwtUtil.generateAccessToken(user.getId(), user.getName(), user.getEmail(), user.getRole());

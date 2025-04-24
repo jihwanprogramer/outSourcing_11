@@ -6,11 +6,11 @@ import com.example.outsourcing_11.domain.comment.entity.Comment;
 
 @Getter
 public class ResponseCommentDto {
-	private String content;
-	private int rating;
-	private String imageUrl;
-	private String createdAt;
-	private String modifiedAt;
+	private final String content;
+	private final int rating;
+	private final String imageUrl;
+	private final String createdAt;
+	private final String modifiedAt;
 
 	public ResponseCommentDto(Comment comment) {
 		this.content = comment.getContent();
