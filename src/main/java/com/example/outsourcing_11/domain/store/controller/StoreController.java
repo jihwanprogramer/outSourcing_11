@@ -6,7 +6,4 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/stores")
 public class StoreController {
-
-	@Autowired
-
 }
