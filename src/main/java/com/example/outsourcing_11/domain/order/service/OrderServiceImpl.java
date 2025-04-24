@@ -32,18 +32,15 @@ public class OrderServiceImpl implements OrderService {
      */
     @Override
     public OrderResponseDto createOrder(OrderRequestDto requestDto) {
+        // 사용자 정보 조회
         User user = userRepository.findById(requestDto.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        Order order = new Order();
-        order.setUser(user);
-        order.setOrderDate(LocalDateTime.now());
-        order.setStatus(OrderStatus.PENDING);
+        List<OrderItem> items = new ArrayList<>(); // 주문 항목 리스트
+        List<OrderItemResponseDto> itemResponses = new ArrayList<>(); // 응답용 DTO 리스트
+        int totalPrice = 0;  // 총 주문 가격 계산용
 
-        List<OrderItem> items = new ArrayList<>();
-        List<OrderItemResponseDto> itemResponses = new ArrayList<>();
-        int totalPrice = 0;
-
+        // 요청된 각 주문 항목 처리
         for (OrderItemRequestDto dto : requestDto.getItems()) {
             OrderItem item = new OrderItem();
             item.setMenu(menuRepository.findById(dto.getMenuId())
@@ -52,25 +49,37 @@ public class OrderServiceImpl implements OrderService {
                     .orElseThrow(() -> new RuntimeException("Store not found")));
             item.setQuantity(dto.getQuantity());
             item.setItemPrice(dto.getItemPrice());
-            item.setOrder(order);
+
+            // 총 주문 금액 계산
+            totalPrice += dto.getItemPrice() * dto.getQuantity();
             items.add(item);
 
-            totalPrice += dto.getItemPrice() * dto.getQuantity();
-
-            OrderItemResponseDto.builder()
+            // 응답용 DTO 생성
+            itemResponses.add(OrderItemResponseDto.builder()
                     .id(null)
                     .menuId(dto.getMenuId())
                     .storeId(dto.getStoreId())
                     .quantity(dto.getQuantity())
                     .itemPrice(dto.getItemPrice())
-                    .build();
+                    .build());
         }
 
-        order.setTotalPrice(totalPrice);
+// ✅ 여기서 totalPrice 계산 완료 후 생성
+        // 주문 객체 생성 (생성자에서 totalPrice까지 포함)
+        Order order = new Order(user, LocalDateTime.now(), OrderStatus.PENDING, totalPrice, items);
+
+        // 각 주문 항목에 주문 연결
+        for (OrderItem item : items) {
+            item.setOrder(order);
+        }
+
+        // 주문에 항목들 추가
         order.getItems().addAll(items);
 
+        // DB에 주문 저장
         Order saved = orderRepository.save(order);
 
+        // 저장된 주문 정보를 기반으로 응답 DTO 구성
         return OrderResponseDto.builder()
                 .id(saved.getId())
                 .userId(saved.getUser().getId())
@@ -133,20 +142,28 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public OrderResponseDto updateOrderStatus(Long orderId, OrderStatusUpdateDto statusUpdateDto) {
-        // 실제 구현 내용{
+        // 주문 ID로 주문 조회
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
 
-        order.setStatus(OrderStatus.valueOf(statusUpdateDto.getStatus()));
-        Order updated = orderRepository.save(order);
+        // 새로운 상태로 주문 객체를 새로 생성
+        Order updated = new Order(
+                order.getUser(),
+                order.getOrderDate(),
+                OrderStatus.valueOf(statusUpdateDto.getStatus()),
+                order.getTotalPrice(),
+                order.getItems()
+        );
+
+        Order saved = orderRepository.save(updated);
 
         return OrderResponseDto.builder()
-                .id(updated.getId())
-                .userId(updated.getUser().getId())
-                .orderDate(updated.getOrderDate())
-                .status(updated.getStatus().name())
-                .totalPrice(updated.getTotalPrice())
-                .items(updated.getItems().stream().map(item -> new OrderItemResponseDto(
+                .id(saved.getId())
+                .userId(saved.getUser().getId())
+                .orderDate(saved.getOrderDate())
+                .status(saved.getStatus().name())
+                .totalPrice(saved.getTotalPrice())
+                .items(saved.getItems().stream().map(item -> new OrderItemResponseDto(
                         item.getId(),
                         item.getMenu().getId(),
                         item.getStore().getId(),
@@ -161,9 +178,18 @@ public class OrderServiceImpl implements OrderService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
 
-        order.setStatus(OrderStatus.CANCELLED);
-        orderRepository.save(order);
+        // 주문 취소 상태로 새 객체 생성
+        Order cancelled = new Order(
+                order.getUser(),
+                order.getOrderDate(),
+                OrderStatus.CANCELLED,
+                order.getTotalPrice(),
+                order.getItems()
+        );
+
+        orderRepository.save(cancelled);
 
         return new CancelResponseDto("주문이 성공적으로 취소되었습니다.", LocalDateTime.now());
     }
+
 }

@@ -19,4 +19,5 @@ public class SignUpResponseDto {
 	private String address;
 	private String role;
 	private LocalDateTime createAt;
+
 }

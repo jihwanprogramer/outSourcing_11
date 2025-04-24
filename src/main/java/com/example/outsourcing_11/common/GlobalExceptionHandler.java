@@ -9,6 +9,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import com.example.outsourcing_11.common.exception.menu.MenuNotFoundException;
 import com.example.outsourcing_11.common.exception.store.StoreCustomException;
 import com.example.outsourcing_11.common.exception.store.StoreErrorCode;
 import com.example.outsourcing_11.common.exception.store.StoreErrorResponse;
@@ -61,6 +62,17 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(UnauthorizedAccessException.class)
 	public ResponseEntity<String> handleUnauthorizedAccess(UnauthorizedAccessException ex) {
 		return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
+	}
+
+	// // 본인 계정에만 접근 가능 403
+	// @ExceptionHandler(UnauthorizedAccessException.class)
+	// public ResponseEntity<String> handleUnauthorizedAccess(UnauthorizedAccessException ex) {
+	// 	return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
+	// }
+
+	@ExceptionHandler(MenuNotFoundException.class)
+	public ResponseEntity<String> handleInvalidLogin(MenuNotFoundException ex) {
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
 	}
 
 	// 모든 예외 처리 (예상하지 못한 오류)
