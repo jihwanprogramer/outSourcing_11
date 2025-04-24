@@ -2,13 +2,14 @@ package com.example.outsourcing_11.domain.order.entity;
 
 import com.example.outsourcing_11.domain.user.entity.User;
 import jakarta.persistence.*;
-import org.springframework.cglib.core.Local;
+import lombok.Getter;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Getter
 @Table(name = "orders")
 public class Order {
 
@@ -49,30 +50,6 @@ public class Order {
     public void setTotalPrice(int totalPrice) {
         this.totalPrice = totalPrice;
     }
-
-    public List<OrderItem> getItems() {
-        return items;
-    }
-    public Long getId() {
-        return id;
-    }
-//
-    public User getUser() {
-        return user;
-    }
-//
-    public LocalDateTime getOrderDate() {
-        return orderDate;
-    }
-
-    public OrderStatus getStatus() {
-        return status;
-    }
-
-    public int getTotalPrice() {
-        return totalPrice;
-    }
-
 
 
 }
