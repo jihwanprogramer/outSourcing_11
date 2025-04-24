@@ -9,6 +9,9 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import com.example.outsourcing_11.common.exception.store.StoreCustomException;
+import com.example.outsourcing_11.common.exception.store.StoreErrorCode;
+import com.example.outsourcing_11.common.exception.store.StoreErrorResponse;
 import com.example.outsourcing_11.common.exception.user.DuplicateUserException;
 import com.example.outsourcing_11.common.exception.user.InvalidLoginException;
 import com.example.outsourcing_11.common.exception.user.UnauthorizedException;
@@ -63,6 +66,18 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<String> handleAllExceptions(Exception ex) {
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류 발생: " + ex.getMessage());
+	}
+
+	/**
+	 * store custom exception
+	 */
+
+	@ExceptionHandler(StoreCustomException.class)
+	public ResponseEntity<StoreErrorResponse> handleCustomException(StoreCustomException ex) {
+		StoreErrorCode errorCode = ex.getErrorCode();
+		StoreErrorResponse response = new StoreErrorResponse(errorCode.getCode(), errorCode.getMessage(),
+			errorCode.getStatus());
+		return new ResponseEntity<>(response, HttpStatus.valueOf(errorCode.getStatus()));
 	}
 
 }
