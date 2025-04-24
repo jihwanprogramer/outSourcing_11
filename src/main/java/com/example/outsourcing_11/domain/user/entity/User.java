@@ -56,7 +56,7 @@ public class User extends Base {
 
 	}
 
-	public User(String name, String email, String password, String phone, String address, String role) {
+	public User(String name, String email, String password, String phone, String role, String address) {
 		this.name = name;
 		this.email = email;
 		this.password = password;

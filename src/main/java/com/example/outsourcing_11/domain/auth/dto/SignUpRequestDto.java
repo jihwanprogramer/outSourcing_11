@@ -35,7 +35,6 @@ public class SignUpRequestDto {
 	private String address;
 
 	@NotBlank
-
 	private String role;
 
 }
