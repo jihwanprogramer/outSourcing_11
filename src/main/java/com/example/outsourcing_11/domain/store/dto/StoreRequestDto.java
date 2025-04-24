@@ -1,16 +1,22 @@
 package com.example.outsourcing_11.domain.store.dto;
 
+import java.time.LocalDateTime;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
+import com.example.outsourcing_11.domain.store.entity.StoreCategory;
+
+/**
+ * 요청 데이터 담는 dto
+ */
 @Getter
-@Setter
 @NoArgsConstructor
 public class StoreRequestDto {
 	private String name;
-	private String openTime;
-	private String closeTime;
+	private LocalDateTime openTime;
+	private LocalDateTime closeTime;
 	private int minimumOrderPrice;
-
+	private String address;
+	private StoreCategory category;
 }
