@@ -32,7 +32,7 @@ public class UserService {
 
 	public UserResponseDto findUserById(Long userId) {
 		User findUser = userRepository.findByIdOrElseThrow(userId);
-		if (findUser.getDeletedAt() != null && !findUser.getStatusEnum().getValue()) {
+		if (findUser.getDeletedAt() != null && !findUser.getStatus().getValue()) {
 
 			throw new UserNotFoundException("사용자를 찾을 수 없습니다.");
 		}
@@ -52,7 +52,7 @@ public class UserService {
 		Long userId = jwtUtil.extractUserId(token);
 		User findUser = userRepository.findByIdOrElseThrow(userId);
 
-		if (findUser.getDeletedAt() != null && !findUser.getStatusEnum().getValue()) {
+		if (findUser.getDeletedAt() != null && !findUser.getStatus().getValue()) {
 			throw new UserNotFoundException("사용자를 찾을 수 없습니다.");
 		}
 
