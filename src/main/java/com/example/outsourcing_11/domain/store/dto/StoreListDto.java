@@ -14,7 +14,7 @@ import com.example.outsourcing_11.domain.store.entity.StoreStatus;
 public class StoreListDto {
 	private Long id;
 	private String name;
-	private int minimumOrderPrice;
+	private int minOrderPrice;
 	private StoreStatus status;
 	private StoreCategory category;
 
