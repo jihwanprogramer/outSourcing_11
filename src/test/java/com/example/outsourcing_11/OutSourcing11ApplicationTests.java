@@ -1,6 +1,20 @@
 package com.example.outsourcing_11;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import com.example.outsourcing_11.domain.menu.entity.Menu;
+import com.example.outsourcing_11.domain.menu.enums.Category;
+import com.example.outsourcing_11.domain.menu.enums.MenuStatus;
 import com.example.outsourcing_11.domain.order.entity.Order;
 import com.example.outsourcing_11.domain.order.entity.OrderItem;
 import com.example.outsourcing_11.domain.order.entity.OrderStatus;
@@ -8,71 +22,61 @@ import com.example.outsourcing_11.domain.order.repository.OrderRepository;
 import com.example.outsourcing_11.domain.store.entity.Store;
 import com.example.outsourcing_11.domain.store.entity.StoreStatus;
 import com.example.outsourcing_11.domain.user.entity.User;
-import jakarta.persistence.EntityManager;
-import jakarta.transaction.Transactional;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.time.LocalDateTime;
 
 @SpringBootTest
 class OutSourcing11ApplicationTests {
 
-    @Autowired
-    private OrderRepository orderRepository;
+	@Autowired
+	private OrderRepository orderRepository;
 
-    @Autowired
-    private EntityManager em;
+	@Autowired
+	private EntityManager em;
 
+	@Transactional
+	@Test
+	@DisplayName("주문 생성 및 조회 테스트")
+	void createAndFindOrder() {
+		// Given
+		User user = new User("유리", "yuri@test.com", "1234", "01012345678", "USER", "서울 강남구");
+		em.persist(user);
 
-    @Transactional
-    @Test
-    @DisplayName("주문 생성 및 조회 테스트")
-    void createAndFindOrder() {
-        // Given
-        User user = new User("유리", "yuri@test.com", "1234", "01012345678", "USER","서울 강남구");
-        em.persist(user);
+		Store store = new Store(
+			"맘스터치",
+			"서울시 강남구",
+			LocalDateTime.now(),                  // openTime
+			LocalDateTime.now().plusHours(10),   // closeTime
+			10000,
+			StoreStatus.OPEN,
+			user
+		);
+		em.persist(store);
+		BigDecimal price = new BigDecimal("8000");
+		Menu menu = new Menu(Category.MAIN_MENU, "불고기버거", "맛있는 불고기버거입니다.", price, MenuStatus.AVAILABLE);
+		em.persist(menu);
 
-        Store store = new Store(
-                "맘스터치",
-                "서울시 강남구",
-                LocalDateTime.now(),                  // openTime
-                LocalDateTime.now().plusHours(10),   // closeTime
-                10000,
-                StoreStatus.OPEN,
-                user
-        );
-        em.persist(store);
+		Order order = new Order();
+		order.setUser(user);
+		order.setOrderDate(LocalDateTime.now());
+		order.setStatus(OrderStatus.PENDING);
+		order.setTotalPrice(16000);
 
-        Menu menu = new Menu("버거", "불고기버거", "맛있는 불고기버거입니다.", 8000, "공개");
-        em.persist(menu);
+		OrderItem item = new OrderItem();
+		item.setOrder(order);
+		item.setMenu(menu);
+		item.setStore(store);
+		item.setQuantity(2);
+		item.setItemPrice(16000);
 
-        Order order = new Order();
-        order.setUser(user);
-        order.setOrderDate(LocalDateTime.now());
-        order.setStatus(OrderStatus.PENDING);
-        order.setTotalPrice(16000);
+		order.getItems().add(item);
 
-        OrderItem item = new OrderItem();
-        item.setOrder(order);
-        item.setMenu(menu);
-        item.setStore(store);
-        item.setQuantity(2);
-        item.setItemPrice(16000);
+		// When
+		Order saved = orderRepository.save(order);
 
-        order.getItems().add(item);
-
-        // When
-        Order saved = orderRepository.save(order);
-
-        // Then
-        Order found = orderRepository.findById(saved.getId()).orElseThrow();
-        assertThat(found.getUser().getName()).isEqualTo("유리");
-        assertThat(found.getItems().get(0).getMenu().getName()).isEqualTo("불고기버거");
-        assertThat(found.getTotalPrice()).isEqualTo(16000);
-    }
+		// Then
+		Order found = orderRepository.findById(saved.getId()).orElseThrow();
+		assertThat(found.getUser().getName()).isEqualTo("유리");
+		assertThat(found.getItems().get(0).getMenu().getName()).isEqualTo("불고기버거");
+		assertThat(found.getTotalPrice()).isEqualTo(16000);
+	}
 
 }

@@ -16,7 +16,7 @@ import com.example.outsourcing_11.common.Status;
 
 @Getter
 @Entity
-@Table(name = "user")
+@Table(name = "users")
 public class User extends Base {
 
 	@Id
