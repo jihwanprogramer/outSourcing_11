@@ -75,7 +75,7 @@ public class UserService {
 			throw new InvalidLoginException("비밀번호가 일치하지 않습니다.");
 		}
 
-		// 쿠키 발급 (3분짜리)
+		// 쿠키 발급 (3분짜리) 삭제인증 전용쿠키
 		Cookie cookie = new Cookie("delete_auth", "true");
 		cookie.setMaxAge(3 * 60); // 180초
 		cookie.setHttpOnly(true);
