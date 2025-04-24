@@ -16,7 +16,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import com.example.outsourcing_11.domain.Base;
+import com.example.outsourcing_11.common.Base;
 import com.example.outsourcing_11.domain.user.entity.User;
 
 @Getter
