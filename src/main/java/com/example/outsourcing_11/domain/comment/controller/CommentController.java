@@ -32,7 +32,7 @@ public class CommentController {
 		@PathVariable Long orderId,
 		@RequestBody RequestCommentDto dto) {
 
-		return new ResponseEntity<ResponseCommentDto>(commentServiceImple.createComment(storeId, orderId, dto),
+		return new ResponseEntity<>(commentServiceImple.createComment(storeId, orderId, dto),
 			HttpStatus.CREATED);
 	}
 
