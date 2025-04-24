@@ -12,6 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -34,7 +35,7 @@ public class Store extends Base {
 	private String address;
 
 	@Enumerated(EnumType.STRING)
-	private StoreStatus status;
+	private StoreStatus status = StoreStatus.OPEN;
 
 	@Enumerated(EnumType.STRING)
 	private StoreCategory category;
@@ -43,6 +44,7 @@ public class Store extends Base {
 	@JoinColumn(name = "owner_id")
 	private User owner;
 
+	@Builder
 	public Store(String name, String address, LocalDateTime openTime, LocalDateTime closeTime, int minimumOrderPrice,
 		StoreStatus status,
 		User owner) {
