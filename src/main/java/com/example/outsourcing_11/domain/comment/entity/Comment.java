@@ -17,6 +17,7 @@ import lombok.Getter;
 
 import com.example.outsourcing_11.common.Base;
 import com.example.outsourcing_11.domain.comment.dto.RequestCommentDto;
+import com.example.outsourcing_11.domain.user.entity.User;
 
 @Getter
 @Entity
