@@ -4,6 +4,7 @@ import com.example.outsourcing_11.domain.Base;
 import com.example.outsourcing_11.domain.menu.dto.request.MenuUpdateRequestDto;
 import com.example.outsourcing_11.domain.menu.enums.Category;
 import com.example.outsourcing_11.domain.menu.enums.MenuStatus;
+import com.example.outsourcing_11.domain.store.entity.Store;
 import jakarta.persistence.*;
 import lombok.Getter;
 
@@ -35,9 +36,9 @@ public class Menu extends Base {
     private MenuStatus status;
 
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "storeId")
-//    private Store store;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "storeId")
+    private Store store;
 
 
     public Menu() {
@@ -45,18 +46,19 @@ public class Menu extends Base {
     }
 
     //정적 생성자 (캡슐화)
-    public static Menu of(Category category, String name, String content, BigDecimal price, MenuStatus status) {
-        Menu menu = new Menu(category, name, content, price, status);
+    public static Menu of(Category category, String name, String content, BigDecimal price, MenuStatus status, Store store) {
+        Menu menu = new Menu(category, name, content, price, status, store);
 
         return menu;
     }
 
-    public Menu(Category category, String name, String content, BigDecimal price, MenuStatus status) {
+    public Menu(Category category, String name, String content, BigDecimal price, MenuStatus status, Store store) {
         this.category = category;
         this.name = name;
         this.content = content;
         this.price = price;
         this.status = status;
+        this.store = store;
     }
 
     public void update(MenuUpdateRequestDto dto) {

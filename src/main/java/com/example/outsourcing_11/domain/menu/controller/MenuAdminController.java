@@ -11,7 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/admin/menus")
+@RequestMapping("/admin/{storeId}/menus")
 @RequiredArgsConstructor
 public class MenuAdminController {
 
@@ -20,24 +20,26 @@ public class MenuAdminController {
 
     @PostMapping
     public ResponseEntity<MenuAdminResponseDto> createMenu(
+        @PathVariable Long storeId,
         @RequestBody MenuSaveRequestDto menuSaveRequestDto) {
-        MenuAdminResponseDto saveMenu = menuAdminServiceImpl.createMenu(menuSaveRequestDto);
+        MenuAdminResponseDto saveMenu = menuAdminServiceImpl.createMenu(storeId, menuSaveRequestDto);
 
         return new ResponseEntity<>(saveMenu, HttpStatus.CREATED);
     }
 
     @PatchMapping("/{menuId}")
     public ResponseEntity<MenuAdminResponseDto> updateMenu(
+        @PathVariable Long storeId,
         @PathVariable Long menuId,
         @RequestBody MenuUpdateRequestDto dto
     ) {
-        MenuAdminResponseDto updateMenu = menuAdminServiceImpl.updateMenu(menuId, dto);
+        MenuAdminResponseDto updateMenu = menuAdminServiceImpl.updateMenu(storeId, menuId, dto);
         return new ResponseEntity<>(updateMenu, HttpStatus.OK);
     }
 
     @DeleteMapping("/{menuId}")
-    public ResponseEntity<Void> deleteMenu(@PathVariable Long menuId) {
-        menuAdminService.delete(menuId);
+    public ResponseEntity<Void> deleteMenu(@PathVariable Long storeId, @PathVariable Long menuId) {
+        menuAdminService.delete(storeId, menuId);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
