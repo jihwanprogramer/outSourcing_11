@@ -1,6 +1,6 @@
 package com.example.outsourcing_11.domain.menu.entity;
 
-import com.example.outsourcing_11.domain.Base;
+import com.example.outsourcing_11.common.Base;
 import com.example.outsourcing_11.domain.menu.dto.request.MenuUpdateRequestDto;
 import com.example.outsourcing_11.domain.menu.enums.Category;
 import com.example.outsourcing_11.domain.menu.enums.MenuStatus;
