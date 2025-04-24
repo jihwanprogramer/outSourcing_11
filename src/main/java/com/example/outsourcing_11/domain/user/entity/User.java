@@ -1,5 +1,7 @@
 package com.example.outsourcing_11.domain.user.entity;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -49,32 +51,30 @@ public class User extends Base {
 
 	}
 
-	public User(String name, String email, String password, String phone, String role, String address) {
+	public User(String name, String email, String password, String phone, String address, String role) {
 		this.name = name;
 		this.email = email;
 		this.password = password;
 		this.phone = phone;
-		this.role = role;
 		this.address = address;
+		this.role = role;
+	}
+
+	public User(String email, String password, String name, String role) {
+		this.email = email;
+		this.password = password;
+		this.name = name;
+		this.role = role;
 	}
 
 	// 현재 boolean status를 enum 형태로 반환 (가독성/비즈니스 로직용)
-	public Status getStatusEnum() {
+	public Status getStatus() {
 		return Status.fromValue(this.status);
 	}
 
-	// enum을 통해 상태를 설정하고 내부적으로는 boolean에 저장
-	public void setStatusEnum(Status memberStatus) {
-		this.status = memberStatus.getValue();
-	}
-
 	// 회원을 탈퇴(비활성화) 상태로 전환하는 도메인 메서드
-	public void deactivate() {
+	public void softDelete() {
+		this.deletedAt = LocalDateTime.now();
 		this.status = Status.NON_EXIST.getValue();
-	}
-
-	// 현재 회원이 활성 상태인지 확인
-	public boolean isActive() {
-		return this.status == Status.EXIST.getValue();
 	}
 }
