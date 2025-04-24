@@ -1,6 +1,7 @@
 package com.example.outsourcing_11.domain.menu.entity;
 
 import com.example.outsourcing_11.common.Base;
+import com.example.outsourcing_11.common.Status;
 import com.example.outsourcing_11.domain.menu.dto.request.MenuUpdateRequestDto;
 import com.example.outsourcing_11.domain.menu.enums.Category;
 import com.example.outsourcing_11.domain.menu.enums.MenuStatus;
@@ -40,6 +41,12 @@ public class Menu extends Base {
     @JoinColumn(name = "storeId")
     private Store store;
 
+    @Column(columnDefinition = "TINYINT(1) DEFAULT 1")
+    private boolean isDeleted = Status.EXIST.getValue();
+
+    public void updateDeleteStatus(boolean isDeleted) {
+        this.isDeleted = isDeleted;
+    }
 
     public Menu() {
 

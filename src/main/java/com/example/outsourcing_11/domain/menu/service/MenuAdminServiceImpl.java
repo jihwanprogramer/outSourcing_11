@@ -1,5 +1,6 @@
 package com.example.outsourcing_11.domain.menu.service;
 
+import com.example.outsourcing_11.common.Status;
 import com.example.outsourcing_11.domain.menu.dto.request.MenuSaveRequestDto;
 import com.example.outsourcing_11.domain.menu.dto.request.MenuUpdateRequestDto;
 import com.example.outsourcing_11.domain.menu.dto.response.MenuAdminResponseDto;
@@ -50,6 +51,7 @@ public class MenuAdminServiceImpl implements MenuAdminService {
         Menu menu = menuRepository.finByIdOrElseThrow(menuId);
 
         if (storeId.equals(menu.getStore().getId())) {
+            menu.updateDeleteStatus(Status.NON_EXIST.getValue());
             menu.timeWhenDeleted();
             menuRepository.save(menu);
         } else {
