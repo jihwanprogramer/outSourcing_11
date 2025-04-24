@@ -49,10 +49,10 @@ public class AuthService {
 	// 로그인 (Access Token 발급)
 	public String login(LoginRequestDto requestDto) {
 		User user = userRepository.findByEmail(requestDto.getEmail())
-			.orElseThrow(() -> new UserNotFoundException("일치하는 유저를 찾을 수 없음"));
+			.orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없습니다."));
 
 		if (!passwordEncoder.matches(requestDto.getPassword(), user.getPassword())) {
-			throw new InvalidLoginException("비밀번호가 일치하지 않음");
+			throw new InvalidLoginException("비밀번호가 일치하지 않습니다.");
 		}
 
 		return jwtUtil.generateAccessToken(user.getId(), user.getName(), user.getEmail(), user.getRole());

@@ -1,5 +1,7 @@
 package com.example.outsourcing_11.domain.user.entity;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -76,7 +78,8 @@ public class User extends Base {
 	}
 
 	// 회원을 탈퇴(비활성화) 상태로 전환하는 도메인 메서드
-	public void deactivate() {
+	public void softDelete() {
+		this.deletedAt = LocalDateTime.now();
 		this.status = Status.NON_EXIST.getValue();
 	}
 
