@@ -30,13 +30,13 @@ public class CartServiceImpl implements CartService {
     @Override
     public CartResponseDto getCartByUserId(Long userId) {
         Cart cart = cartRepository.findByUserId(userId)
-            .orElseThrow(() -> new RuntimeException("Cart not found"));
+                .orElseThrow(() -> new RuntimeException("Cart not found"));
 
         return CartResponseDto.builder()
-            .id(cart.getId())
-            .userId(cart.getUser().getId())
-            .items(Collections.emptyList()) // 실제 CartItemResponseDto 리스트 매핑 필요
-            .build();
+                .id(cart.getId())
+                .userId(cart.getUser().getId())
+                .items(Collections.emptyList()) // 실제 CartItemResponseDto 리스트 매핑 필요
+                .build();
     }
 
     /**
@@ -50,16 +50,17 @@ public class CartServiceImpl implements CartService {
     @Override
     public CartResponseDto createCart(CartRequestDto requestDto) {
         User user = userRepository.findById(requestDto.getUserId())
-            .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-        Cart cart = new Cart(user);
+        Cart cart = new Cart();
+        cart.setUser(user);
 
         Cart saved = cartRepository.save(cart);
 
         return CartResponseDto.builder()
-            .id(saved.getId())
-            .userId(saved.getUser().getId())
-            .items(Collections.emptyList()) // CartItemResponseDto 리스트 매핑 필요
-            .build();
+                .id(saved.getId())
+                .userId(saved.getUser().getId())
+                .items(Collections.emptyList()) // CartItemResponseDto 리스트 매핑 필요
+                .build();
     }
 }

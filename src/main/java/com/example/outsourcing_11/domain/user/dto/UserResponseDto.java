@@ -28,4 +28,5 @@ public class UserResponseDto {
 		this.address = address;
 		this.role = role;
 	}
+
 }
