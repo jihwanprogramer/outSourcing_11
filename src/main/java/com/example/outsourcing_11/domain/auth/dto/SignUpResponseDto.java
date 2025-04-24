@@ -2,17 +2,22 @@ package com.example.outsourcing_11.domain.auth.dto;
 
 import java.time.LocalDateTime;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 
 @Getter
-@RequiredArgsConstructor
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class SignUpResponseDto {
 
-	private final String userName;
-	private final String email;
-	private final String phone;
-	private final String address;
-	private final String role;
-	private final LocalDateTime createAt;
+	private String userName;
+	private String email;
+	private String phone;
+	private String address;
+	private String role;
+	private LocalDateTime createAt;
+
 }

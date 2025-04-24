@@ -19,49 +19,45 @@ import com.example.outsourcing_11.domain.comment.dto.RequestCommentDto;
 import com.example.outsourcing_11.domain.comment.dto.ResponseCommentDto;
 import com.example.outsourcing_11.domain.comment.service.CommentServiceImple;
 
-@RequestMapping
+@RequestMapping("stores/{storeId}/orders/{orderId}/comment/")
 @RestController
 @RequiredArgsConstructor
 public class CommentController {
 
 	private static CommentServiceImple commentServiceImple;
 
-	@PostMapping("stores/{storeId}/orders/{orderId}/comment")
+	@PostMapping
 	public ResponseEntity<ResponseCommentDto> creatComment(
-		@PathVariable Long storeId,
 		@PathVariable Long orderId,
 		@RequestBody RequestCommentDto dto) {
 
-		return new ResponseEntity<>(commentServiceImple.createComment(storeId, orderId, dto),
-			HttpStatus.CREATED);
+		return new ResponseEntity<>(commentServiceImple.createComment(orderId, 0L, dto), HttpStatus.CREATED);
 	}
 
-	@GetMapping("stores/{storeId}/orders/{orderId}/comment")
+	@GetMapping
 	public ResponseEntity<List<ResponseCommentDto>> getComment(
-		@PathVariable Long storeId,
 		@PathVariable Long orderId,
 		@RequestParam int min,
 		@RequestParam int max) {
 
-		return new ResponseEntity<>(commentServiceImple.findCommentsByRatingRange(min, max), HttpStatus.OK);
+		return new ResponseEntity<>(commentServiceImple.findCommentsByRatingRange(orderId, 0L, min, max),
+			HttpStatus.OK);
 	}
 
-	@PutMapping("stores/{storeId}/orders/{orderId}/comment/{commentId}")
+	@PutMapping("/{commentId}")
 	public ResponseEntity<ResponseCommentDto> putComment(
-		@PathVariable Long storeId,
 		@PathVariable Long orderId,
 		@PathVariable Long commentId,
 		@RequestBody RequestCommentDto dto) {
 
-		return new ResponseEntity<>(commentServiceImple.updateComment(commentId, dto), HttpStatus.OK);
+		return new ResponseEntity<>(commentServiceImple.updateComment(orderId, 0L, commentId, dto), HttpStatus.OK);
 	}
 
-	@DeleteMapping("stores/{storeId}/orders/{orderId}/comment/{commentId}")
+	@DeleteMapping("/{commentId}")
 	public ResponseEntity<Void> deleteComment(
-		@PathVariable Long storeId,
 		@PathVariable Long orderId,
 		@PathVariable Long commentId) {
-		commentServiceImple.deleteComment(commentId);
+		commentServiceImple.deleteComment(orderId, 0L, commentId);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 }
