@@ -36,6 +36,9 @@ public class Store extends Base {
 	@Enumerated(EnumType.STRING)
 	private StoreStatus status;
 
+	@Enumerated(EnumType.STRING)
+	private StoreCategory category;
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "owner_id")
 	private User owner;
