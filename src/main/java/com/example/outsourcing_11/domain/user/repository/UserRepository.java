@@ -2,7 +2,10 @@ package com.example.outsourcing_11.domain.user.repository;
 
 import java.util.Optional;
 
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import com.example.outsourcing_11.common.exception.user.UserNotFoundException;
 import com.example.outsourcing_11.domain.user.entity.User;
 
@@ -32,4 +35,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 			new UserNotFoundException("존재하지 않는 정보입니다.")); // 조회 실패시(해당 id 없을 때) 404, "존재하지 않는 정보입니다."
 	}
 
+	@EntityGraph(attributePaths = {"storeList"})
+	@Query("SELECT u FROM User u WHERE u.id = :userId")
+	Optional<User> findOwnerWithStores(@Param("userId") Long userId);
 }

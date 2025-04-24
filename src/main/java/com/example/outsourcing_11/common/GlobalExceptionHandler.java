@@ -14,6 +14,7 @@ import com.example.outsourcing_11.common.exception.store.StoreErrorCode;
 import com.example.outsourcing_11.common.exception.store.StoreErrorResponse;
 import com.example.outsourcing_11.common.exception.user.DuplicateUserException;
 import com.example.outsourcing_11.common.exception.user.InvalidLoginException;
+import com.example.outsourcing_11.common.exception.user.UnauthorizedAccessException;
 import com.example.outsourcing_11.common.exception.user.UnauthorizedException;
 import com.example.outsourcing_11.common.exception.user.UserNotFoundException;
 
@@ -56,11 +57,11 @@ public class GlobalExceptionHandler {
 		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
 	}
 
-	// // 본인 계정에만 접근 가능 403
-	// @ExceptionHandler(UnauthorizedAccessException.class)
-	// public ResponseEntity<String> handleUnauthorizedAccess(UnauthorizedAccessException ex) {
-	// 	return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
-	// }
+	// 비활성계정 접근불가 403
+	@ExceptionHandler(UnauthorizedAccessException.class)
+	public ResponseEntity<String> handleUnauthorizedAccess(UnauthorizedAccessException ex) {
+		return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
+	}
 
 	// 모든 예외 처리 (예상하지 못한 오류)
 	@ExceptionHandler(Exception.class)

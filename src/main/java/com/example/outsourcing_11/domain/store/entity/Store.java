@@ -41,7 +41,7 @@ public class Store extends Base {
 	private StoreCategory category;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "owner_id")
+	@JoinColumn(referencedColumnName = "user_id", name = "owner_id")
 	private User owner;
 
 	@Builder
