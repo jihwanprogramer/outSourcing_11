@@ -3,6 +3,7 @@ package com.example.outsourcing_11.domain.order.entity;
 import com.example.outsourcing_11.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +11,7 @@ import java.util.List;
 @Entity
 @Table(name = "carts")
 @Getter
-
+@NoArgsConstructor
 public class Cart {
 //
 
