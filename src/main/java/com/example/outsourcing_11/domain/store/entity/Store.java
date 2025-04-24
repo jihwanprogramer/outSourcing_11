@@ -42,6 +42,7 @@ public class Store extends Base {
 	private StoreCategory category;
 
 	@ManyToOne(fetch = FetchType.LAZY)
+
 	@JoinColumn(name = "owner_id")
 	private User owner;
 
@@ -54,6 +55,7 @@ public class Store extends Base {
 		this.minimumOrderPrice = minimumOrderPrice;
 		this.status = status;
 		this.category = category;
+
 		this.owner = owner;
 	}
 
