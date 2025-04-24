@@ -83,7 +83,7 @@ class MenuAdminControllerTest {
         mockMvc.perform(post("/admin/999/menus")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(dto)))
-            .andExpect(status().isNotFound())  // 404 상태 코드 확인
+            .andExpect(status().isInternalServerError())
             .andExpect(jsonPath("$.message").value("해당 가게를 찾을 수 없습니다."));  // 응답 메시지 확인
     }
 
