@@ -2,15 +2,10 @@ package com.example.outsourcing_11.domain.store.service;
 
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import com.example.outsourcing_11.common.exception.store.StoreCustomException;
 import com.example.outsourcing_11.common.exception.store.StoreErrorCode;
 import com.example.outsourcing_11.domain.menu.repository.MenuRepository;
-import com.example.outsourcing_11.domain.store.dto.StoreRequestDto;
-import com.example.outsourcing_11.domain.store.dto.StoreResponseDto;
-import com.example.outsourcing_11.domain.store.entity.Store;
-import com.example.outsourcing_11.domain.store.entity.StoreStatus;
 import com.example.outsourcing_11.domain.store.repository.StoreRepository;
 import com.example.outsourcing_11.domain.user.entity.User;
 import com.example.outsourcing_11.domain.user.repository.UserRepository;
@@ -41,18 +36,18 @@ public class StoreService {
 			throw new StoreCustomException(StoreErrorCode.ONLY_OWNER);
 		}
 	}
-
-	public ResponseEntity<StoreResponseDto> createStore(String token, StoreRequestDto requestDto) {
-
-		User user = getCurrentUser(token);
-		validateOwnerRole(token);
-		int storeCount = storeRepository.countByOwnerAndStatus(user, StoreStatus.OPEN);
-		if (storeCount >= 3) {
-			throw new StoreCustomException(StoreErrorCode.LIMIT_THREE);
-		}
-
-		Store store = new Store(requestDto, user);
-
-	}
+	//
+	// public ResponseEntity<StoreResponseDto> createStore(String token, StoreRequestDto requestDto) {
+	//
+	// 	User user = getCurrentUser(token);
+	// 	validateOwnerRole(token);
+	// 	int storeCount = storeRepository.countByOwnerAndStatus(user, StoreStatus.OPEN);
+	// 	if (storeCount >= 3) {
+	// 		throw new StoreCustomException(StoreErrorCode.LIMIT_THREE);
+	// 	}
+	//
+	// 	Store store = new Store(requestDto, user);
+	//
+	// }
 
 }
