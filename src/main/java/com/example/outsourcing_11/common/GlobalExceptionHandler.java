@@ -1,19 +1,22 @@
 package com.example.outsourcing_11.common;
 
-import com.example.outsourcing_11.common.exception.menu.MenuNotFoundException;
-import com.example.outsourcing_11.common.exception.user.DuplicateUserException;
-import com.example.outsourcing_11.common.exception.user.InvalidLoginException;
-import com.example.outsourcing_11.common.exception.user.UnauthorizedException;
-import com.example.outsourcing_11.common.exception.user.UserNotFoundException;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
-import java.util.HashMap;
-import java.util.Map;
+import com.example.outsourcing_11.common.exception.store.StoreCustomException;
+import com.example.outsourcing_11.common.exception.store.StoreErrorCode;
+import com.example.outsourcing_11.common.exception.store.StoreErrorResponse;
+import com.example.outsourcing_11.common.exception.user.DuplicateUserException;
+import com.example.outsourcing_11.common.exception.user.InvalidLoginException;
+import com.example.outsourcing_11.common.exception.user.UnauthorizedException;
+import com.example.outsourcing_11.common.exception.user.UserNotFoundException;
+import com.example.outsourcing_11.common.exception.menu.MenuNotFoundException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -70,6 +73,18 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleAllExceptions(Exception ex) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류 발생: " + ex.getMessage());
     }
+
+	/**
+	 * store custom exception
+	 */
+
+	@ExceptionHandler(StoreCustomException.class)
+	public ResponseEntity<StoreErrorResponse> handleCustomException(StoreCustomException ex) {
+		StoreErrorCode errorCode = ex.getErrorCode();
+		StoreErrorResponse response = new StoreErrorResponse(errorCode.getCode(), errorCode.getMessage(),
+			errorCode.getStatus());
+		return new ResponseEntity<>(response, HttpStatus.valueOf(errorCode.getStatus()));
+	}
 
 }
 
