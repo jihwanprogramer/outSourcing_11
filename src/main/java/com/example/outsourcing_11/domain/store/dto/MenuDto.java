@@ -13,6 +13,7 @@ public class MenuDto {
 	private int price;
 
 	public MenuDto(Store store) {
+		this.id = id;
 		this.name = name;
 		this.price = price;
 	}

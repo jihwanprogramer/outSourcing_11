@@ -18,7 +18,7 @@ public class StoreResponseDto {
 	private String address;
 	private LocalDateTime openTime;
 	private LocalDateTime closeTime;
-	private int minimumOrderPrice;
+	private int minOrderPrice;
 	private StoreStatus status;
 
 }

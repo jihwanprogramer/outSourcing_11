@@ -29,7 +29,7 @@ public abstract class Base {
 
 	//timeWhenDeleted() 메서드에서만 deletedAt = LocalDateTime.now() 실행되도록 해야함
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
-	private LocalDateTime deletedAt; // 기본값 없이 null 상태 유지!
+	protected LocalDateTime deletedAt; // 기본값 없이 null 상태 유지!
 
 	public void timeWhenDeleted() {
 		this.deletedAt = LocalDateTime.now();

@@ -16,7 +16,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import com.example.outsourcing_11.domain.Base;
+import com.example.outsourcing_11.common.Base;
+import com.example.outsourcing_11.domain.store.dto.StoreRequestDto;
 import com.example.outsourcing_11.domain.user.entity.User;
 
 @Getter
@@ -41,19 +42,20 @@ public class Store extends Base {
 	private StoreCategory category;
 
 	@ManyToOne(fetch = FetchType.LAZY)
+
 	@JoinColumn(name = "owner_id")
 	private User owner;
 
 	@Builder
-	public Store(String name, String address, LocalDateTime openTime, LocalDateTime closeTime, int minimumOrderPrice,
-		StoreStatus status,
-		User owner) {
+	public Store(StoreRequestDto dto, User owner) {
 		this.name = name;
 		this.address = address;
 		this.openTime = openTime;
 		this.closeTime = closeTime;
 		this.minimumOrderPrice = minimumOrderPrice;
 		this.status = status;
+		this.category = category;
+
 		this.owner = owner;
 	}
 
