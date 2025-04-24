@@ -4,6 +4,7 @@ import java.util.Date;
 
 import org.springframework.stereotype.Component;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -33,6 +34,39 @@ public class JwtUtil {
 			.parseClaimsJws(token)
 			.getBody()
 			.getSubject());  // subject에 유저 PK 값이 담겨있음
+	}
+
+	// JWT에서 유저 userName 값 추출
+	public String extractUserNameFromToken(String token) {
+		Claims claims = Jwts.parserBuilder()
+			.setSigningKey(Keys.hmacShaKeyFor(secretKey.getBytes()))
+			.build()
+			.parseClaimsJws(token)
+			.getBody();
+
+		return claims.get("userName", String.class);
+	}
+
+	// JWT에서 유저 email 값 추출
+	public String extractEmailFromToken(String token) {
+		Claims claims = Jwts.parserBuilder()
+			.setSigningKey(Keys.hmacShaKeyFor(secretKey.getBytes()))
+			.build()
+			.parseClaimsJws(token)
+			.getBody();
+
+		return claims.get("email", String.class);
+	}
+
+	// JWT에서 유저 role 값 추출
+	public String extractRoleFromToken(String token) {
+		Claims claims = Jwts.parserBuilder()
+			.setSigningKey(Keys.hmacShaKeyFor(secretKey.getBytes()))
+			.build()
+			.parseClaimsJws(token)
+			.getBody();
+
+		return claims.get("role", String.class);
 	}
 
 	// 토큰 유효성 체크
