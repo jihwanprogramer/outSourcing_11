@@ -19,7 +19,7 @@ public class MenuAdminController {
     private final MenuAdminServiceImpl menuAdminServiceImpl;
     private final MenuAdminService menuAdminService;
 
-    @PreAuthorize("hasRole('OWNER')")
+    @PreAuthorize("hasRole('사장님')")
     @PostMapping
     public ResponseEntity<MenuAdminResponseDto> createMenu(
         @PathVariable Long storeId,
@@ -29,7 +29,7 @@ public class MenuAdminController {
         return new ResponseEntity<>(saveMenu, HttpStatus.CREATED);
     }
 
-    @PreAuthorize("hasRole('OWNER')")
+    @PreAuthorize("hasRole('사장님')")
     @PatchMapping("/{menuId}")
     public ResponseEntity<MenuAdminResponseDto> updateMenu(
         @PathVariable Long storeId,
@@ -40,7 +40,7 @@ public class MenuAdminController {
         return new ResponseEntity<>(updateMenu, HttpStatus.OK);
     }
 
-    @PreAuthorize("hasRole('OWNER')")
+    @PreAuthorize("hasRole('사장님')")
     @DeleteMapping("/{menuId}")
     public ResponseEntity<Void> deleteMenu(@PathVariable Long storeId, @PathVariable Long menuId) {
         menuAdminService.delete(storeId, menuId);
