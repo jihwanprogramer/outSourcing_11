@@ -128,7 +128,7 @@ public class StoreService {
 		validateOwnerRole(token);
 		User user = getCurrentUser(token);
 
-		return storeRepository.findAllByOwnerAndIsDeletedFalse(user)
+		return storeRepository.findAllByOwnerAndDeletedFalse(user)
 			.stream()
 			.map(StoreResponseDto::new)
 			.collect(Collectors.toList());

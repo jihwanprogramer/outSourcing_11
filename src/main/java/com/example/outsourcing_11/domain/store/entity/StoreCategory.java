@@ -9,7 +9,8 @@ public enum StoreCategory {
 	JAPANESE,
 	CHINESE,
 	CAFE,
-	ETC
+	ETC,
+	HAMBURGER
 
 
 }

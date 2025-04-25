@@ -16,6 +16,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -25,6 +26,8 @@ import com.example.outsourcing_11.domain.menu.entity.Menu;
 import com.example.outsourcing_11.domain.store.dto.StoreRequestDto;
 import com.example.outsourcing_11.domain.user.entity.User;
 
+@Builder
+@AllArgsConstructor
 @Getter
 @Entity
 public class Store extends Base {
