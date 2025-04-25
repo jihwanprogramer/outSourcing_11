@@ -68,7 +68,7 @@ public class Order extends Base {
 		}
 	}
 
-	public Order(User user, LocalDateTime now, OrderStatus pending, int i) {
+	public Order() {
 
 	}
 }
