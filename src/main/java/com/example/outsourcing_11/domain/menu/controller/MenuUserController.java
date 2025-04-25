@@ -1,7 +1,6 @@
 package com.example.outsourcing_11.domain.menu.controller;
 
 import com.example.outsourcing_11.domain.menu.dto.response.MenuUserResponseDto;
-import com.example.outsourcing_11.domain.menu.entity.Menu;
 import com.example.outsourcing_11.domain.menu.enums.Category;
 import com.example.outsourcing_11.domain.menu.service.MenuUserServiceImpl;
 import lombok.RequiredArgsConstructor;
@@ -24,8 +23,9 @@ public class MenuUserController {
         @RequestParam(required = false) Long lastId,
         @RequestParam(defaultValue = "20") int size) {
 
-        Slice<Menu> menuList = menuUserServiceImpl.findCursorMenuBySize(storeId, categoryCursor, lastId, size);
-        return new ResponseEntity<>(menuList.map(MenuUserResponseDto::new), HttpStatus.OK);
+
+        Slice<MenuUserResponseDto> menuList = menuUserServiceImpl.findCursorMenuBySize(storeId, categoryCursor, lastId, size);
+        return new ResponseEntity<>(menuList, HttpStatus.OK);
 
     }
 
