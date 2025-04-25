@@ -1,6 +1,5 @@
 package com.example.outsourcing_11.domain.comment.entity;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
@@ -34,7 +33,7 @@ public class Comment extends Base {
 	private Comment parent;
 
 	@OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<Comment> childrenComment = new ArrayList<>();
+	private List<Comment> ownerComment;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "order_id")
@@ -76,6 +75,12 @@ public class Comment extends Base {
 
 	public void updateDeleteStatus(boolean isDeleted) {
 		this.isDeleted = isDeleted;
+	}
+
+	public void update(RequestCommentDto dto) {
+		this.content = dto.getContent();
+		this.imageUrl = dto.getImageUrl();
+		this.rating = dto.getRating();
 	}
 
 	public void updateUserAndStore(User user, Store store) {
