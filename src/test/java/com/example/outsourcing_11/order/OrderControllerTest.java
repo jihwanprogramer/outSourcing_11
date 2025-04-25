@@ -1,5 +1,6 @@
 package com.example.outsourcing_11.order;
 
+import com.example.outsourcing_11.common.UserRole;
 import com.example.outsourcing_11.domain.menu.entity.Menu;
 import com.example.outsourcing_11.domain.menu.repository.MenuRepository;
 import com.example.outsourcing_11.domain.order.dto.OrderItemRequestDto;
@@ -47,58 +48,55 @@ public class OrderControllerTest {
     @DisplayName("POST /orders - 주문 생성")
     void createOrder() throws Exception {
         // given
-        User user = userRepository.save(new User("유리", "yuri@example.com", "1234", "01011112222", "USER", "서울시"));
+        User user = userRepository.save(new User(
+                "유리",
+                "yuri@example.com",
+                "1234",
+                "01011112222",
+                "서울시",
+                UserRole.CUSTOMER
 
-        StoreRequestDto dto = new StoreRequestDto();
-        Field field = StoreRequestDto.class.getDeclaredField("name");
-        field.setAccessible(true);
-        field.set(dto, "맥도날드");
-        field = StoreRequestDto.class.getDeclaredField("address");
-        field.setAccessible(true);
-        field.set(dto, "서울시");
-        field = StoreRequestDto.class.getDeclaredField("openTime");
-        field.setAccessible(true);
-        field.set(dto, LocalDateTime.now());
-        field = StoreRequestDto.class.getDeclaredField("closeTime");
-        field.setAccessible(true);
-        field.set(dto, LocalDateTime.now().plusHours(8));
-        field = StoreRequestDto.class.getDeclaredField("minOrderPrice");
-        field.setAccessible(true);
-        field.set(dto, 5000);
-        field = StoreRequestDto.class.getDeclaredField("category");
-        field.setAccessible(true);
-        field.set(dto, StoreCategory.HAMBURGER);
+        ));
 
-        Store store = Store.builder()
-                .name(dto.getName())
-                .address(dto.getAddress())
-                .openTime(dto.getOpenTime())
-                .closeTime(dto.getCloseTime())
-                .minimumOrderPrice(dto.getMinOrderPrice())// 또는 isOpen()
-                .category(dto.getCategory())
-                .owner(user)
-                .build();
+        StoreRequestDto dto = new StoreRequestDto(
+                "맥도날드",
+                LocalDateTime.now(),
+                LocalDateTime.now().plusHours(8),
+                5000,
+                "햄버거",
+                StoreCategory.HAMBURGER,
+                StoreStatus.OPEN
+        );
+
+        Store store = new Store(dto, user);
+        store = storeRepository.save(store);
         store = storeRepository.save(store);
 
         Menu menu = new Menu();
+
         Field mField = Menu.class.getDeclaredField("category");
         mField.setAccessible(true);
-        mField.set(menu, Category.MAIN_MENU);
+        mField.set(menu, Category.MAIN_MENU);  // enum 값 사용
+
         mField = Menu.class.getDeclaredField("name");
         mField.setAccessible(true);
         mField.set(menu, "치즈버거");
+
         mField = Menu.class.getDeclaredField("content");
         mField.setAccessible(true);
         mField.set(menu, "치즈가 가득한 버거");
+
         mField = Menu.class.getDeclaredField("price");
         mField.setAccessible(true);
         mField.set(menu, BigDecimal.valueOf(7000));
+
         mField = Menu.class.getDeclaredField("status");
         mField.setAccessible(true);
-        mField.set(menu, MenuStatus.AVAILABLE);
+        mField.set(menu, MenuStatus.AVAILABLE);  // enum 값 사용
+
         mField = Menu.class.getDeclaredField("store");
         mField.setAccessible(true);
-        mField.set(menu, store);
+        mField.set(menu, store);  // 미리 저장된 Store 객체여야 함
 
         menu = menuRepository.save(menu);
 
