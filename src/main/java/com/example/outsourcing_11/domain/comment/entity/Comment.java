@@ -17,7 +17,7 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 
 import com.example.outsourcing_11.common.Base;
-import com.example.outsourcing_11.domain.comment.dto.RequestCommentDto;
+import com.example.outsourcing_11.domain.comment.dto.user.RequestCommentDto;
 import com.example.outsourcing_11.domain.order.entity.Order;
 import com.example.outsourcing_11.domain.store.entity.Store;
 import com.example.outsourcing_11.domain.user.entity.User;
@@ -78,12 +78,8 @@ public class Comment extends Base {
 		this.isDeleted = isDeleted;
 	}
 
-	public void setUser(User setUser) {
-		this.user = setUser;
+	public void updateUserAndStore(User user, Store store) {
+		this.user = user;
+		this.store = store;
 	}
-
-	public void setOrder(Order order) {
-		this.order = order;
-	}
-
 }
