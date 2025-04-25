@@ -5,5 +5,5 @@ import com.example.outsourcing_11.domain.menu.enums.Category;
 import org.springframework.data.domain.Slice;
 
 public interface MenuUserService {
-    Slice<Menu> findCursorMenuBySize(Category categoryCursor, Long lastId, int size);
+    Slice<Menu> findCursorMenuBySize(Long storeId, Category categoryCursor, Long lastId, int size);
 }

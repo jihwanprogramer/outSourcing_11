@@ -18,9 +18,9 @@ public class MenuUserServiceImpl implements MenuUserService {
 
     @Override
     @Transactional
-    public Slice<Menu> findCursorMenuBySize(Category categoryCursor, Long lastId, int size) {
+    public Slice<Menu> findCursorMenuBySize(Long storeId, Category categoryCursor, Long lastId, int size) {
         Pageable pageable = PageRequest.of(0, size);
-        return menuRepository.findByCursorMenuBySize(categoryCursor, lastId, pageable);
+        return menuRepository.findByCursorMenuBySize(storeId, categoryCursor, lastId, pageable);
 
     }
 }
