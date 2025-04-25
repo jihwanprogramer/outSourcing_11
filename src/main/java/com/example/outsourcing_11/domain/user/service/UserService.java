@@ -30,7 +30,6 @@ import com.example.outsourcing_11.util.JwtUtil;
 public class UserService {
 
 	private final UserRepository userRepository;
-
 	private final PasswordEncoder passwordEncoder;
 	private final JwtUtil jwtUtil;
 
@@ -38,7 +37,6 @@ public class UserService {
 	public UserResponseDto findUserById(Long userId) {
 		User findUser = userRepository.findByIdOrElseThrow(userId);
 		if (findUser.getDeletedAt() != null && !findUser.getStatus().getValue()) {
-
 			throw new UserNotFoundException("사용자를 찾을 수 없습니다.");
 		}
 

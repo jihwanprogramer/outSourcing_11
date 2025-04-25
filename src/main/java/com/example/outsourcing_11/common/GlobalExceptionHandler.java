@@ -22,11 +22,11 @@ import com.example.outsourcing_11.common.exception.user.UserNotFoundException;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-	// 사용자를 찾을 수 없을 때 404(예: ID가 없는 경우)
-	@ExceptionHandler(UserNotFoundException.class)
-	public ResponseEntity<String> handleUserNotFoundException(UserNotFoundException ex) {
-		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
-	}
+    // 사용자를 찾을 수 없을 때 404(예: ID가 없는 경우)
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<String> handleUserNotFoundException(UserNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    }
 
 	// @Valid 관련 오류 처리 -> 메세지만 띄움
 	@ExceptionHandler(MethodArgumentNotValidException.class)

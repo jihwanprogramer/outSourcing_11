@@ -5,6 +5,13 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
+
+# application.properties 무시
+application.properties
+
+# yml도 무시
+**/application.yml
+
 ### STS ###
 .apt_generated
 .classpath

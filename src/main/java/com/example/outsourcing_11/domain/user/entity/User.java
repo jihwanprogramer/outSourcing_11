@@ -20,7 +20,7 @@ import com.example.outsourcing_11.domain.store.entity.Store;
 
 @Getter
 @Entity
-@Table(name = "user")
+@Table(name = "users")
 public class User extends Base {
 
 	@Id
@@ -56,7 +56,7 @@ public class User extends Base {
 
 	}
 
-	public User(String name, String email, String password, String phone, String role, String address) {
+	public User(String name, String email, String password, String phone, String address, String role) {
 		this.name = name;
 		this.email = email;
 		this.password = password;
