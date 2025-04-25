@@ -19,8 +19,6 @@ import com.example.outsourcing_11.domain.order.entity.Order;
 import com.example.outsourcing_11.domain.order.entity.OrderItem;
 import com.example.outsourcing_11.domain.order.entity.OrderStatus;
 import com.example.outsourcing_11.domain.order.repository.OrderRepository;
-import com.example.outsourcing_11.domain.store.entity.Store;
-import com.example.outsourcing_11.domain.store.entity.StoreStatus;
 import com.example.outsourcing_11.domain.user.entity.User;
 
 @SpringBootTest
@@ -40,16 +38,16 @@ class OutSourcing11ApplicationTests {
 		User user = new User("유리", "yuri@test.com", "1234", "01012345678", "USER", "서울 강남구");
 		em.persist(user);
 
-		Store store = new Store(
-			"맘스터치",
-			"서울시 강남구",
-			LocalDateTime.now(),                  // openTime
-			LocalDateTime.now().plusHours(10),   // closeTime
-			10000,
-			StoreStatus.OPEN,
-			user
-		);
-		em.persist(store);
+		// Store store = new Store(
+		// 	"맘스터치",
+		// 	"서울시 강남구",
+		// 	LocalDateTime.now(),                  // openTime
+		// 	LocalDateTime.now().plusHours(10),   // closeTime
+		// 	10000,
+		// 	StoreStatus.OPEN,
+		// 	user
+		// );
+		// em.persist(store);
 		BigDecimal price = new BigDecimal("8000");
 		Menu menu = new Menu(Category.MAIN_MENU, "불고기버거", "맛있는 불고기버거입니다.", price, MenuStatus.AVAILABLE);
 		em.persist(menu);
@@ -63,7 +61,7 @@ class OutSourcing11ApplicationTests {
 		OrderItem item = new OrderItem();
 		item.setOrder(order);
 		item.setMenu(menu);
-		item.setStore(store);
+		// item.setStore(store);
 		item.setQuantity(2);
 		item.setItemPrice(16000);
 
