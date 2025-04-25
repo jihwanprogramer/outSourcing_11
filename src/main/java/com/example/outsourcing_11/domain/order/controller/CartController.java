@@ -1,5 +1,6 @@
 package com.example.outsourcing_11.domain.order.controller;
 
+import com.example.outsourcing_11.domain.order.dto.CartItemRequestDto;
 import com.example.outsourcing_11.domain.order.dto.CartRequestDto;
 import com.example.outsourcing_11.domain.order.dto.CartResponseDto;
 import com.example.outsourcing_11.domain.order.service.CartService;
@@ -29,5 +30,13 @@ public class CartController {
     public ResponseEntity<CartResponseDto> createCart(@RequestBody CartRequestDto requestDto) {
         CartResponseDto createdCart = cartService.createCart(requestDto);
         return ResponseEntity.ok(createdCart);
+    }
+    /**
+     * 장바구니에 항목 추가
+     */
+    @PostMapping("/items")
+    public ResponseEntity<CartResponseDto> addItemToCart(@RequestBody CartItemRequestDto dto) {
+        CartResponseDto responseDto = cartService.addItemToCart(dto);
+        return ResponseEntity.ok(responseDto);
     }
 }
