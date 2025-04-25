@@ -78,17 +78,15 @@ public class Store extends Base {
 	@Column(columnDefinition = "TINYINT(1) DEFAULT 1")
 	private boolean deleted = Status.EXIST.getValue();
 
-	public Store(String name, String address, LocalDateTime openTime, LocalDateTime closeTime, int minimumOrderPrice,
-		StoreStatus status, StoreCategory category, User owner, boolean deleted) {
-		this.name = name;
-		this.address = address;
-		this.openTime = openTime;
-		this.closeTime = closeTime;
-		this.minimumOrderPrice = minimumOrderPrice;
-		this.status = status;
-		this.category = category;
-		this.owner = owner;
-		this.deleted = deleted;
+	public Store(StoreRequestDto dto, User user) {
+		this.name = dto.getName();
+		this.address = dto.getAddress();
+		this.openTime = dto.getOpenTime();
+		this.closeTime = dto.getCloseTime();
+		this.minimumOrderPrice = dto.getMinOrderPrice();
+		this.status = dto.getStatus();
+		this.category = dto.getCategory();
+		this.owner = user;
 	}
 
 	public void updateStatus() {

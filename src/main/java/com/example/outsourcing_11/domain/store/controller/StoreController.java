@@ -5,16 +5,18 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import com.example.outsourcing_11.config.security.CustomUserDetails;
 import com.example.outsourcing_11.domain.store.dto.SalesDto;
 import com.example.outsourcing_11.domain.store.dto.StoreDetailDto;
 import com.example.outsourcing_11.domain.store.dto.StoreListDto;
@@ -30,10 +32,11 @@ public class StoreController {
 	private final StoreService storeService;
 
 	@PostMapping
+	@PreAuthorize("hasRole('사장님')")
 	public ResponseEntity<StoreResponseDto> createStore(
-		@RequestHeader("Authorization") String token,
+		@AuthenticationPrincipal CustomUserDetails userDetails,
 		@RequestBody StoreRequestDto requestDto) {
-		StoreResponseDto response = storeService.createStore(token, requestDto);
+		StoreResponseDto response = storeService.createStore(userDetails.getUser(), requestDto);
 		return ResponseEntity.ok(response);
 	}
 
@@ -50,78 +53,85 @@ public class StoreController {
 		return ResponseEntity.ok(detail);
 	}
 
+	@PreAuthorize("hasRole('사장님')")
 	@GetMapping("/my")
 	public ResponseEntity<List<StoreResponseDto>> getMyStores(
-		@RequestHeader("Authorization") String token) {
-		List<StoreResponseDto> stores = storeService.getMyStores(token);
+		@AuthenticationPrincipal CustomUserDetails userDetails) {
+		List<StoreResponseDto> stores = storeService.getMyStores(userDetails.getUser());
 		return ResponseEntity.ok(stores);
 	}
 
+	@PreAuthorize("hasRole('사장님')")
 	@PutMapping("/{storeId}")
 	public ResponseEntity<Void> updateStore(
 		@PathVariable Long storeId,
 		@RequestBody StoreRequestDto requestDto,
-		@RequestHeader("Authorization") String token) {
-		storeService.updateStore(storeId, requestDto, token);
+		@AuthenticationPrincipal CustomUserDetails userDetails) {
+		storeService.updateStore(storeId, requestDto, userDetails.getUser());
 		return ResponseEntity.ok().build();
 	}
 
+	@PreAuthorize("hasRole('사장님')")
 	@DeleteMapping("/{storeId}")
 	public ResponseEntity<Void> deleteStore(
 		@PathVariable Long storeId,
-		@RequestHeader("Authorization") String token) {
-		storeService.deleteStore(storeId, token);
+		@AuthenticationPrincipal CustomUserDetails userDetails) {
+		storeService.deleteStore(storeId, userDetails.getUser());
 		return ResponseEntity.ok().build();
 	}
 
 	@PostMapping("/{storeId}/favorite")
 	public ResponseEntity<Void> addFavorite(
 		@PathVariable Long storeId,
-		@RequestHeader("Authorization") String token) {
-		storeService.addFavorite(storeId, token);
+		@AuthenticationPrincipal CustomUserDetails userDetails) {
+		storeService.addFavorite(storeId, userDetails.getUser());
 		return ResponseEntity.ok().build();
 	}
 
 	@DeleteMapping("/{storeId}/favorite")
 	public ResponseEntity<Void> removeFavorite(
 		@PathVariable Long storeId,
-		@RequestHeader("Authorization") String token) {
-		storeService.removeFavorite(storeId, token);
+		@AuthenticationPrincipal CustomUserDetails userDetails) {
+		storeService.removeFavorite(storeId, userDetails.getUser());
 		return ResponseEntity.ok().build();
 	}
 
+	@PreAuthorize("hasRole('사장님')")
 	@PostMapping("/{storeId}/notice")
 	public ResponseEntity<Void> createNotice(
 		@PathVariable Long storeId,
 		@RequestBody String content,
-		@RequestHeader("Authorization") String token) {
-		storeService.createNotice(storeId, content, token);
+		@AuthenticationPrincipal CustomUserDetails userDetails) {
+		storeService.createNotice(storeId, content, userDetails.getUser());
 		return ResponseEntity.ok().build();
 	}
 
+	@PreAuthorize("hasRole('사장님')")
 	@PutMapping("/notice/{noticeId}")
 	public ResponseEntity<Void> updateNotice(
 		@PathVariable Long noticeId,
 		@RequestBody String content,
-		@RequestHeader("Authorization") String token) {
-		storeService.updateNotice(noticeId, content, token);
+		@AuthenticationPrincipal CustomUserDetails userDetails) {
+		storeService.updateNotice(noticeId, content, userDetails.getUser());
 		return ResponseEntity.ok().build();
 	}
 
+	@PreAuthorize("hasRole('사장님')")
 	@DeleteMapping("/notice/{noticeId}")
 	public ResponseEntity<Void> deleteNotice(
 		@PathVariable Long noticeId,
-		@RequestHeader("Authorization") String token) {
-		storeService.deleteNotice(noticeId, token);
+		@AuthenticationPrincipal CustomUserDetails userDetails) {
+		storeService.deleteNotice(noticeId, userDetails.getUser());
 		return ResponseEntity.ok().build();
 	}
 
+	@PreAuthorize("hasRole('사장님')")
 	@GetMapping("/{storeId}/sales")
 	public ResponseEntity<SalesDto> getSales(
 		@PathVariable Long storeId,
 		@RequestParam("type") String type,
-		@RequestHeader("Authorization") String token) {
-		SalesDto sales = storeService.getSales(storeId, token, type);
+		@AuthenticationPrincipal CustomUserDetails userDetails) {
+		SalesDto sales = storeService.getSales(storeId, userDetails.getUser(), type);
 		return ResponseEntity.ok(sales);
 	}
 

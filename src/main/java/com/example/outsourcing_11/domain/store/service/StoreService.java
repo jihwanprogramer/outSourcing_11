@@ -42,30 +42,10 @@ public class StoreService {
 	private final JwtUtil jwtUtil;
 
 	/**
-	 *
-	 * 현재 유저 반환 메서드
-	 */
-	private User getCurrentUser(String token) {
-		Long userId = jwtUtil.extractUserId(token);
-		return userRepository.findById(userId)
-			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.USER_NOT_FOUND));
-	}
-
-	private void validateOwnerRole(String token) {
-		String role = jwtUtil.extractRoleFromToken(token);
-		if (!role.equals("사장님")) {
-			throw new StoreCustomException(StoreErrorCode.ONLY_OWNER);
-		}
-	}
-
-	/**
 	 * 가게 생성 3개까지 제한
 	 *
 	 */
-	public StoreResponseDto createStore(String token, StoreRequestDto requestDto) {
-
-		User user = getCurrentUser(token);
-		validateOwnerRole(token);
+	public StoreResponseDto createStore(User user, StoreRequestDto requestDto) {
 		int storeCount = storeRepository.countByOwnerAndStatus(user, StoreStatus.OPEN);
 		if (storeCount >= 3) {
 			throw new StoreCustomException(StoreErrorCode.LIMIT_THREE);
@@ -120,14 +100,11 @@ public class StoreService {
 
 	/**
 	 * 내 가게 조회
-	 * @param token
+	 *
 	 * @return
 	 */
 	@Transactional(readOnly = true)
-	public List<StoreResponseDto> getMyStores(String token) {
-		validateOwnerRole(token);
-		User user = getCurrentUser(token);
-
+	public List<StoreResponseDto> getMyStores(User user) {
 		return storeRepository.findAllByOwnerAndDeletedFalse(user)
 			.stream()
 			.map(StoreResponseDto::new)
@@ -138,11 +115,9 @@ public class StoreService {
 	 * 가게 수정
 	 * @param storeId
 	 * @param requestDto
-	 * @param token
+	 * @param user
 	 */
-	public void updateStore(Long storeId, StoreRequestDto requestDto, String token) {
-		validateOwnerRole(token);
-		User user = getCurrentUser(token);
+	public void updateStore(Long storeId, StoreRequestDto requestDto, User user) {
 
 		Store store = storeRepository.findByIdAndOwnerAndDeletedFalse(storeId, user)
 			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.STORE_NOT_FOUND));
@@ -154,11 +129,9 @@ public class StoreService {
 	/**
 	 * 가게 삭제 - soft delete
 	 * @param storeId
-	 * @param token
+	 * @param user
 	 */
-	public void deleteStore(Long storeId, String token) {
-		validateOwnerRole(token);
-		User user = getCurrentUser(token);
+	public void deleteStore(Long storeId, User user) {
 		Store store = storeRepository.findByIdAndOwnerAndDeletedFalse(storeId, user)
 			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.STORE_NOT_FOUND));
 		store.softDelete();
@@ -167,10 +140,9 @@ public class StoreService {
 	/**
 	 * 즐겨찾기 등록
 	 * @param storeId
-	 * @param token
+	 * @param user
 	 */
-	public void addFavorite(Long storeId, String token) {
-		User user = getCurrentUser(token);
+	public void addFavorite(Long storeId, User user) {
 		Store store = storeRepository.findByIdAndDeletedFalse(storeId)
 			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.STORE_NOT_FOUND));
 
@@ -185,10 +157,9 @@ public class StoreService {
 	/**
 	 * 즐겨찾기 해제
 	 * @param storeId
-	 * @param token
+	 * @param user
 	 */
-	public void removeFavorite(Long storeId, String token) {
-		User user = getCurrentUser(token);
+	public void removeFavorite(Long storeId, User user) {
 		Favorite favorite = favoriteRepository.findByUserIdAndStoreId(user.getId(), storeId)
 			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NON_FAVORITE));
 
@@ -199,11 +170,9 @@ public class StoreService {
 	 * 공지 등록
 	 * @param storeId
 	 * @param content
-	 * @param token
+	 * @param user
 	 */
-	public void createNotice(Long storeId, String content, String token) {
-		validateOwnerRole(token);
-		User user = getCurrentUser(token);
+	public void createNotice(Long storeId, String content, User user) {
 		Store store = storeRepository.findByIdAndOwnerAndDeletedFalse(storeId, user)
 			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.STORE_NOT_FOUND));
 
@@ -218,11 +187,10 @@ public class StoreService {
 	 * 공지 수정
 	 * @param noticeId
 	 * @param content
-	 * @param token
+	 * @param user
 	 */
-	public void updateNotice(Long noticeId, String content, String token) {
-		validateOwnerRole(token);
-		User user = getCurrentUser(token);
+	public void updateNotice(Long noticeId, String content, User user) {
+
 		Notice notice = noticeRepository.findByIdWithStore(noticeId)
 			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NO_NOTICE));
 
@@ -240,11 +208,9 @@ public class StoreService {
 	/**
 	 * 공지 삭제
 	 * @param noticeId
-	 * @param token
+	 * @param user
 	 */
-	public void deleteNotice(Long noticeId, String token) {
-		validateOwnerRole(token);
-		User user = getCurrentUser(token);
+	public void deleteNotice(Long noticeId, User user) {
 		Notice notice = noticeRepository.findByIdWithStore(noticeId)
 			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NO_NOTICE));
 
@@ -258,14 +224,12 @@ public class StoreService {
 	/**
 	 * 판매량 통계
 	 * @param storeId
-	 * @param token
+	 * @param user
 	 * @param type
 	 * @return
 	 */
 	@Transactional(readOnly = true)
-	public SalesDto getSales(Long storeId, String token, String type) {
-		validateOwnerRole(token);
-		User user = getCurrentUser(token);
+	public SalesDto getSales(Long storeId, User user, String type) {
 		Store store = storeRepository.findByIdAndOwnerAndDeletedFalse(storeId, user)
 			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.STORE_NOT_FOUND));
 
@@ -290,5 +254,17 @@ public class StoreService {
 		BigDecimal totalSales = orderRepository.sumTotalPriceByStoreAndCreatedAtBetween(store, start, now);
 		return new SalesDto(totalSales);
 
+	}
+
+	/**
+	 * 자동으로 상태 영업시작, 마감
+	 */
+	@Transactional
+	public void updateAllStoreStatuses() {
+		List<Store> stores = storeRepository.findAll();
+		for (Store store : stores) {
+			store.updateStatus();
+		}
+		storeRepository.saveAll(stores);
 	}
 }
