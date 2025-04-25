@@ -23,13 +23,15 @@ public class MenuUserServiceImpl implements MenuUserService {
     @Transactional
     public Slice<MenuUserResponseDto> findCursorMenuBySize(Long storeId, Category categoryCursor, Long lastId, int size) {
         Pageable pageable = PageRequest.of(0, size);
-        long commentCount = commentRepository.countByStoreId(storeId);
-
         Slice<Menu> menuSlice = menuRepository.findByCursorMenuBySize(storeId, categoryCursor, lastId, pageable);
 
-        return menuSlice.map(menu -> new MenuUserResponseDto(menu, commentCount));
-
+        return menuSlice.map(menu -> {
+            long commentCount = commentRepository.countByMenuId(menu.getId());
+            return new MenuUserResponseDto(menu, commentCount);
+        });
     }
 
-
 }
+
+
+
