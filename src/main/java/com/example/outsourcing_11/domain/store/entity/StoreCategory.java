@@ -1,6 +1,7 @@
 package com.example.outsourcing_11.domain.store.entity;
 
 public enum StoreCategory {
+
 	BURGER,
 	CHICKEN,
 	PIZZA,
@@ -9,5 +10,6 @@ public enum StoreCategory {
 	CHINESE,
 	CAFE,
 	ETC
+
 
 }

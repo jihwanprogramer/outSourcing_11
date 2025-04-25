@@ -3,6 +3,7 @@ package com.example.outsourcing_11.domain.order.entity;
 import com.example.outsourcing_11.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
+import org.springframework.cglib.core.Local;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -35,20 +36,17 @@ public class Order {
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> items = new ArrayList<>();
 
-    public void setUser(User user) {
+    public Order(User user, LocalDateTime orderDate, OrderStatus status, int totalPrice, List<OrderItem> items) {
         this.user = user;
-    }
-
-    public void setOrderDate(LocalDateTime orderDate) {
         this.orderDate = orderDate;
-    }
-
-    public void setStatus(OrderStatus status) {
         this.status = status;
-    }
-
-    public void setTotalPrice(int totalPrice) {
         this.totalPrice = totalPrice;
+        this.items = items;
+
+        // 양방향 연관관계 설정
+        for (OrderItem item : items) {
+            item.setOrder(this);
+        }
     }
 
 
