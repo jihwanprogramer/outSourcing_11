@@ -8,6 +8,7 @@ import com.example.outsourcing_11.domain.menu.service.MenuAdminServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -18,6 +19,7 @@ public class MenuAdminController {
     private final MenuAdminServiceImpl menuAdminServiceImpl;
     private final MenuAdminService menuAdminService;
 
+    @PreAuthorize("hasRole('OWNER')")
     @PostMapping
     public ResponseEntity<MenuAdminResponseDto> createMenu(
         @PathVariable Long storeId,
@@ -27,6 +29,7 @@ public class MenuAdminController {
         return new ResponseEntity<>(saveMenu, HttpStatus.CREATED);
     }
 
+    @PreAuthorize("hasRole('OWNER')")
     @PatchMapping("/{menuId}")
     public ResponseEntity<MenuAdminResponseDto> updateMenu(
         @PathVariable Long storeId,
@@ -37,6 +40,7 @@ public class MenuAdminController {
         return new ResponseEntity<>(updateMenu, HttpStatus.OK);
     }
 
+    @PreAuthorize("hasRole('OWNER')")
     @DeleteMapping("/{menuId}")
     public ResponseEntity<Void> deleteMenu(@PathVariable Long storeId, @PathVariable Long menuId) {
         menuAdminService.delete(storeId, menuId);
