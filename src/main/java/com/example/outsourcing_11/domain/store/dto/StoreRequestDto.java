@@ -22,4 +22,7 @@ public class StoreRequestDto {
 	private StoreCategory category;
 	private StoreStatus status;
 
+	public StoreRequestDto() {
+
+	}
 }

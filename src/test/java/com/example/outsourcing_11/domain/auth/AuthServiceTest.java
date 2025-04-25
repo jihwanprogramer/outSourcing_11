@@ -15,6 +15,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
+import com.example.outsourcing_11.common.UserRole;
 import com.example.outsourcing_11.common.exception.user.DuplicateUserException;
 import com.example.outsourcing_11.common.exception.user.InvalidLoginException;
 import com.example.outsourcing_11.config.PasswordEncoder;
@@ -69,7 +70,7 @@ public class AuthServiceTest {
 		String encodedPassword = "encoded-password";  // 저장된 암호화된 비밀번호
 		String expectedToken = "mocked-access-token";
 
-		User user = new User(email, encodedPassword, "테스트", "고객");
+		User user = new User(email, encodedPassword, "테스트", UserRole.CUSTOMER);
 		ReflectionTestUtils.setField(user, "id", 1L);
 
 		given(userRepository.findByEmail(email)).willReturn(Optional.of(user));
@@ -93,7 +94,7 @@ public class AuthServiceTest {
 		String rawPassword = "wrongPassword";
 		String encodedPassword = "$2a$10$encoded"; // 예시 해시
 
-		User user = new User(email, encodedPassword, "테스트", "권한");
+		User user = new User(email, encodedPassword, "테스트", UserRole.CUSTOMER);
 		ReflectionTestUtils.setField(user, "deletedAt", null);
 		given(userRepository.findByEmail(email)).willReturn(Optional.of(user));
 		given(passwordEncoder.matches(rawPassword, encodedPassword)).willReturn(false);
@@ -113,7 +114,7 @@ public class AuthServiceTest {
 		String email = "test2@test.com";
 		String rawPassword = "wrongPassword";
 
-		User user = new User("이름", email, rawPassword, "전화번호", "주소", "권한");
+		User user = new User("이름", email, rawPassword, "전화번호", "주소", UserRole.CUSTOMER);
 		ReflectionTestUtils.setField(user, "deletedAt", null);
 		given(userRepository.existsByEmail(email)).willReturn(true);
 
