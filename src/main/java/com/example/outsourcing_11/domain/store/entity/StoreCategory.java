@@ -8,5 +8,8 @@ public enum StoreCategory {
     JAPANESE,
     CHINESE,
     CAFE,
-    ETC
+    ETC,
+    HAMBURGER
+    // 필요한 카테고리 더 추가 가능
+
 }
