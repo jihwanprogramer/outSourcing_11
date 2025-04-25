@@ -6,9 +6,10 @@ import lombok.Getter;
 public enum StoreErrorCode {
 	LIMIT_THREE("BAD-001", "최대 3개의 가게까지 등록할 수 있습니다.", 400),
 	NON_CATEGORY("BAD-002", "지원하지 않는 카테고리입니다.", 400),
-	ALREADY_FAVORIT("BAD-003", "이미 즐겨찾기 등록된 가게입니다.", 400),
+	ALREADY_FAVORITE("BAD-003", "이미 즐겨찾기 등록된 가게입니다.", 400),
 	NON_CONTENT("BAD-004", "내용을 입력해주세요", 400),
 	PERIOD_ERROR("BAD-005", "월간,주간,일간 단위로 조회 가능합니다.", 400),
+	NON_FAVORITE("BAD-006", "즐겨찾기 상태가 아닙니다.", 400),
 	ONLY_OWNER("AUTH-001", "사장님만 이용가능한 기능입니다.", 401),
 	ONLY_MY_STORE("AUTH-002", "본인 가게에만 접근 가능합니다.", 401),
 	LOGIN_PLZ("AUTH-003", "로그인 후 이용가능한 기능입니다.", 401),
