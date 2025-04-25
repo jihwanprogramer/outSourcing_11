@@ -6,9 +6,9 @@ import com.example.outsourcing_11.domain.menu.dto.response.MenuAdminResponseDto;
 
 public interface MenuAdminService {
 
-    MenuAdminResponseDto createMenu(Long storeId, MenuSaveRequestDto menuSaveRequestDto);
+	MenuAdminResponseDto createMenu(Long storeId, MenuSaveRequestDto menuSaveRequestDto);
 
-    MenuAdminResponseDto updateMenu(Long storeId, Long menuId, MenuUpdateRequestDto dto);
+	MenuAdminResponseDto updateMenu(Long storeId, Long menuId, MenuUpdateRequestDto dto);
 
-    void delete(Long storeId, Long menuId);
+	void delete(Long storeId, Long menuId);
 }

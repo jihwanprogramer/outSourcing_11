@@ -1,4 +1,4 @@
-package com.example.outsourcing_11.domain.comment.dto;
+package com.example.outsourcing_11.domain.comment.dto.user;
 
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;

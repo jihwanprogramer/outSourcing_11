@@ -1,6 +1,6 @@
-package com.example.outsourcing_11;
+package com.example.outsourcing_11.comment;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -8,8 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import jakarta.persistence.EntityManager;
 
@@ -30,6 +28,7 @@ import com.example.outsourcing_11.domain.order.entity.OrderItem;
 import com.example.outsourcing_11.domain.order.entity.OrderStatus;
 import com.example.outsourcing_11.domain.order.repository.OrderRepository;
 import com.example.outsourcing_11.domain.store.entity.Store;
+import com.example.outsourcing_11.domain.store.entity.StoreCategory;
 import com.example.outsourcing_11.domain.store.entity.StoreStatus;
 import com.example.outsourcing_11.domain.store.repository.StoreRepository;
 import com.example.outsourcing_11.domain.user.entity.User;
@@ -38,8 +37,7 @@ import com.example.outsourcing_11.domain.user.repository.UserRepository;
 @ActiveProfiles("local")
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-public class CommentServiceTest {
-
+public class CommentRepositoryTest {
 	@Autowired
 	private UserRepository userRepository;
 	@Autowired
@@ -69,26 +67,22 @@ public class CommentServiceTest {
 
 		List<Store> stores = new ArrayList<>();
 		for (int i = 0; i < users.size(); i++) {
-			stores.add(new Store("맘스터치", "서울시 강남구", LocalDateTime.now(), LocalDateTime.now().plusHours(10), 10000,
-				StoreStatus.OPEN, users.get(i)));
-
+			stores.add(new Store("맘스터치", "서울시 강남구", 16000, StoreCategory.BURGER, StoreStatus.OPEN, users.get(i)));
 		}
 		stores.forEach(em::persist);
 
 		BigDecimal price = new BigDecimal("8000");
-		List<Menu> menus = IntStream.range(0, 4)
-			.mapToObj(i -> new Menu(Category.MAIN_MENU, "불고기버거", "맛있는 불고기버거입니다.", price, MenuStatus.AVAILABLE))
-			.collect(Collectors.toList());
+
+		List<Menu> menus = new ArrayList<>();
+		for (int i = 0; i < users.size(); i++) {
+			menus.add(new Menu(Category.MAIN_MENU, "치즈 버거", "맛있는 버거", price, MenuStatus.AVAILABLE, stores.get(i)));
+		}
 		menus.forEach(em::persist);
 
 		List<Order> orders = new ArrayList<>();
 		for (int i = 0; i < users.size(); i++) {
 
-			Order order = new Order();
-			order.setUser(users.get(i));
-			order.setOrderDate(LocalDateTime.now());
-			order.setStatus(OrderStatus.PENDING);
-			order.setTotalPrice(16000);
+			Order order = new Order(users.get(i), LocalDateTime.now(), OrderStatus.PENDING, 16000);
 
 			OrderItem item = new OrderItem();
 			item.setOrder(order);
@@ -111,8 +105,7 @@ public class CommentServiceTest {
 		for (int i = 0; i < users.size(); i++) {
 			int num = random.nextInt(0, 5);
 			Comment comment = commentRepository.save(new Comment("맛있습니다!", null, num));
-			comment.setUser(users.get(i));
-			comment.setOrder(orders.get(i));
+
 		}
 		List<Comment> found = commentRepository.findByRatingBetweenAndDeletedAtIsNull(0, 5);
 		//then
@@ -131,31 +124,14 @@ public class CommentServiceTest {
 		User user = new User("유리", "yuri@test.com", "1234", "01012345678", "USER", "서울 강남구");
 		em.persist(user);
 
-		Store store = new Store(
-			"맘스터치",
-			"서울시 강남구",
-			LocalDateTime.now(),                  // openTime
-			LocalDateTime.now().plusHours(10),   // closeTime
-			10000,
-			StoreStatus.OPEN,
-			user
-		);
+		Store store = new Store("맘스터치", "서울시 강남구", 16000, StoreCategory.BURGER, StoreStatus.OPEN, user);
 		em.persist(store);
 
 		BigDecimal price = new BigDecimal("8000");
-		Menu menu = new Menu(Category.MAIN_MENU,
-			"불고기버거",
-			"맛있는 불고기버거입니다.",
-			price,
-			MenuStatus.AVAILABLE);
-
+		Menu menu = new Menu(Category.MAIN_MENU, "치즈 버거", "맛있는 버거", price, MenuStatus.AVAILABLE, store);
 		em.persist(menu);
 
-		Order order = new Order();
-		order.setUser(user);
-		order.setOrderDate(LocalDateTime.now());
-		order.setStatus(OrderStatus.PENDING);
-		order.setTotalPrice(16000);
+		Order order = new Order(user, LocalDateTime.now(), OrderStatus.PENDING, 16000);
 
 		OrderItem item = new OrderItem();
 		item.setOrder(order);
@@ -171,8 +147,7 @@ public class CommentServiceTest {
 		menuRepository.save(menu);
 		orderRepository.save(order);
 		Comment comment = commentRepository.save(new Comment("맛있습니다!", null, 5));
-		comment.setUser(user);
-		comment.setOrder(order);
+		comment.updateUserAndStore(user, store);
 		//when
 		Optional<Comment> found = commentRepository.findById(comment.getId());
 
@@ -180,5 +155,4 @@ public class CommentServiceTest {
 		assertThat(found).isPresent();
 		assertThat(found.get().getId()).isEqualTo(comment.getId());
 	}
-
 }

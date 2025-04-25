@@ -5,6 +5,8 @@ import java.util.List;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -16,6 +18,7 @@ import lombok.Getter;
 
 import com.example.outsourcing_11.common.Base;
 import com.example.outsourcing_11.common.Status;
+import com.example.outsourcing_11.common.UserRole;
 import com.example.outsourcing_11.domain.store.entity.Store;
 
 @Getter
@@ -40,8 +43,9 @@ public class User extends Base {
 	@Column(nullable = false)
 	private String phone;
 
-	@Column(name = "role", nullable = false, columnDefinition = "varchar(100) DEFAULT '고객'")
-	private String role = "고객";
+	@Enumerated(EnumType.STRING)
+	@Column(name = "role", nullable = false, columnDefinition = "varchar(100) default 'CUSTOMER'")
+	private UserRole role;
 
 	@Column(nullable = false)
 	private String address;
@@ -56,7 +60,7 @@ public class User extends Base {
 
 	}
 
-	public User(String name, String email, String password, String phone, String address, String role) {
+	public User(String name, String email, String password, String phone, String address, UserRole role) {
 		this.name = name;
 		this.email = email;
 		this.password = password;
@@ -65,7 +69,7 @@ public class User extends Base {
 		this.role = role;
 	}
 
-	public User(String email, String password, String name, String role) {
+	public User(String email, String password, String name, UserRole role) {
 		this.email = email;
 		this.password = password;
 		this.name = name;

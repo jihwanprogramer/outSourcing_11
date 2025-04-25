@@ -1,6 +1,5 @@
 package com.example.outsourcing_11.domain.comment.entity;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
@@ -17,7 +16,7 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 
 import com.example.outsourcing_11.common.Base;
-import com.example.outsourcing_11.domain.comment.dto.RequestCommentDto;
+import com.example.outsourcing_11.domain.comment.dto.user.RequestCommentDto;
 import com.example.outsourcing_11.domain.order.entity.Order;
 import com.example.outsourcing_11.domain.store.entity.Store;
 import com.example.outsourcing_11.domain.user.entity.User;
@@ -34,7 +33,7 @@ public class Comment extends Base {
 	private Comment parent;
 
 	@OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<Comment> childrenComment = new ArrayList<>();
+	private List<Comment> ownerComment;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "order_id")
@@ -78,12 +77,14 @@ public class Comment extends Base {
 		this.isDeleted = isDeleted;
 	}
 
-	public void setUser(User setUser) {
-		this.user = setUser;
+	public void update(RequestCommentDto dto) {
+		this.content = dto.getContent();
+		this.imageUrl = dto.getImageUrl();
+		this.rating = dto.getRating();
 	}
 
-	public void setOrder(Order order) {
-		this.order = order;
+	public void updateUserAndStore(User user, Store store) {
+		this.user = user;
+		this.store = store;
 	}
-
 }
