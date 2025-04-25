@@ -1,4 +1,4 @@
-package com.example.outsourcing_11.auth;
+package com.example.outsourcing_11.domain.auth;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -74,7 +74,7 @@ public class AuthServiceTest {
 
 		given(userRepository.findByEmail(email)).willReturn(Optional.of(user));
 		given(passwordEncoder.matches(rawPassword, encodedPassword)).willReturn(true);  // 비번 일치
-		given(jwtUtil.generateAccessToken(user.getId(), user.getName(), user.getEmail(), user.getRole()))
+		given(jwtUtil.generateAccessToken(user.getId(), user.getName(), user.getEmail(), user.getRole().getRoleName()))
 			.willReturn(expectedToken);
 
 		LoginRequestDto requestDto = new LoginRequestDto(email, rawPassword);
@@ -118,7 +118,7 @@ public class AuthServiceTest {
 		given(userRepository.existsByEmail(email)).willReturn(true);
 
 		SignUpRequestDto requestDto = new SignUpRequestDto("이름", email, rawPassword, "전화번호", "주소", "권한");
-		
+
 		// when & then
 		assertThrows(DuplicateUserException.class, () -> {
 			authService.signUp(requestDto);

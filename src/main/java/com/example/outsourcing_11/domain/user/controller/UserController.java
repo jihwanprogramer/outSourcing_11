@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import com.example.outsourcing_11.config.security.CustomUserDetails;
 import com.example.outsourcing_11.domain.user.dto.DeleteUserResponseDto;
 import com.example.outsourcing_11.domain.user.dto.PasswordRequestDto;
 import com.example.outsourcing_11.domain.user.dto.UserResponseDto;
@@ -33,8 +35,8 @@ public class UserController {
 	}
 
 	@GetMapping("/checkLogin")
-	public ResponseEntity<UserResponseDto> findLoginUserById(HttpServletRequest request) {
-		UserResponseDto responseDto = userService.findLoginUserById(request);
+	public ResponseEntity<UserResponseDto> findLoginUserById(@AuthenticationPrincipal CustomUserDetails userDetails) {
+		UserResponseDto responseDto = userService.findLoginUserById(userDetails);
 		return new ResponseEntity<>(responseDto, HttpStatus.OK);
 	}
 

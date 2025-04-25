@@ -1,4 +1,4 @@
-package com.example.outsourcing_11.user;
+package com.example.outsourcing_11.domain.user.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -15,12 +15,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import com.example.outsourcing_11.common.Status;
-import com.example.outsourcing_11.common.exception.user.UnauthorizedException;
 import com.example.outsourcing_11.common.exception.user.UserNotFoundException;
+import com.example.outsourcing_11.config.security.CustomUserDetails;
 import com.example.outsourcing_11.domain.user.dto.UserResponseDto;
 import com.example.outsourcing_11.domain.user.entity.User;
 import com.example.outsourcing_11.domain.user.repository.UserRepository;
-import com.example.outsourcing_11.domain.user.service.UserService;
 import com.example.outsourcing_11.util.JwtUtil;
 
 @ExtendWith(MockitoExtension.class)
@@ -58,19 +57,16 @@ public class UserServiceTest {
 	@Test
 	void 로그인유저조회_성공() {
 		// given
-		String token = "Bearer mock-token";
 		Long userId = 1L;
 		User user = new User("홍길동", "test@test.com", "1234", "010-0000-0000", "서울", "고객");
 		ReflectionTestUtils.setField(user, "id", userId);
 		ReflectionTestUtils.setField(user, "deletedAt", null);
 
-		given(request.getHeader("Authorization")).willReturn(token);
-		given(jwtUtil.validateToken(token)).willReturn(true);
-		given(jwtUtil.extractUserId(token)).willReturn(userId);
+		CustomUserDetails userDetails = new CustomUserDetails(user);
 		given(userRepository.findByIdOrElseThrow(userId)).willReturn(user);
 
 		// when
-		UserResponseDto result = userService.findLoginUserById(request);
+		UserResponseDto result = userService.findLoginUserById(userDetails);
 
 		// then
 		assertEquals("test@test.com", result.getEmail());
@@ -78,37 +74,20 @@ public class UserServiceTest {
 	}
 
 	@Test
-	void 로그인유저조회_실패_유효하지않은토큰() {
-		// given
-		String token = "Bearer invalid-token";
-		given(request.getHeader("Authorization")).willReturn(token);
-		given(jwtUtil.validateToken(token)).willReturn(false);
-
-		// when & then
-		assertThrows(UnauthorizedException.class, () -> {
-			userService.findLoginUserById(request);
-		});
-	}
-
-	@Test
 	void 로그인유저조회_실패_삭제된유저() {
 		// given
-		String token = "Bearer mock-token";
 		Long userId = 1L;
-
 		User deletedUser = new User("홍길동", "test@test.com", "1234", "010", "서울", "고객");
 		ReflectionTestUtils.setField(deletedUser, "id", userId);
-		ReflectionTestUtils.setField(deletedUser, "deletedAt", LocalDateTime.now());     // 삭제된 상태
+		ReflectionTestUtils.setField(deletedUser, "deletedAt", LocalDateTime.now());
 		ReflectionTestUtils.setField(deletedUser, "status", Status.NON_EXIST.getValue());
 
-		given(request.getHeader("Authorization")).willReturn(token);
-		given(jwtUtil.validateToken(token)).willReturn(true);
-		given(jwtUtil.extractUserId(token)).willReturn(userId);
+		CustomUserDetails userDetails = new CustomUserDetails(deletedUser);
 		given(userRepository.findByIdOrElseThrow(userId)).willReturn(deletedUser);
 
 		// when & then
 		assertThrows(UserNotFoundException.class, () -> {
-			userService.findLoginUserById(request);
+			userService.findLoginUserById(userDetails);
 		});
 	}
 }

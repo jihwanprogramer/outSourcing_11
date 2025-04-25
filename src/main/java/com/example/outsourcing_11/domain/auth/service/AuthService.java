@@ -3,6 +3,7 @@ package com.example.outsourcing_11.domain.auth.service;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Service;
+import com.example.outsourcing_11.common.UserRole;
 import com.example.outsourcing_11.common.exception.user.DuplicateUserException;
 import com.example.outsourcing_11.common.exception.user.InvalidLoginException;
 import com.example.outsourcing_11.common.exception.user.UnauthorizedAccessException;
@@ -33,8 +34,8 @@ public class AuthService {
 			requestDto.getEmail(),
 			encodedPassword,
 			requestDto.getPhone(),
-			requestDto.getRole(),
-			requestDto.getAddress()
+			requestDto.getAddress(),
+			UserRole.from(requestDto.getRole())
 		);
 		userRepository.save(user);
 
@@ -59,6 +60,6 @@ public class AuthService {
 			throw new UnauthorizedAccessException("탈퇴한 회원 정보입니다.");
 		}
 
-		return jwtUtil.generateAccessToken(user.getId(), user.getName(), user.getEmail(), user.getRole());
+		return jwtUtil.generateAccessToken(user.getId(), user.getName(), user.getEmail(), user.getRole().getRoleName());
 	}
 }
