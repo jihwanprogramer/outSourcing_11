@@ -1,13 +1,13 @@
 package com.example.outsourcing_11.domain.comment.repository;
 
 import com.example.outsourcing_11.domain.comment.entity.Comment;
-import org.springframework.data.jpa.repository.EntityGraph;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -32,8 +32,8 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     @Query("SELECT c FROM Comment c JOIN Fetch  Order o WHERE o.id = :orderId AND c.isDeleted = false ")
     Optional<Comment> findWithRelationsByOrderId(@Param("orderId") Long orderId);
 
-    @Query("SELECT COUNT(c) FROM Comment c WHERE c.store.id = :storeId AND c.deletedAt IS NULL")
-    long countByStoreId(@Param("storeId") Long storeId);
+    @Query("SELECT COUNT(c) FROM Comment c JOIN c.order o JOIN o.items oi WHERE oi.menu.id = :menuId AND c.isDeleted = false")
+    long countByMenuId(@Param("menuId") Long menuId);
 
     default Comment findByOrThrowElse(Long commentId) {
         return findByIdAndDeletedAtIsNull(commentId).orElseThrow(() -> new RuntimeException("Temp Error"));

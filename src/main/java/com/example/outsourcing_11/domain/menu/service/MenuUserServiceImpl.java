@@ -26,7 +26,7 @@ public class MenuUserServiceImpl implements MenuUserService {
         Slice<Menu> menuSlice = menuRepository.findByCursorMenuBySize(storeId, categoryCursor, lastId, pageable);
 
         return menuSlice.map(menu -> {
-            long commentCount = commentRepository.countByMenuId(menu.getId());
+            long commentCount = commentRepository.countByMenuId((menu.getId()));
             return new MenuUserResponseDto(menu, commentCount);
         });
     }
