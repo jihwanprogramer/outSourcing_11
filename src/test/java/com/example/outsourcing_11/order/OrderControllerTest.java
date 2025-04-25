@@ -76,10 +76,14 @@ public class OrderControllerTest {
 		field.set(dto, StoreCategory.HAMBURGER);
 
 		Store store = Store.builder()
-			.dto(dto)
+			.name(dto.getName())
+			.address(dto.getAddress())
+			.openTime(dto.getOpenTime())
+			.closeTime(dto.getCloseTime())
+			.minimumOrderPrice(dto.getMinOrderPrice())// 또는 isOpen()
+			.category(dto.getCategory())
 			.owner(user)
 			.build();
-
 		store = storeRepository.save(store);
 
 		Menu menu = new Menu();
