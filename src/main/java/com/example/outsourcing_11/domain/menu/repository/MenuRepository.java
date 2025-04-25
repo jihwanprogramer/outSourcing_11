@@ -17,14 +17,16 @@ public interface MenuRepository extends JpaRepository<Menu, Long> {
 
     @Query("""
             SELECT m FROM Menu m
-            WHERE (:categoryCursor IS NULL
+            WHERE m.store.id = :storeId
+            AND (:categoryCursor IS NULL
                    OR m.category > :categoryCursor
                    OR (m.category = :categoryCursor AND m.id > :lastId)
                   )
             AND m.deletedAt IS NULL
             ORDER BY m.category ASC, m.id ASC
         """)
-    Slice<Menu> findByCursorMenuBySize(@Param("categoryCursor") Category categoryCursor,
+    Slice<Menu> findByCursorMenuBySize(@Param("storeId") Long storeId,
+                                       @Param("categoryCursor") Category categoryCursor,
                                        @Param("lastId") Long lastId,
                                        Pageable pageable);
 }

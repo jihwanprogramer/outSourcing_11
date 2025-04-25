@@ -17,14 +17,16 @@ public class MenuUserResponseDto {
     private final String content;
     private final MenuStatus menuStatus;
     private final LocalDateTime createdAt;
+    private final long commentCount;
 
-    public MenuUserResponseDto(Menu menu) {
+    public MenuUserResponseDto(Menu menu, long commentCount) {
         this.menuId = menu.getId();
         this.category = menu.getCategory();
         this.menuName = menu.getName();
         this.content = menu.getContent();
         this.menuStatus = menu.getStatus();
         this.createdAt = menu.getCreatedAt();
+        this.commentCount = commentCount;
     }
 
 }
