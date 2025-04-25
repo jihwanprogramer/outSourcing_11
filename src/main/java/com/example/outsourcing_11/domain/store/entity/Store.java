@@ -14,14 +14,12 @@ import jakarta.persistence.ManyToOne;
 
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 import com.example.outsourcing_11.common.Base;
 import com.example.outsourcing_11.domain.user.entity.User;
 
 @Getter
 @Entity
-@NoArgsConstructor
 public class Store extends Base {
 
 	@Id
@@ -55,6 +53,21 @@ public class Store extends Base {
 		this.minimumOrderPrice = minimumOrderPrice;
 		this.status = status;
 		this.owner = owner;
+	}
+
+	public Store(String name, String address, int minimumOrderPrice, StoreCategory category, StoreStatus status,
+		User user) {
+		this.name = name;
+		this.address = address;
+		this.minimumOrderPrice = minimumOrderPrice;
+		this.status = status;
+		this.category = category;
+		this.owner = user;
+
+	}
+
+	public Store() {
+
 	}
 
 	public void close() {

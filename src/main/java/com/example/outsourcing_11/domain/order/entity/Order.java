@@ -1,14 +1,29 @@
 package com.example.outsourcing_11.domain.order.entity;
 
-import com.example.outsourcing_11.domain.user.entity.User;
-import jakarta.persistence.*;
-import org.springframework.cglib.core.Local;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+
+import lombok.Getter;
+
+import com.example.outsourcing_11.domain.user.entity.User;
+
 @Entity
+@Getter
 @Table(name = "orders")
 public class Order {
 
@@ -17,62 +32,31 @@ public class Order {
     @Column(name = "order_id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "user_id", nullable = false)
+	private User user;
 
-    @Column(name = "order_date", nullable = false)
-    private LocalDateTime orderDate;
+	@Column(name = "order_date", nullable = false)
+	private LocalDateTime orderDate;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false)
-    private OrderStatus status = OrderStatus.PENDING;
+	@Enumerated(EnumType.STRING)
+	@Column(name = "status", nullable = false)
+	private OrderStatus status = OrderStatus.PENDING;
 
-    @Column(name = "total_price", nullable = false)
-    private int totalPrice;
+	@Column(name = "total_price", nullable = false)
+	private int totalPrice;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<OrderItem> items = new ArrayList<>();
+	@OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<OrderItem> items = new ArrayList<>();
 
-    public void setUser(User user) {
-        this.user = user;
-    }
+	public Order() {
 
-    public void setOrderDate(LocalDateTime orderDate) {
-        this.orderDate = orderDate;
-    }
+	}
 
-    public void setStatus(OrderStatus status) {
-        this.status = status;
-    }
-
-    public void setTotalPrice(int totalPrice) {
-        this.totalPrice = totalPrice;
-    }
-
-    public List<OrderItem> getItems() {
-        return items;
-    }
-    public Long getId() {
-        return id;
-    }
-//
-    public User getUser() {
-        return user;
-    }
-//
-    public LocalDateTime getOrderDate() {
-        return orderDate;
-    }
-
-    public OrderStatus getStatus() {
-        return status;
-    }
-
-    public int getTotalPrice() {
-        return totalPrice;
-    }
-
-
-
+	public Order(User user, LocalDateTime orderDate, OrderStatus status, int totalPrice) {
+		this.user = user;
+		this.orderDate = orderDate;
+		this.status = status;
+		this.totalPrice = totalPrice;
+	}
 }
