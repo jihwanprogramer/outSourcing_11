@@ -2,8 +2,8 @@ package com.example.outsourcing_11.domain.comment.service;
 
 import java.util.List;
 
-import com.example.outsourcing_11.domain.comment.dto.RequestCommentDto;
-import com.example.outsourcing_11.domain.comment.dto.ResponseCommentDto;
+import com.example.outsourcing_11.domain.comment.dto.user.RequestCommentDto;
+import com.example.outsourcing_11.domain.comment.dto.user.ResponseCommentDto;
 
 public interface CommentService {
 	ResponseCommentDto createComment(Long orderId, Long userId, RequestCommentDto dto);

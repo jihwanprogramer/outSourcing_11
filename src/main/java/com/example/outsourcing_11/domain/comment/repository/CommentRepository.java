@@ -1,32 +1,41 @@
 package com.example.outsourcing_11.domain.comment.repository;
 
 import com.example.outsourcing_11.domain.comment.entity.Comment;
-import org.springframework.data.jpa.repository.EntityGraph;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface CommentRepository extends JpaRepository<Comment, Long> {
 
-    Optional<Comment> findByIdAndDeletedAtIsNull(Long id);
+    //commentId에 해당하는 comment 조회
+    Optional<Comment> findByIdAndDeletedAtIsNull(Long comentId);
 
-    // // 존재하는 유저 중 , comment가 삭제도 안됬으면서 별점의 범위로 조회.
-    @EntityGraph(attributePaths = {"user"})
-    List<Comment> findByRatingBetweenAndDeletedAtIsNull(int min, int max);
+    //별점 범위에 따른 comment 조회
 
-    //
-    // // 주문상태가 완료이면서 , comment가 삭제도 안된 경우
-    // //@EntityGraph(attributePaths = {"order"})
-    //
+    /**
+     * 2025.04.25
+     * 김형진
+     * 별점 범위 이면서 soft Delete가 적용된거 외에 것을 조회
+     *
+     * @param min ~0
+     * @param max ~5
+     * @return comments
+     */
+    Page<Comment> findByRatingBetweenAndDeletedAtIsNull(int min, int max, Pageable pageable);
+
+    @Query("SELECT c FROM Comment c JOIN Fetch  Order o WHERE o.id = :orderId AND c.isDeleted = false ")
+    Optional<Comment> findWithRelationsByOrderId(@Param("orderId") Long orderId);
+
+    @Query("SELECT COUNT(c) FROM Comment c JOIN c.order o JOIN o.items oi WHERE oi.menu.id = :menuId AND c.isDeleted = false")
+    long countByMenuId(@Param("menuId") Long menuId);
+
     default Comment findByOrThrowElse(Long commentId) {
         return findByIdAndDeletedAtIsNull(commentId).orElseThrow(() -> new RuntimeException("Temp Error"));
     }
-
-    @Query("SELECT COUNT(c) FROM Comment c WHERE c.store.id = :storeId AND c.deletedAt IS NULL")
-    long countByStoreId(@Param("storeId") Long storeId);
 }
