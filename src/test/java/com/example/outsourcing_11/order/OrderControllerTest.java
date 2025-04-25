@@ -5,6 +5,7 @@ import com.example.outsourcing_11.domain.menu.entity.Menu;
 import com.example.outsourcing_11.domain.menu.repository.MenuRepository;
 import com.example.outsourcing_11.domain.order.dto.OrderItemRequestDto;
 import com.example.outsourcing_11.domain.order.dto.OrderRequestDto;
+import com.example.outsourcing_11.domain.order.repository.CartRepository;
 import com.example.outsourcing_11.domain.store.dto.StoreRequestDto;
 import com.example.outsourcing_11.domain.store.entity.Store;
 import com.example.outsourcing_11.domain.store.entity.StoreStatus;
@@ -18,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import com.example.outsourcing_11.domain.store.entity.StoreCategory;
@@ -29,6 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 // JSON 응답 값 검증용 (jsonPath())
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
@@ -43,20 +46,38 @@ public class OrderControllerTest {
     @Autowired private UserRepository userRepository;
     @Autowired private MenuRepository menuRepository;
     @Autowired private StoreRepository storeRepository;
+    @Autowired private CartRepository cartRepository;
+
 
     @Test
+    @Transactional
+    @WithMockUser(username = "yuri@example.com", roles = {"CUSTOMER"})
     @DisplayName("POST /orders - 주문 생성")
     void createOrder() throws Exception {
-        // given
-        User user = userRepository.save(new User(
-                "유리",
-                "yuri@example.com",
-                "1234",
-                "01011112222",
-                "서울시",
-                UserRole.CUSTOMER
+        // ✅ 중복 유저 정리 (Store 먼저 삭제 → User 삭제)
+        userRepository.findByEmail("yuri@example.com").ifPresent(user -> {
+            // 1. 유저의 장바구니 먼저 삭제
+            cartRepository.deleteAllByUser(user);
 
-        ));
+            // 2. 그 유저가 소유한 가게들 삭제
+            storeRepository.deleteAll(storeRepository.findAllByOwner(user));
+
+            // 3. 마지막으로 유저 삭제
+            userRepository.delete(user);
+        });
+        userRepository.findByEmail("yuri@example.com")
+                .ifPresent(userRepository::delete);
+
+        // given
+        User user = new User(
+                "유리",                   // name
+                "yuri@example.com",       // email
+                "1234",                   // password
+                "01011112222",            // phone
+                "서울시",                 // address
+                UserRole.CUSTOMER         // ✅ 반드시 enum 타입
+        );
+        user = userRepository.save(user);
 
         StoreRequestDto dto = new StoreRequestDto(
                 "맥도날드",
@@ -68,9 +89,7 @@ public class OrderControllerTest {
                 StoreStatus.OPEN
         );
 
-        Store store = new Store(dto, user);
-        store = storeRepository.save(store);
-        store = storeRepository.save(store);
+        Store store = storeRepository.save(new Store(dto, user));
 
         Menu menu = new Menu();
 

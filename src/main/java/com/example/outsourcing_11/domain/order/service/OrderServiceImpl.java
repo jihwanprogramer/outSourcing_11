@@ -1,11 +1,13 @@
 package com.example.outsourcing_11.domain.order.service;
 
+import com.example.outsourcing_11.domain.menu.entity.Menu;
 import com.example.outsourcing_11.domain.menu.repository.MenuRepository;
 import com.example.outsourcing_11.domain.order.dto.*;
 import com.example.outsourcing_11.domain.order.entity.Order;
 import com.example.outsourcing_11.domain.order.entity.OrderItem;
 import com.example.outsourcing_11.domain.order.entity.OrderStatus;
 import com.example.outsourcing_11.domain.order.repository.OrderRepository;
+import com.example.outsourcing_11.domain.store.entity.Store;
 import com.example.outsourcing_11.domain.store.repository.StoreRepository;
 import com.example.outsourcing_11.domain.user.entity.User;
 import com.example.outsourcing_11.domain.user.repository.UserRepository;
@@ -32,29 +34,31 @@ public class OrderServiceImpl implements OrderService {
      */
     @Override
     public OrderResponseDto createOrder(OrderRequestDto requestDto) {
-        // 사용자 정보 조회
         User user = userRepository.findById(requestDto.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        List<OrderItem> items = new ArrayList<>(); // 주문 항목 리스트
-        List<OrderItemResponseDto> itemResponses = new ArrayList<>(); // 응답용 DTO 리스트
-        int totalPrice = 0;  // 총 주문 가격 계산용
+        List<OrderItem> items = new ArrayList<>();
+        List<OrderItemResponseDto> itemResponses = new ArrayList<>();
+        int totalPrice = 0;
 
-        // 요청된 각 주문 항목 처리
+        Store store = null; // ✅ 대표 store 지정
+
         for (OrderItemRequestDto dto : requestDto.getItems()) {
+            Menu menu = menuRepository.findById(dto.getMenuId())
+                    .orElseThrow(() -> new RuntimeException("Menu not found"));
+
+            store = storeRepository.findById(dto.getStoreId())
+                    .orElseThrow(() -> new RuntimeException("Store not found"));
+
             OrderItem item = new OrderItem();
-            item.setMenu(menuRepository.findById(dto.getMenuId())
-                    .orElseThrow(() -> new RuntimeException("Menu not found")));
-            item.setStore(storeRepository.findById(dto.getStoreId())
-                    .orElseThrow(() -> new RuntimeException("Store not found")));
+            item.setMenu(menu);
+            item.setStore(store);
             item.setQuantity(dto.getQuantity());
             item.setItemPrice(dto.getItemPrice());
-
-            // 총 주문 금액 계산
-            totalPrice += dto.getItemPrice() * dto.getQuantity();
             items.add(item);
 
-            // 응답용 DTO 생성
+            totalPrice += dto.getItemPrice() * dto.getQuantity();
+
             itemResponses.add(OrderItemResponseDto.builder()
                     .id(null)
                     .menuId(dto.getMenuId())
@@ -64,32 +68,27 @@ public class OrderServiceImpl implements OrderService {
                     .build());
         }
 
-// ✅ 여기서 totalPrice 계산 완료 후 생성
-        // 주문 객체 생성 (생성자에서 totalPrice까지 포함)
-        Order order = new Order(user, LocalDateTime.now(), OrderStatus.PENDING, totalPrice, items);
+        // ✅ for문 바깥에서 Order 객체 생성 (한 번만!)
+        Order order = new Order(
+                user,
+                store, // ✅ 대표 store
+                LocalDateTime.now(),
+                OrderStatus.PENDING,
+                totalPrice,
+                items
+        );
 
-        // 각 주문 항목에 주문 연결
-        for (OrderItem item : items) {
-            item.setOrder(order);
-        }
+        orderRepository.save(order);
 
-        // 주문에 항목들 추가
-        order.getItems().addAll(items);
-
-        // DB에 주문 저장
-        Order saved = orderRepository.save(order);
-
-        // 저장된 주문 정보를 기반으로 응답 DTO 구성
-        return OrderResponseDto.builder()
-                .id(saved.getId())
-                .userId(saved.getUser().getId())
-                .orderDate(saved.getOrderDate())
-                .status(saved.getStatus().name())
-                .totalPrice(saved.getTotalPrice())
-                .items(itemResponses)
-                .build();
+        return new OrderResponseDto(
+                order.getId(),
+                user.getId(),
+                order.getStatus().name(),     // ✅ enum → String으로 변환
+                totalPrice,
+                itemResponses,
+                order.getOrderDate()         // ✅ 마지막 파라미터!
+        );
     }
-
     @Override
     public List<OrderResponseDto> getOrdersByUserId(Long userId) {
         return orderRepository.findByUserId(userId).stream()

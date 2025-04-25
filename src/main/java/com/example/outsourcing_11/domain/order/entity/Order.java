@@ -71,4 +71,17 @@ public class Order extends Base {
 	public Order() {
 
 	}
+	public Order(User user, Store store, LocalDateTime orderDate, OrderStatus status, int totalPrice, List<OrderItem> items) {
+		this.user = user;
+		this.store = store; // ✅ store 추가
+		this.orderDate = orderDate;
+		this.status = status;
+		this.totalPrice = totalPrice;
+		this.items = items;
+
+		// 양방향 연관관계 설정
+		for (OrderItem item : items) {
+			item.setOrder(this);
+		}
+	}
 }
