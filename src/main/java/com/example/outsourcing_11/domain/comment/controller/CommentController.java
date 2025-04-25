@@ -51,7 +51,7 @@ public class CommentController {
 	}
 
 	@PutMapping("/orders/{orderId}/comment/{commentId}")
-	public ResponseEntity<ResponseCommentDto> putComment(
+	public ResponseEntity<ResponseCommentDto> updateComment(
 		@PathVariable Long orderId,
 		@AuthenticationPrincipal CustomUserDetails userDetails,
 		@PathVariable Long commentId,
