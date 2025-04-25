@@ -27,6 +27,6 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
         return findByIdAndDeletedAtIsNull(commentId).orElseThrow(() -> new RuntimeException("Temp Error"));
     }
 
-    @Query("SELECT COUNT(c) FROM Comment c WHERE c.store.id = :storeId AND c.deletedAt IS NULL")
-    long countByStoreId(@Param("storeId") Long storeId);
+    @Query("SELECT COUNT(c) FROM Comment c JOIN c.order o JOIN o.items oi WHERE oi.menu.id = :menuId AND c.isDeleted = false")
+    long countByMenuId(@Param("menuId") Long menuId);
 }
