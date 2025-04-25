@@ -84,4 +84,7 @@ public class Order extends Base {
 			item.setOrder(this);
 		}
 	}
+	public void changeStatus(OrderStatus newStatus) {
+		this.status = newStatus;
+	}
 }

@@ -20,6 +20,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import com.example.outsourcing_11.domain.store.entity.StoreCategory;
@@ -51,6 +52,7 @@ public class OrderControllerTest {
 
     @Test
     @Transactional
+    @Rollback(false) // ✅ 이거 추가하면 실제 DB에 남음
     @WithMockUser(username = "yuri@example.com", roles = {"CUSTOMER"})
     @DisplayName("POST /orders - 주문 생성")
     void createOrder() throws Exception {
@@ -134,15 +136,43 @@ public class OrderControllerTest {
 
 
     @Test
-    @DisplayName("주문 생성 후 사용자 주문 목록에 자동 반영되는지 확인")
+    @WithMockUser(username = "yuri@example.com", roles = {"CUSTOMER"})
+    @DisplayName("유저 주문 조회 테스트")
     void createAndGetOrdersByUserId() throws Exception {
-        mockMvc.perform(get("/orders/1"))
+        // ✅ 테스트용 유저 저장 (username과 @WithMockUser 일치시켜야 인증 성공)
+        User user = userRepository.findByEmail("yuri@example.com")
+                .orElseGet(() -> userRepository.save(new User(
+                        "유리",
+                        "yuri@example.com",
+                        "1234",
+                        "01011112222",
+                        "서울시",
+                        UserRole.CUSTOMER
+                )));
+        user = userRepository.save(user);
+
+        // ✅ 유저 아이디로 URL 호출
+        mockMvc.perform(get("/orders/user/" + user.getId()))
                 .andExpect(status().isOk());
     }
     @Test
+    @WithMockUser(username = "yuri@example.com", roles = {"CUSTOMER"})
     @DisplayName("GET /orders/{orderId} - 단일 주문 조회")
     void getOrderById() throws Exception {
-        mockMvc.perform(get("/orders/1"))
+        // ✅ 테스트용 유저 저장 (username과 @WithMockUser 일치시켜야 인증 성공)
+        User user = userRepository.findByEmail("yuri@example.com")
+                .orElseGet(() -> userRepository.save(new User(
+                        "유리",
+                        "yuri@example.com",
+                        "1234",
+                        "01011112222",
+                        "서울시",
+                        UserRole.CUSTOMER
+                )));
+        user = userRepository.save(user);
+
+        // ✅ 유저 아이디로 URL 호출
+        mockMvc.perform(get("/orders/user/" + user.getId()))
                 .andExpect(status().isOk());
     }
 
@@ -161,11 +191,12 @@ public class OrderControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "yuri@example.com", roles = {"CUSTOMER"})
     @DisplayName("PATCH /orders/{orderId} - 주문 상태 변경")
     void updateOrderStatus() throws Exception {
         String body = "{\"status\":\"COMPLETED\"}";
 
-        mockMvc.perform(patch("/orders/1")
+        mockMvc.perform(patch("/orders/4")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body))
                 .andExpect(status().isOk())
@@ -173,9 +204,10 @@ public class OrderControllerTest {
     }
 
     @Test
-    @DisplayName("DELETE /orders/{orderId} - 주문 취소")
+    @WithMockUser(username = "yuri@example.com", roles = {"CUSTOMER"})
+    @DisplayName("DELETE /orders/{id} - 주문 취소")
     void cancelOrder() throws Exception {
-        mockMvc.perform(delete("/orders/1"))
+        mockMvc.perform(delete("/orders/10"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("주문이 성공적으로 취소되었습니다."));
     }

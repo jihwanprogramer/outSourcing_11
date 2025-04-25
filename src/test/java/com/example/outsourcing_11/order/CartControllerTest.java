@@ -7,6 +7,8 @@ import com.example.outsourcing_11.domain.menu.enums.MenuStatus;
 import com.example.outsourcing_11.domain.menu.repository.MenuRepository;
 import com.example.outsourcing_11.domain.order.dto.CartItemRequestDto;
 import com.example.outsourcing_11.domain.order.dto.CartRequestDto;
+import com.example.outsourcing_11.domain.order.repository.CartRepository;
+import com.example.outsourcing_11.domain.order.repository.OrderRepository;
 import com.example.outsourcing_11.domain.store.dto.StoreRequestDto;
 import com.example.outsourcing_11.domain.store.entity.Store;
 import com.example.outsourcing_11.domain.store.entity.StoreCategory;
@@ -41,10 +43,16 @@ public class CartControllerTest {
     @Autowired private UserRepository userRepository;
     @Autowired private MenuRepository menuRepository;
     @Autowired private StoreRepository storeRepository;
+    @Autowired
+    private CartRepository cartRepository;
+
+    @Autowired
+    private OrderRepository orderRepository;
 
     @Test
     @DisplayName("장바구니에 항목 추가 - POST /carts/items")
     void addItemToCart() throws Exception {
+
         // given: 사용자, 가게, 메뉴 생성
         User user = userRepository.save(new User(
                 "유리",

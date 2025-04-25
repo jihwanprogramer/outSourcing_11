@@ -145,15 +145,16 @@ public class OrderServiceImpl implements OrderService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
 
+
         // 새로운 상태로 주문 객체를 새로 생성
         Order updated = new Order(
                 order.getUser(),
+                order.getStore(),
                 order.getOrderDate(),
                 OrderStatus.valueOf(statusUpdateDto.getStatus()),
                 order.getTotalPrice(),
-                order.getItems()
+                new ArrayList<>(order.getItems()) // ✅ 리스트 복사해서 넘김
         );
-
         Order saved = orderRepository.save(updated);
 
         return OrderResponseDto.builder()
@@ -175,20 +176,11 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public CancelResponseDto cancelOrder(Long orderId) {
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("Order not found"));
+                .orElseThrow(() -> new RuntimeException("Order not found")); // 여기서 에러
 
-        // 주문 취소 상태로 새 객체 생성
-        Order cancelled = new Order(
-                order.getUser(),
-                order.getOrderDate(),
-                OrderStatus.CANCELLED,
-                order.getTotalPrice(),
-                order.getItems()
-        );
-
-        orderRepository.save(cancelled);
-
+        orderRepository.delete(order);
         return new CancelResponseDto("주문이 성공적으로 취소되었습니다.", LocalDateTime.now());
     }
+    }
 
-}
+
