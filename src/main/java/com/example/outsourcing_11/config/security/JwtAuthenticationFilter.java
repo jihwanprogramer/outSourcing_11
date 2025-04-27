@@ -38,7 +38,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 		Long userId = jwtUtil.extractUserId(token); // 토큰에서 유저 ID 추출
 		User user = userRepository.findById(userId)
-			.filter(u -> u.getDeletedAt() == null && u.getStatus().getValue()) // 유효한 유저인지 확인
+			.filter(u -> u.getDeletedAt() == null && !u.getStatus().getValue()) // 유효한 유저인지 확인
 			.orElse(null);
 
 		if (user != null) {

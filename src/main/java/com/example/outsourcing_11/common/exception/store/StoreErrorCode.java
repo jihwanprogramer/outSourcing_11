@@ -17,7 +17,9 @@ public enum StoreErrorCode {
 	KEYWORD_NOT_FOUND("NF-002", "해당 키워드가 존재하지 않습니다.", 404),
 	STORE_NOT_FOUND("NF-003", "존재하지 않는 가게입니다.", 404),
 	NO_NOTICE("NF-004", "존재하지 않는 공지입니다.", 404),
-	USER_NOT_FOUND("NF-005", "사용자를 찾을 수 없습니다.", 404);
+	USER_NOT_FOUND("NF-005", "사용자를 찾을 수 없습니다.", 404),
+	MY_STORE_NOT_FOUND("NF-006", "내 소유의 가게가 존재하지 않습니다.", 404),
+	NO_STORE_IN_CATEGORY("NF-007", "해당 카테고리에 가게가 없습니다.", 404);
 
 	private final String code;
 	private final String message;

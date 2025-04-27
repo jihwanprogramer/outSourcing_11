@@ -18,6 +18,7 @@ public class StoreListDto {
 	private int minOrderPrice;
 	private StoreStatus status;
 	private StoreCategory category;
+	private int favoriteCount;
 
 	public StoreListDto(Store store) {
 		this.id = store.getId();
@@ -25,6 +26,6 @@ public class StoreListDto {
 		this.category = store.getCategory();
 		this.minOrderPrice = store.getMinimumOrderPrice();
 		this.status = store.getStatus();
-
+		this.favoriteCount = store.getFavoriteCount();
 	}
 }
