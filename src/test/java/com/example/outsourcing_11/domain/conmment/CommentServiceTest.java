@@ -16,8 +16,8 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import com.example.outsourcing_11.common.UserRole;
-import com.example.outsourcing_11.domain.comment.dto.user.RequestCommentDto;
-import com.example.outsourcing_11.domain.comment.dto.user.ResponseCommentDto;
+import com.example.outsourcing_11.domain.comment.dto.RequestCommentDto;
+import com.example.outsourcing_11.domain.comment.dto.ResponseCommentDto;
 import com.example.outsourcing_11.domain.comment.entity.Comment;
 import com.example.outsourcing_11.domain.comment.repository.CommentRepository;
 import com.example.outsourcing_11.domain.comment.service.CommentServiceImple;

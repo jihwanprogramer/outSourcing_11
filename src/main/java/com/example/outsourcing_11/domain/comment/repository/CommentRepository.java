@@ -13,6 +13,8 @@ import com.example.outsourcing_11.domain.comment.entity.Comment;
 @Repository
 public interface CommentRepository extends JpaRepository<Comment, Long> {
 
+	Optional<Comment> findByIdAndIsDeletedFalse(Long commentId);
+
 	/**
 	 * commentId에 해당하는 comment 조회
 	 * @param commentId

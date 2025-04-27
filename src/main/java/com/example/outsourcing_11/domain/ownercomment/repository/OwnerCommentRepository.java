@@ -1,4 +1,4 @@
-package com.example.outsourcing_11.domain.comment.repository;
+package com.example.outsourcing_11.domain.ownercomment.repository;
 
 import java.util.Optional;
 
@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import com.example.outsourcing_11.domain.comment.entity.OwnerComment;
+import com.example.outsourcing_11.domain.ownercomment.entity.OwnerComment;
 
 @Repository
 public interface OwnerCommentRepository extends JpaRepository<OwnerComment, Long> {

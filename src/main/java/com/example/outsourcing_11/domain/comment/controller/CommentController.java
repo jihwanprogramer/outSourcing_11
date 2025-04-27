@@ -17,8 +17,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.example.outsourcing_11.config.security.CustomUserDetails;
-import com.example.outsourcing_11.domain.comment.dto.user.RequestCommentDto;
-import com.example.outsourcing_11.domain.comment.dto.user.ResponseCommentDto;
+import com.example.outsourcing_11.domain.comment.dto.RequestCommentDto;
+import com.example.outsourcing_11.domain.comment.dto.ResponseCommentDto;
 import com.example.outsourcing_11.domain.comment.service.CommentServiceImple;
 import com.example.outsourcing_11.domain.user.service.UserService;
 

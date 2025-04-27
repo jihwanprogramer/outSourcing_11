@@ -11,8 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import com.example.outsourcing_11.common.Status;
 import com.example.outsourcing_11.common.exception.CustomException;
-import com.example.outsourcing_11.domain.comment.dto.user.RequestCommentDto;
-import com.example.outsourcing_11.domain.comment.dto.user.ResponseCommentDto;
+import com.example.outsourcing_11.domain.comment.dto.RequestCommentDto;
+import com.example.outsourcing_11.domain.comment.dto.ResponseCommentDto;
 import com.example.outsourcing_11.domain.comment.entity.Comment;
 import com.example.outsourcing_11.domain.comment.repository.CommentRepository;
 import com.example.outsourcing_11.domain.order.entity.Order;
@@ -46,7 +46,7 @@ public class CommentServiceImple implements CommentService {
 	@Override
 	public List<ResponseCommentDto> findCommentsByRatingRange(Long orderId, Long userId, int min, int max) {
 
-		PageRequest pageRequest = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createAt"));
+		PageRequest pageRequest = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdAt"));
 		Page<Comment> comments = commentRepository.findByRatingBetweenAndDeletedAtIsNull(min, max, pageRequest);
 		return comments.stream().map(ResponseCommentDto::new).toList();
 	}
