@@ -5,7 +5,10 @@ import com.example.outsourcing_11.domain.menu.entity.Menu;
 import com.example.outsourcing_11.domain.menu.repository.MenuRepository;
 import com.example.outsourcing_11.domain.order.dto.OrderItemRequestDto;
 import com.example.outsourcing_11.domain.order.dto.OrderRequestDto;
+import com.example.outsourcing_11.domain.order.entity.Cart;
+import com.example.outsourcing_11.domain.order.entity.Order;
 import com.example.outsourcing_11.domain.order.repository.CartRepository;
+import com.example.outsourcing_11.domain.order.repository.OrderRepository;
 import com.example.outsourcing_11.domain.store.dto.StoreRequestDto;
 import com.example.outsourcing_11.domain.store.entity.Store;
 import com.example.outsourcing_11.domain.store.entity.StoreStatus;
@@ -42,12 +45,26 @@ import java.util.List;
 @SpringBootTest
 @AutoConfigureMockMvc
 public class OrderControllerTest {
-    @Autowired private MockMvc mockMvc;
-    @Autowired private ObjectMapper objectMapper;
-    @Autowired private UserRepository userRepository;
-    @Autowired private MenuRepository menuRepository;
-    @Autowired private StoreRepository storeRepository;
-    @Autowired private CartRepository cartRepository;
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private MenuRepository menuRepository;
+
+    @Autowired
+    private StoreRepository storeRepository;
+
+    @Autowired
+    private CartRepository cartRepository;
+
+    @Autowired
+    private OrderRepository orderRepository;
 
 
     @Test
@@ -58,11 +75,48 @@ public class OrderControllerTest {
     void createOrder() throws Exception {
         // ✅ 중복 유저 정리 (Store 먼저 삭제 → User 삭제)
         userRepository.findByEmail("yuri@example.com").ifPresent(user -> {
-            // 1. 유저의 장바구니 먼저 삭제
+
+            // 1. CartItem 삭제
+            List<Cart> carts = cartRepository.findAllByUser(user);
+            for (Cart cart : carts) {
+                cart.getItems().clear();
+                cartRepository.save(cart);
+            }
+
+            // 2. Cart 삭제
+            cartRepository.deleteAllByUser(user);
+
+            // 3. OrderItem이랑 Order 관계를 제거
+            List<Order> orders = orderRepository.findAllByUser(user);
+            for (Order order : orders) {
+                order.getItems().clear();
+                orderRepository.save(order);
+            }
+
+            // 4. Order 삭제
+            orderRepository.deleteAllByUser(user);
+
+            // 5. Store와 Menu 관계 제거
+            List<Store> stores = storeRepository.findAllByOwner(user);
+            for (Store store : stores) {
+                store.getMenus().clear();
+                store.getOrders().clear();
+                storeRepository.save(store);
+            }
+
+            // 6. Store 삭제
+            storeRepository.deleteAll(stores);
+
+            // 7. User 삭제
+            userRepository.delete(user);
+
+
+           // 1. 유저의 장바구니 먼저 삭제
             cartRepository.deleteAllByUser(user);
 
             // 2. 그 유저가 소유한 가게들 삭제
-            storeRepository.deleteAll(storeRepository.findAllByOwner(user));
+            List<Store> list = storeRepository.findAllByOwner(user);
+            storeRepository.deleteAll(list);
 
             // 3. 마지막으로 유저 삭제
             userRepository.delete(user);

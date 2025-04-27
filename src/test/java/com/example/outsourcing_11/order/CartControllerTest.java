@@ -56,8 +56,8 @@ public class CartControllerTest {
         // given: 사용자, 가게, 메뉴 생성
         User user = userRepository.save(new User(
                 "유리",
-                "yuri@example.com",
-                "1234",
+                "yuri2@example.com",
+                "12234",
                 "01011112222",
                 "서울시",
                 UserRole.CUSTOMER
