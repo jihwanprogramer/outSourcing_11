@@ -1,6 +1,6 @@
 package com.example.outsourcing_11.domain.store.dto;
 
-import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,8 +15,8 @@ import com.example.outsourcing_11.domain.store.entity.StoreStatus;
 @AllArgsConstructor
 public class StoreRequestDto {
 	private String name;
-	private LocalDateTime openTime;
-	private LocalDateTime closeTime;
+	private LocalTime openTime;
+	private LocalTime closeTime;
 	private int minOrderPrice;
 	private String address;
 	private StoreCategory category;

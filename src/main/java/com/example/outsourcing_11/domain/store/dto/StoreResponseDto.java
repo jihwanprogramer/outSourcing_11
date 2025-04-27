@@ -1,6 +1,6 @@
 package com.example.outsourcing_11.domain.store.dto;
 
-import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -18,11 +18,12 @@ public class StoreResponseDto {
 	private Long id;
 	private String name;
 	private String address;
-	private LocalDateTime openTime;
-	private LocalDateTime closeTime;
+	private LocalTime openTime;
+	private LocalTime closeTime;
 	private int minimumOrderPrice;
 	private StoreStatus status;
 	private StoreCategory category;
+	private int favoriteCount;
 
 	public StoreResponseDto(Store store) {
 		this.id = store.getId();
@@ -33,17 +34,8 @@ public class StoreResponseDto {
 		this.minimumOrderPrice = store.getMinimumOrderPrice();
 		this.status = store.getStatus();
 		this.category = store.getCategory();
+		this.favoriteCount = store.getFavorites().size();
 	}
 
-	public StoreResponseDto(StoreResponseDto responseDto) {
-		this.id = id;
-		this.name = name;
-		this.address = address;
-		this.openTime = openTime;
-		this.closeTime = closeTime;
-		this.minimumOrderPrice = minimumOrderPrice;
-		this.status = status;
-		this.category = category;
-	}
 }
 
