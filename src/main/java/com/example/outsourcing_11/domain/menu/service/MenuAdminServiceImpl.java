@@ -1,6 +1,7 @@
 package com.example.outsourcing_11.domain.menu.service;
 
 import com.example.outsourcing_11.common.Status;
+import com.example.outsourcing_11.common.exception.menu.MenuNotFoundException;
 import com.example.outsourcing_11.domain.menu.dto.request.MenuSaveRequestDto;
 import com.example.outsourcing_11.domain.menu.dto.request.MenuUpdateRequestDto;
 import com.example.outsourcing_11.domain.menu.dto.response.MenuAdminResponseDto;
@@ -39,7 +40,7 @@ public class MenuAdminServiceImpl implements MenuAdminService {
         if (findStore.getId().equals(menu.getStore().getId())) {
             menu.update(dto);
         } else {
-            throw new RuntimeException("해당 가게에 입력하신 메뉴가 없습니다");
+            throw new MenuNotFoundException("해당 가게에 입력하신 메뉴가 없습니다");
         }
 
         return new MenuAdminResponseDto(menu);
@@ -55,7 +56,7 @@ public class MenuAdminServiceImpl implements MenuAdminService {
             menu.timeWhenDeleted();
             menuRepository.save(menu);
         } else {
-            throw new RuntimeException("해당 가게에 입력하신 메뉴가 없습니다");
+            throw new MenuNotFoundException("해당 가게에 입력하신 메뉴가 없습니다");
         }
 
     }
