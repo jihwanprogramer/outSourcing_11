@@ -12,6 +12,7 @@ import com.example.outsourcing_11.domain.order.repository.CartRepository;
 import com.example.outsourcing_11.domain.order.repository.OrderRepository;
 import com.example.outsourcing_11.domain.store.dto.StoreRequestDto;
 import com.example.outsourcing_11.domain.store.entity.Store;
+import com.example.outsourcing_11.domain.store.entity.StoreCategory;
 import com.example.outsourcing_11.domain.store.entity.StoreStatus;
 import com.example.outsourcing_11.domain.store.repository.StoreRepository;
 import com.example.outsourcing_11.domain.user.entity.User;

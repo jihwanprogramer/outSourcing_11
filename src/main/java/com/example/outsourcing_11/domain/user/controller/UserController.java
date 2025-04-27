@@ -2,6 +2,7 @@ package com.example.outsourcing_11.domain.user.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 
 import lombok.RequiredArgsConstructor;
 
@@ -47,7 +48,7 @@ public class UserController {
 
 	@PostMapping("/delete-auth")
 	public ResponseEntity<String> issueDeleteAuthCookie(
-		@RequestBody PasswordRequestDto passwordDto,
+		@Valid @RequestBody PasswordRequestDto passwordDto,
 		@AuthenticationPrincipal CustomUserDetails userDetails,
 		HttpServletResponse response) {
 		userService.issueDeleteAuthCookie(passwordDto, userDetails, response);
@@ -56,7 +57,7 @@ public class UserController {
 
 	@PutMapping("/update")
 	public ResponseEntity<String> updateUser(
-		@RequestBody UpdateUserRequestDto updateUserRequestDto,
+		@Valid @RequestBody UpdateUserRequestDto updateUserRequestDto,
 		@AuthenticationPrincipal CustomUserDetails userDetails, HttpServletRequest request) {
 		userService.updateUser(updateUserRequestDto, userDetails, request);
 		return new ResponseEntity<>("회원 정보 수정 완료", HttpStatus.OK);
@@ -64,7 +65,7 @@ public class UserController {
 
 	@PatchMapping("/updateAddress")
 	public ResponseEntity<String> updateUserAddress(
-		@RequestBody UpdateUserAddressRequestDto requestDto,
+		@Valid @RequestBody UpdateUserAddressRequestDto requestDto,
 		@AuthenticationPrincipal CustomUserDetails userDetails, HttpServletRequest request) {
 		userService.updateUserAddress(requestDto, userDetails, request);
 		return new ResponseEntity<>("회원 정보 수정 완료", HttpStatus.OK);
@@ -72,7 +73,7 @@ public class UserController {
 
 	@PatchMapping("/updatePassword")
 	public ResponseEntity<String> updateUserPassword(
-		@RequestBody UpdateUserPasswordRequestDto requestDto,
+		@Valid @RequestBody UpdateUserPasswordRequestDto requestDto,
 		@AuthenticationPrincipal CustomUserDetails userDetails, HttpServletRequest request) {
 		userService.updateUserPassword(requestDto, userDetails, request);
 		return new ResponseEntity<>("회원 정보 수정 완료", HttpStatus.OK);
