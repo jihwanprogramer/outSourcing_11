@@ -16,7 +16,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 
-import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -26,7 +25,6 @@ import com.example.outsourcing_11.domain.menu.entity.Menu;
 import com.example.outsourcing_11.domain.order.entity.Order;
 import com.example.outsourcing_11.domain.store.dto.StoreRequestDto;
 import com.example.outsourcing_11.domain.user.entity.User;
-
 
 @Getter
 @Entity
@@ -110,6 +108,18 @@ public class Store extends Base {
 	public void softDelete() {
 		this.deletedAt = LocalDateTime.now();
 		this.deleted = Status.NON_EXIST.getValue();
+	}
+
+	public Store(String name, String address, LocalDateTime openTime, LocalDateTime closeTime, int price,
+		StoreStatus status, StoreCategory storeCategory, User user) {
+		this.name = name;
+		this.address = address;
+		this.openTime = openTime;
+		this.closeTime = closeTime;
+		this.minimumOrderPrice = price;
+		this.status = status;
+		this.category = storeCategory;
+		this.owner = user;
 	}
 
 }
