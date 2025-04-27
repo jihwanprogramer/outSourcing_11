@@ -13,10 +13,14 @@ import com.example.outsourcing_11.domain.comment.entity.Comment;
 @Repository
 public interface CommentRepository extends JpaRepository<Comment, Long> {
 
-	//commentId에 해당하는 comment 조회
-	Optional<Comment> findByIdAndDeletedAtIsNull(Long comentId);
+	Optional<Comment> findByIdAndIsDeletedFalse(Long commentId);
 
-	//별점 범위에 따른 comment 조회
+	/**
+	 * commentId에 해당하는 comment 조회
+	 * @param commentId
+	 * @return
+	 */
+	Optional<Comment> findByIdAndOrderIdAndDeletedAtIsNull(Long commentId, Long orderId);
 
 	/**
 	 * 2025.04.25
@@ -29,8 +33,19 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 	 */
 	Page<Comment> findByRatingBetweenAndDeletedAtIsNull(int min, int max, Pageable pageable);
 
-	@Query("SELECT c FROM Comment c JOIN c.order o WHERE o.id = :orderId AND c.isDeleted = false ")
+	/**
+	 * 주문에 존재하는 comment를 전부 조회 (대댓글 조회 하지 않음)
+	 * @param orderId Long orederId
+	 * @return Optional로 받아서 내보냄
+	 */
+	@Query("SELECT c FROM Comment c JOIN  c.order o WHERE o.id = :orderId AND c.isDeleted = false ORDER BY c.createdAt DESC")
 	Optional<Comment> findWithRelationsByOrderId(@Param("orderId") Long orderId);
+
+	/**
+	 *
+	 * @param menuId
+	 * @return
+	 */
 
 	@Query("SELECT COUNT(c) FROM Comment c JOIN c.order o JOIN o.items oi WHERE oi.menu.id = :menuId AND c.isDeleted = false")
 	long countByMenuId(@Param("menuId") Long menuId);

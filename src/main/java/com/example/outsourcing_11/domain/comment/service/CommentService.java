@@ -10,6 +10,8 @@ public interface CommentService {
 
 	List<ResponseCommentDto> findCommentsByRatingRange(Long orderId, Long userId, int min, int max);
 
+	List<ResponseCommentDto> findByOrderComments(Long orderId, Long userId);
+
 	ResponseCommentDto updateComment(Long orderId, Long userId, Long commentId, RequestCommentDto dto);
 
 	void deleteComment(Long orderId, Long userId, Long commentId);

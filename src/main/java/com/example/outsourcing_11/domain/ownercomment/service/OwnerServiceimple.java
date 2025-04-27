@@ -28,12 +28,13 @@ public class OwnerServiceimple implements OwnerService {
 
 	@Override
 	public OwnerResponseCommentDto createOwerComment(Long commentId, OwnerRequestCommentDto dto) {
-		Comment comment = commentRepository.findById(commentId)
+		Comment comment = commentRepository.findByIdAndIsDeletedFalse(commentId)
 			.orElseThrow(() -> new CustomException("리뷰가 존재 하지 않습니다.", HttpStatus.NOT_FOUND));
 		OwnerComment ownerComment = new OwnerComment(dto);
 
 		ownerComment.updateComment(comment);
-		comment.updateOwnerComment(ownerComment);
+		comment.updateOwenrComment(ownerComment);
+
 		ownerCommentRepository.save(ownerComment);
 		return new OwnerResponseCommentDto(ownerComment);
 	}
@@ -57,7 +58,7 @@ public class OwnerServiceimple implements OwnerService {
 	 */
 	@Override
 	public List<OwnerResponseCommentDto> getOwnerComments(Long storeId, Long commentId) {
-		Comment comment = commentRepository.findByIdAndDeletedAtIsNull(commentId)
+		Comment comment = commentRepository.findByIdAndIsDeletedFalse(commentId)
 			.orElseThrow(() -> new CustomException("리뷰가 존재 하지 않습니다.", HttpStatus.NOT_FOUND));
 
 		PageRequest pageRequest = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdAt"));
@@ -68,7 +69,7 @@ public class OwnerServiceimple implements OwnerService {
 
 	@Override
 	public OwnerResponseCommentDto updateOwnerComment(Long commentId, OwnerRequestCommentDto dto) {
-		Comment comment = commentRepository.findByIdAndDeletedAtIsNull(commentId)
+		Comment comment = commentRepository.findByIdAndIsDeletedFalse(commentId)
 			.orElseThrow(() -> new CustomException("리뷰가 존재 하지 않습니다.", HttpStatus.NOT_FOUND));
 
 		if (comment.getOwnerComment() == null) {
@@ -83,7 +84,7 @@ public class OwnerServiceimple implements OwnerService {
 
 	@Override
 	public void deleteOwerComment(Long commentId) {
-		Comment comment = commentRepository.findByIdAndDeletedAtIsNull(commentId)
+		Comment comment = commentRepository.findByIdAndIsDeletedFalse(commentId)
 			.orElseThrow(() -> new CustomException("리뷰가 존재 하지 않습니다.", HttpStatus.NOT_FOUND));
 		if (comment.getOwnerComment() == null) {
 			throw new CustomException("사장님 댓글이 존재하지 않습니다.", HttpStatus.NOT_FOUND);

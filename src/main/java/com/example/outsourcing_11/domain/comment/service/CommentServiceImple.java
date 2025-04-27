@@ -23,15 +23,15 @@ import com.example.outsourcing_11.domain.order.repository.OrderRepository;
 @RequiredArgsConstructor
 public class CommentServiceImple implements CommentService {
 
-	private static CommentRepository commentRepository;
-	private static OrderRepository orderRepository;
+	private final OrderRepository orderRepository;
+	private final CommentRepository commentRepository;
 
 	@Override
 	public ResponseCommentDto createComment(Long orderId, Long userId, RequestCommentDto dto) {
 
 		Order order = orderRepository.findById(orderId)
 			.orElseThrow(() -> new CustomException("존재하지 않는 주문입니다.", HttpStatus.NOT_FOUND));
-		if (!order.getUser().equals(userId)) {
+		if (!order.getUser().getId().equals(userId)) {
 			throw new CustomException("작성 권한이 없습니다.", HttpStatus.BAD_REQUEST);
 		}
 		if (!order.getStatus().equals(OrderStatus.COMPLETED)) {
@@ -46,15 +46,7 @@ public class CommentServiceImple implements CommentService {
 	@Override
 	public List<ResponseCommentDto> findCommentsByRatingRange(Long orderId, Long userId, int min, int max) {
 
-		Order order = orderRepository.findById(orderId)
-			.orElseThrow(() -> new CustomException("존재하지 않는 주문입니다.", HttpStatus.NOT_FOUND));
-		if (!order.getUser().equals(userId)) {
-			throw new CustomException("조회 권한이 없습니다.", HttpStatus.BAD_REQUEST);
-		}
-		if (!order.getStatus().equals(OrderStatus.COMPLETED)) {
-			throw new CustomException("배달완료가되지 않았습니다.", HttpStatus.BAD_REQUEST);
-		}
-		PageRequest pageRequest = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createAt"));
+		PageRequest pageRequest = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdAt"));
 		Page<Comment> comments = commentRepository.findByRatingBetweenAndDeletedAtIsNull(min, max, pageRequest);
 		return comments.stream().map(ResponseCommentDto::new).toList();
 	}
@@ -63,7 +55,7 @@ public class CommentServiceImple implements CommentService {
 
 		Order order = orderRepository.findById(orderId)
 			.orElseThrow(() -> new CustomException("존재하지 않는 주문입니다.", HttpStatus.NOT_FOUND));
-		if (!order.getUser().equals(userId)) {
+		if (!order.getUser().getId().equals(userId)) {
 			throw new CustomException("조회 권한이 없습니다.", HttpStatus.BAD_REQUEST);
 		}
 		if (!order.getStatus().equals(OrderStatus.COMPLETED)) {
@@ -81,17 +73,20 @@ public class CommentServiceImple implements CommentService {
 
 		Order order = orderRepository.findById(orderId)
 			.orElseThrow(() -> new CustomException("존재하지 않는 주문입니다.", HttpStatus.NOT_FOUND));
-		if (!order.getUser().equals(userId)) {
+
+		if (!order.getUser().getId().equals(userId)) {
 			throw new CustomException("수정 권한이 없습니다.", HttpStatus.BAD_REQUEST);
 		}
+
 		if (!order.getStatus().equals(OrderStatus.COMPLETED)) {
 			throw new CustomException("배달완료가되지 않았습니다.", HttpStatus.BAD_REQUEST);
 		}
 
 		Comment findcomment = commentRepository
-			.findByIdAndDeletedAtIsNull(commentId)
+			.findByIdAndOrderIdAndDeletedAtIsNull(commentId, orderId)
 			.orElseThrow(() -> new CustomException("존재하지 않는 리뷰 입니다.", HttpStatus.NOT_FOUND));
 		findcomment.update(dto);
+		commentRepository.save(findcomment);
 		return new ResponseCommentDto(findcomment);
 	}
 
@@ -100,16 +95,18 @@ public class CommentServiceImple implements CommentService {
 
 		Order order = orderRepository.findById(orderId)
 			.orElseThrow(() -> new CustomException("존재하지 않는 주문입니다.", HttpStatus.NOT_FOUND));
-		if (!order.getUser().equals(userId)) {
-			throw new CustomException("삭제 권한이 없습니다.", HttpStatus.BAD_REQUEST);
+
+		if (!order.getUser().getId().equals(userId)) {
+			throw new CustomException("수정 권한이 없습니다.", HttpStatus.BAD_REQUEST);
 		}
+
 		if (!order.getStatus().equals(OrderStatus.COMPLETED)) {
 			throw new CustomException("배달완료가되지 않았습니다.", HttpStatus.BAD_REQUEST);
 		}
 
 		//softDelete 진행.
 		Comment findcomment = commentRepository
-			.findByIdAndDeletedAtIsNull(commentId)
+			.findByIdAndOrderIdAndDeletedAtIsNull(commentId, orderId)
 			.orElseThrow(() -> new CustomException("존재하지 않는 리뷰 입니다.", HttpStatus.NOT_FOUND));
 		Status status = Status.fromValue(true);
 		findcomment.updateDeleteStatus(status.getValue());

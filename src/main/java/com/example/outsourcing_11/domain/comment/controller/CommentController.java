@@ -35,12 +35,14 @@ public class CommentController {
 		@PathVariable Long orderId,
 		@AuthenticationPrincipal CustomUserDetails userDetails,
 		@RequestBody RequestCommentDto dto) {
+
 		return new ResponseEntity<>(commentServiceImple.createComment(orderId, userDetails.getUserId(), dto),
 			HttpStatus.CREATED);
 	}
 
+	//별점 범위에 따른 유저들의 댓글 조회
 	@GetMapping("/orders/{orderId}/comment")
-	public ResponseEntity<List<ResponseCommentDto>> getComment(
+	public ResponseEntity<List<ResponseCommentDto>> getComments(
 		@PathVariable Long orderId,
 		@AuthenticationPrincipal CustomUserDetails userDetails,
 		@RequestParam int min,
@@ -51,7 +53,7 @@ public class CommentController {
 	}
 
 	@PutMapping("/orders/{orderId}/comment/{commentId}")
-	public ResponseEntity<ResponseCommentDto> putComment(
+	public ResponseEntity<ResponseCommentDto> updateComment(
 		@PathVariable Long orderId,
 		@AuthenticationPrincipal CustomUserDetails userDetails,
 		@PathVariable Long commentId,
@@ -66,6 +68,7 @@ public class CommentController {
 		@PathVariable Long orderId,
 		@AuthenticationPrincipal CustomUserDetails userDetails,
 		@PathVariable Long commentId) {
+
 		commentServiceImple.deleteComment(orderId, userDetails.getUserId(), commentId);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
