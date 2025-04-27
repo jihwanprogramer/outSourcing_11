@@ -11,9 +11,9 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface MenuRepository extends JpaRepository<Menu, Long> {
-	default Menu finByIdOrElseThrow(Long menuId) {
-		return findById(menuId).orElseThrow(() -> new NullPointerException("존재하지 않는 메뉴입니다"));
-	}
+    default Menu finByIdOrElseThrow(Long menuId) {
+        return findById(menuId).orElseThrow(() -> new MenuNotFoundException("존재하지 않는 메뉴입니다"));
+    }
 
 	@Query("""
 		    SELECT m FROM Menu m
