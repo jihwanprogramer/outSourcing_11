@@ -47,6 +47,8 @@ dependencies {
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
     implementation 'com.fasterxml.jackson.core:jackson-annotations:2.15.2'
     testImplementation 'com.h2database:h2'
+    testImplementation 'org.springframework.security:spring-security-test'
+
 }
 
 tasks.named('test') {
