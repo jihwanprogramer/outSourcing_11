@@ -7,7 +7,7 @@ build/
 
 
 # application.properties 무시
-application.properties
+src/main/resources/application.properties
 
 # yml도 무시
 **/application.yml
@@ -44,3 +44,4 @@ out/
 .vscode/
 
 
+src/main/resources/application.properties
