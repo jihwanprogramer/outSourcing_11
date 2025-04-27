@@ -21,7 +21,7 @@ public class MenuUserController {
         @PathVariable Long storeId,
         @RequestParam(required = false) Category categoryCursor,
         @RequestParam(required = false) Long lastId,
-        @RequestParam(defaultValue = "20") int size) {
+        @RequestParam(defaultValue = "5") int size) {
 
 
         Slice<MenuUserResponseDto> menuList = menuUserServiceImpl.findCursorMenuBySize(storeId, categoryCursor, lastId, size);

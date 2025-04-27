@@ -28,4 +28,6 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
 	List<Store> findAllByOwnerAndDeletedFalse(User user);
 
 	Optional<Store> findByIdAndOwnerAndDeletedFalse(Long storeId, User user);
+
+	List<Store> findAllByOwner(User user);
 }

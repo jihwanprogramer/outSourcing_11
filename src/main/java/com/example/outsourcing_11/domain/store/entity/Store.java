@@ -102,6 +102,18 @@ public class Store extends Base {
 		this.owner = user;
 	}
 
+	public Store(String name, String address, LocalDateTime openTime, LocalDateTime closeTime, int price,
+		StoreStatus status, StoreCategory storeCategory, User user) {
+		this.name = name;
+		this.address = address;
+		this.openTime = openTime;
+		this.closeTime = closeTime;
+		this.minimumOrderPrice = price;
+		this.status = status;
+		this.category = storeCategory;
+		this.owner = user;
+	}
+
 	public void updateStatus() {
 		LocalTime now = LocalTime.now();
 		if (now.isAfter(this.openTime) && now.isBefore(this.closeTime)) {
@@ -121,6 +133,18 @@ public class Store extends Base {
 	public void softDelete() {
 		this.deletedAt = LocalDateTime.now();
 		this.deleted = Status.NON_EXIST.getValue();
+	}
+
+	public Store(String name, String address, LocalDateTime openTime, LocalDateTime closeTime, int price,
+		StoreStatus status, StoreCategory storeCategory, User user) {
+		this.name = name;
+		this.address = address;
+		this.openTime = openTime;
+		this.closeTime = closeTime;
+		this.minimumOrderPrice = price;
+		this.status = status;
+		this.category = storeCategory;
+		this.owner = user;
 	}
 
 }

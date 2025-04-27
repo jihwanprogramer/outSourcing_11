@@ -13,6 +13,7 @@ import com.example.outsourcing_11.domain.store.entity.Store;
 import com.example.outsourcing_11.domain.store.repository.StoreRepository;
 import com.example.outsourcing_11.domain.user.entity.User;
 import com.example.outsourcing_11.domain.user.repository.UserRepository;
+import org.springframework.transaction.annotation.Transactional; // ✅ 수정된 import
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -95,6 +96,12 @@ public class CartServiceImpl implements CartService {
                 .map(CartItem::toResponseDto)
                 .toList();
         return new CartResponseDto(cart.getId(), user.getId(), responseItems);
+    }
+
+    @Transactional(readOnly = true)
+    public Cart getEntityByUserId(Long userId) {
+        return cartRepository.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("장바구니가 존재하지 않습니다."));
     }
 
 }
