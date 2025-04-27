@@ -1,6 +1,7 @@
-package com.example.outsourcing_11.domain.comment.entity;
+package com.example.outsourcing_11.domain.ownercomment.entity;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -11,7 +12,8 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 
 import com.example.outsourcing_11.common.Base;
-import com.example.outsourcing_11.domain.comment.dto.Owner.OwnerRequestCommentDto;
+import com.example.outsourcing_11.domain.comment.entity.Comment;
+import com.example.outsourcing_11.domain.ownercomment.dto.OwnerRequestCommentDto;
 
 @Getter
 @Entity
@@ -21,8 +23,8 @@ public class OwnerComment extends Base {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@OneToOne
-	@JoinColumn(name = "comment_id", nullable = false, unique = true)
+	@OneToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "comment_id")
 	private Comment comment;
 
 	private String content;
@@ -46,4 +48,7 @@ public class OwnerComment extends Base {
 		this.content = content;
 	}
 
+	public void updateComment(Comment comment) {
+		this.comment = comment;
+	}
 }

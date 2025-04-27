@@ -1,4 +1,4 @@
-package com.example.outsourcing_11.domain.comment.dto.Owner;
+package com.example.outsourcing_11.domain.ownercomment.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

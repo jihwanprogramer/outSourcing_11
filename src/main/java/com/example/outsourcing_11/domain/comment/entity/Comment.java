@@ -1,7 +1,5 @@
 package com.example.outsourcing_11.domain.comment.entity;
 
-import java.util.List;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -16,8 +14,9 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 
 import com.example.outsourcing_11.common.Base;
-import com.example.outsourcing_11.domain.comment.dto.user.RequestCommentDto;
+import com.example.outsourcing_11.domain.comment.dto.RequestCommentDto;
 import com.example.outsourcing_11.domain.order.entity.Order;
+import com.example.outsourcing_11.domain.ownercomment.entity.OwnerComment;
 import com.example.outsourcing_11.domain.store.entity.Store;
 import com.example.outsourcing_11.domain.user.entity.User;
 
@@ -29,11 +28,8 @@ public class Comment extends Base {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	private Comment parent;
-
 	@OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<Comment> ownerComment;
+	private OwnerComment ownerComment;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "order_id")
@@ -83,8 +79,13 @@ public class Comment extends Base {
 		this.rating = dto.getRating();
 	}
 
-	public void updateUserAndStore(User user, Store store) {
-		this.user = user;
-		this.store = store;
+	public void updateOrder(Order order) {
+		this.user = order.getUser();
+		this.store = order.getStore();
+		this.order = order;
+	}
+
+	public void updateOwnerComment(OwnerComment ownerComment) {
+		this.ownerComment = ownerComment;
 	}
 }

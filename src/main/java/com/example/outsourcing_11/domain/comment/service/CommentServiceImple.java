@@ -11,8 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import com.example.outsourcing_11.common.Status;
 import com.example.outsourcing_11.common.exception.CustomException;
-import com.example.outsourcing_11.domain.comment.dto.user.RequestCommentDto;
-import com.example.outsourcing_11.domain.comment.dto.user.ResponseCommentDto;
+import com.example.outsourcing_11.domain.comment.dto.RequestCommentDto;
+import com.example.outsourcing_11.domain.comment.dto.ResponseCommentDto;
 import com.example.outsourcing_11.domain.comment.entity.Comment;
 import com.example.outsourcing_11.domain.comment.repository.CommentRepository;
 import com.example.outsourcing_11.domain.order.entity.Order;
@@ -108,7 +108,9 @@ public class CommentServiceImple implements CommentService {
 		}
 
 		//softDelete 진행.
-		Comment findcomment = commentRepository.findByOrThrowElse(commentId);
+		Comment findcomment = commentRepository
+			.findByIdAndDeletedAtIsNull(commentId)
+			.orElseThrow(() -> new CustomException("존재하지 않는 리뷰 입니다.", HttpStatus.NOT_FOUND));
 		Status status = Status.fromValue(true);
 		findcomment.updateDeleteStatus(status.getValue());
 		findcomment.timeWhenDeleted();
