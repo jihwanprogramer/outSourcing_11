@@ -18,6 +18,7 @@ import com.example.outsourcing_11.util.JwtUtil;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
