@@ -16,5 +16,13 @@ public class OrderResponseDto {
     private List<OrderItemResponseDto> items;
     private LocalDateTime orderDate;
 
-
+    public OrderResponseDto(Long id, Long userId, String status, int totalPrice,
+                            List<OrderItemResponseDto> items, LocalDateTime orderDate) {
+        this.id = id;
+        this.userId = userId;
+        this.status = status;
+        this.totalPrice = totalPrice;
+        this.items = items;
+        this.orderDate = orderDate;
+    }
 }
