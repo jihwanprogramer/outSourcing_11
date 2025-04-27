@@ -15,7 +15,6 @@ import com.example.outsourcing_11.domain.comment.dto.user.RequestCommentDto;
 import com.example.outsourcing_11.domain.comment.dto.user.ResponseCommentDto;
 import com.example.outsourcing_11.domain.comment.entity.Comment;
 import com.example.outsourcing_11.domain.comment.repository.CommentRepository;
-import com.example.outsourcing_11.domain.comment.repository.OwnerCommentRepository;
 import com.example.outsourcing_11.domain.order.entity.Order;
 import com.example.outsourcing_11.domain.order.entity.OrderStatus;
 import com.example.outsourcing_11.domain.order.repository.OrderRepository;
@@ -24,16 +23,15 @@ import com.example.outsourcing_11.domain.order.repository.OrderRepository;
 @RequiredArgsConstructor
 public class CommentServiceImple implements CommentService {
 
-	private final CommentRepository commentRepository;
 	private final OrderRepository orderRepository;
-	private final OwnerCommentRepository ownerCommentRepository;
+	private final CommentRepository commentRepository;
 
 	@Override
 	public ResponseCommentDto createComment(Long orderId, Long userId, RequestCommentDto dto) {
 
 		Order order = orderRepository.findById(orderId)
 			.orElseThrow(() -> new CustomException("존재하지 않는 주문입니다.", HttpStatus.NOT_FOUND));
-		if (!order.getUser().equals(userId)) {
+		if (!order.getUser().getId().equals(userId)) {
 			throw new CustomException("작성 권한이 없습니다.", HttpStatus.BAD_REQUEST);
 		}
 		if (!order.getStatus().equals(OrderStatus.COMPLETED)) {
@@ -57,7 +55,7 @@ public class CommentServiceImple implements CommentService {
 
 		Order order = orderRepository.findById(orderId)
 			.orElseThrow(() -> new CustomException("존재하지 않는 주문입니다.", HttpStatus.NOT_FOUND));
-		if (!order.getUser().equals(userId)) {
+		if (!order.getUser().getId().equals(userId)) {
 			throw new CustomException("조회 권한이 없습니다.", HttpStatus.BAD_REQUEST);
 		}
 		if (!order.getStatus().equals(OrderStatus.COMPLETED)) {
@@ -75,17 +73,20 @@ public class CommentServiceImple implements CommentService {
 
 		Order order = orderRepository.findById(orderId)
 			.orElseThrow(() -> new CustomException("존재하지 않는 주문입니다.", HttpStatus.NOT_FOUND));
-		if (!order.getUser().equals(userId)) {
+
+		if (!order.getUser().getId().equals(userId)) {
 			throw new CustomException("수정 권한이 없습니다.", HttpStatus.BAD_REQUEST);
 		}
+
 		if (!order.getStatus().equals(OrderStatus.COMPLETED)) {
 			throw new CustomException("배달완료가되지 않았습니다.", HttpStatus.BAD_REQUEST);
 		}
 
 		Comment findcomment = commentRepository
-			.findByIdAndDeletedAtIsNull(commentId)
+			.findByIdAndOrderIdAndDeletedAtIsNull(commentId, orderId)
 			.orElseThrow(() -> new CustomException("존재하지 않는 리뷰 입니다.", HttpStatus.NOT_FOUND));
 		findcomment.update(dto);
+		commentRepository.save(findcomment);
 		return new ResponseCommentDto(findcomment);
 	}
 
@@ -94,15 +95,19 @@ public class CommentServiceImple implements CommentService {
 
 		Order order = orderRepository.findById(orderId)
 			.orElseThrow(() -> new CustomException("존재하지 않는 주문입니다.", HttpStatus.NOT_FOUND));
-		if (!order.getUser().equals(userId)) {
-			throw new CustomException("삭제 권한이 없습니다.", HttpStatus.BAD_REQUEST);
+
+		if (!order.getUser().getId().equals(userId)) {
+			throw new CustomException("수정 권한이 없습니다.", HttpStatus.BAD_REQUEST);
 		}
+
 		if (!order.getStatus().equals(OrderStatus.COMPLETED)) {
 			throw new CustomException("배달완료가되지 않았습니다.", HttpStatus.BAD_REQUEST);
 		}
 
 		//softDelete 진행.
-		Comment findcomment = commentRepository.findByOrThrowElse(commentId);
+		Comment findcomment = commentRepository
+			.findByIdAndOrderIdAndDeletedAtIsNull(commentId, orderId)
+			.orElseThrow(() -> new CustomException("존재하지 않는 리뷰 입니다.", HttpStatus.NOT_FOUND));
 		Status status = Status.fromValue(true);
 		findcomment.updateDeleteStatus(status.getValue());
 		findcomment.timeWhenDeleted();

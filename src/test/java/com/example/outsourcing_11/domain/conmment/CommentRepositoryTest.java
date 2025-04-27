@@ -105,33 +105,22 @@ public class CommentRepositoryTest {
 		menuRepository.saveAll(menus);
 		menuRepository.flush();
 		List<OrderItem> items = new ArrayList<>();
-
-		OrderItem item1 = new OrderItem();
-		item1.setMenu(menus.get(0));
-		item1.setStore(stores.get(0));
-		item1.setQuantity(1);
-
-		OrderItem item2 = new OrderItem();
-		item2.setMenu(menus.get(1));
-		item2.setStore(stores.get(0));
-		item2.setQuantity(1);
-
-		OrderItem item3 = new OrderItem();
-		item3.setMenu(menus.get(1));
-		item3.setStore(stores.get(0));
-		item3.setQuantity(1);
-
-		items.add(item1);
-		items.add(item2);
-		items.add(item3);
-
+		Random randomMenu = new Random();
+		for (int j = 0; j < 3; j++) {
+			int menuNum = randomMenu.nextInt(0, 3);
+			OrderItem item = new OrderItem();
+			item.setMenu(menus.get(menuNum));
+			item.setStore(stores.get(0));
+			item.setQuantity(1);
+			items.add(item);
+		}
 		Order order = new Order(customer.get(1), stores.get(0), LocalDateTime.now(), OrderStatus.COMPLETED, 8000,
 			items);
 
 		orderRepository.save(order);
 		orderRepository.flush();
 		Comment comment = new Comment("맛있습니다.", null, 3);
-		comment.updateUserAndStore(order);
+		comment.updateOrder(order);
 		commentRepository.save(comment);
 		commentRepository.flush();
 		//when
@@ -231,7 +220,7 @@ public class CommentRepositoryTest {
 		for (int i = 0; i < customer.size(); i++) {
 			int rating = randomRating.nextInt(0, 5);
 			Comment comment = new Comment("맛있습니다.", null, rating);
-			comment.updateUserAndStore(orders.get(i));
+			comment.updateOrder(orders.get(i));
 
 			comments.add(comment);
 		}
@@ -331,7 +320,7 @@ public class CommentRepositoryTest {
 			int rating = randomRating.nextInt(0, 5);
 			int contentNum = randomContent.nextInt(0, content.length - 1);
 			Comment comment = new Comment(content[contentNum], null, rating);
-			comment.updateUserAndStore(orders.get(i));
+			comment.updateOrder(orders.get(i));
 
 			comments.add(comment);
 		}
