@@ -1,6 +1,7 @@
 package com.example.outsourcing_11.domain.store.entity;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
@@ -39,10 +40,10 @@ public class Store extends Base {
 	private String name;
 
 	@Column(name = "open_time", nullable = false)
-	private LocalDateTime openTime;
+	private LocalTime openTime;
 
 	@Column(name = "close_time", nullable = false)
-	private LocalDateTime closeTime;
+	private LocalTime closeTime;
 
 	@Column(name = "minimum_order_price", nullable = false)
 	private int minimumOrderPrice;
@@ -70,12 +71,24 @@ public class Store extends Base {
 	private List<Order> orders;
 
 	@OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
+	@Column(columnDefinition = "TEXT", name = "notice")
 	private List<Notice> notices;
 
 	@OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Favorite> favorites;
 
-	@Column(columnDefinition = "TINYINT(1) DEFAULT 1")
+	@Column(nullable = false)
+	private int favoriteCount = 0;
+
+	public void increaseFavorite() {
+		this.favoriteCount++;
+	}
+
+	public void decreaseFavorite() {
+		this.favoriteCount--;
+	}
+
+	@Column(columnDefinition = "TINYINT(1)")
 	private boolean deleted = Status.EXIST.getValue();
 
 	public Store(StoreRequestDto dto, User user) {
@@ -90,7 +103,7 @@ public class Store extends Base {
 	}
 
 	public void updateStatus() {
-		LocalDateTime now = LocalDateTime.now();
+		LocalTime now = LocalTime.now();
 		if (now.isAfter(this.openTime) && now.isBefore(this.closeTime)) {
 			this.status = StoreStatus.OPEN;
 		} else {
