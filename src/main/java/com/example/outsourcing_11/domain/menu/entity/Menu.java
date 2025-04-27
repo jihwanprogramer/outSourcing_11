@@ -40,7 +40,7 @@ public class Menu extends Base {
     @JoinColumn(name = "storeId")
     private Store store;
 
-    @Column(columnDefinition = "TINYINT(1) DEFAULT 1")
+    @Column(columnDefinition = "TINYINT(1)")
     private boolean isDeleted = Status.EXIST.getValue();
 
     public void updateDeleteStatus(boolean isDeleted) {

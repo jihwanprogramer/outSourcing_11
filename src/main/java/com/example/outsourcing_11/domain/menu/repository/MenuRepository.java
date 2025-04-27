@@ -1,5 +1,6 @@
 package com.example.outsourcing_11.domain.menu.repository;
 
+import com.example.outsourcing_11.common.exception.menu.MenuNotFoundException;
 import com.example.outsourcing_11.domain.menu.entity.Menu;
 import com.example.outsourcing_11.domain.menu.enums.Category;
 import org.springframework.data.domain.Pageable;
@@ -12,7 +13,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface MenuRepository extends JpaRepository<Menu, Long> {
     default Menu finByIdOrElseThrow(Long menuId) {
-        return findById(menuId).orElseThrow(() -> new NullPointerException("존재하지 않는 메뉴입니다"));
+        return findById(menuId).orElseThrow(() -> new MenuNotFoundException("존재하지 않는 메뉴입니다"));
     }
 
     @Query("""
