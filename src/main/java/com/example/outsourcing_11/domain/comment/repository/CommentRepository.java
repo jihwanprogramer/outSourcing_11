@@ -32,7 +32,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     @Query("SELECT c FROM Comment c JOIN Fetch  Order o WHERE o.id = :orderId AND c.isDeleted = false ")
     Optional<Comment> findWithRelationsByOrderId(@Param("orderId") Long orderId);
 
-    @Query("SELECT COUNT(c) FROM Comment c JOIN c.order o JOIN o.items oi WHERE oi.menu.id = :menuId AND c.isDeleted = false")
+    @Query("SELECT COUNT(c) FROM Comment c JOIN c.order o JOIN o.items oi WHERE oi.menu.id = :menuId AND c.parent IS NULL AND c.isDeleted = false")
     long countByMenuId(@Param("menuId") Long menuId);
 
     default Comment findByOrThrowElse(Long commentId) {
