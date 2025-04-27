@@ -122,4 +122,16 @@ public class Store extends Base {
 		this.deleted = Status.NON_EXIST.getValue();
 	}
 
+	public Store(String name, String address, LocalDateTime openTime, LocalDateTime closeTime, int price,
+		StoreStatus status, StoreCategory storeCategory, User user) {
+		this.name = name;
+		this.address = address;
+		this.openTime = openTime;
+		this.closeTime = closeTime;
+		this.minimumOrderPrice = price;
+		this.status = status;
+		this.category = storeCategory;
+		this.owner = user;
+	}
+
 }

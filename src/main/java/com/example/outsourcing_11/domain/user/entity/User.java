@@ -86,4 +86,25 @@ public class User extends Base {
 		this.deletedAt = LocalDateTime.now();
 		this.status = Status.NON_EXIST.getValue();
 	}
+
+	public void updatePassword(String password) {
+		this.password = password;
+	}
+
+	public void updateAddress(String address) {
+		this.address = address;
+	}
+
+	public void updatePhone(String phone) {
+		this.phone = phone;
+	}
+
+	public void updateName(String name) {
+		this.name = name;
+	}
+
+	public void updateEmail(String email) {
+		this.email = email;
+	}
+
 }

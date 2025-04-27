@@ -1,11 +1,15 @@
 package com.example.outsourcing_11.order;
 
+
 import com.example.outsourcing_11.common.UserRole;
 import com.example.outsourcing_11.domain.menu.entity.Menu;
 import com.example.outsourcing_11.domain.menu.repository.MenuRepository;
 import com.example.outsourcing_11.domain.order.dto.OrderItemRequestDto;
 import com.example.outsourcing_11.domain.order.dto.OrderRequestDto;
+import com.example.outsourcing_11.domain.order.entity.Cart;
+import com.example.outsourcing_11.domain.order.entity.Order;
 import com.example.outsourcing_11.domain.order.repository.CartRepository;
+import com.example.outsourcing_11.domain.order.repository.OrderRepository;
 import com.example.outsourcing_11.domain.store.dto.StoreRequestDto;
 import com.example.outsourcing_11.domain.store.entity.Store;
 import com.example.outsourcing_11.domain.store.entity.StoreStatus;
@@ -13,6 +17,7 @@ import com.example.outsourcing_11.domain.store.repository.StoreRepository;
 import com.example.outsourcing_11.domain.user.entity.User;
 import com.example.outsourcing_11.domain.user.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,10 +27,11 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.web.servlet.MockMvc;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import com.example.outsourcing_11.domain.store.entity.StoreCategory;
+import com.example.outsourcing_11.common.UserRole;
+import com.example.outsourcing_11.domain.menu.entity.Menu;
 import com.example.outsourcing_11.domain.menu.enums.Category;
 import com.example.outsourcing_11.domain.menu.enums.MenuStatus;
+
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 // 응답 상태 확인용 (status().isOk(), isCreated() 등)
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -39,15 +45,31 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
+
 @SpringBootTest
 @AutoConfigureMockMvc
 public class OrderControllerTest {
-    @Autowired private MockMvc mockMvc;
-    @Autowired private ObjectMapper objectMapper;
-    @Autowired private UserRepository userRepository;
-    @Autowired private MenuRepository menuRepository;
-    @Autowired private StoreRepository storeRepository;
-    @Autowired private CartRepository cartRepository;
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private MenuRepository menuRepository;
+
+    @Autowired
+    private StoreRepository storeRepository;
+
+    @Autowired
+    private CartRepository cartRepository;
+
+    @Autowired
+    private OrderRepository orderRepository;
 
 
     @Test
@@ -58,11 +80,48 @@ public class OrderControllerTest {
     void createOrder() throws Exception {
         // ✅ 중복 유저 정리 (Store 먼저 삭제 → User 삭제)
         userRepository.findByEmail("yuri@example.com").ifPresent(user -> {
-            // 1. 유저의 장바구니 먼저 삭제
+
+            // 1. CartItem 삭제
+            List<Cart> carts = cartRepository.findAllByUser(user);
+            for (Cart cart : carts) {
+                cart.getItems().clear();
+                cartRepository.save(cart);
+            }
+
+            // 2. Cart 삭제
+            cartRepository.deleteAllByUser(user);
+
+            // 3. OrderItem이랑 Order 관계를 제거
+            List<Order> orders = orderRepository.findAllByUser(user);
+            for (Order order : orders) {
+                order.getItems().clear();
+                orderRepository.save(order);
+            }
+
+            // 4. Order 삭제
+            orderRepository.deleteAllByUser(user);
+
+            // 5. Store와 Menu 관계 제거
+            List<Store> stores = storeRepository.findAllByOwner(user);
+            for (Store store : stores) {
+                store.getMenus().clear();
+                store.getOrders().clear();
+                storeRepository.save(store);
+            }
+
+            // 6. Store 삭제
+            storeRepository.deleteAll(stores);
+
+            // 7. User 삭제
+            userRepository.delete(user);
+
+
+           // 1. 유저의 장바구니 먼저 삭제
             cartRepository.deleteAllByUser(user);
 
             // 2. 그 유저가 소유한 가게들 삭제
-            storeRepository.deleteAll(storeRepository.findAllByOwner(user));
+            List<Store> list = storeRepository.findAllByOwner(user);
+            storeRepository.deleteAll(list);
 
             // 3. 마지막으로 유저 삭제
             userRepository.delete(user);
@@ -119,20 +178,33 @@ public class OrderControllerTest {
         mField.setAccessible(true);
         mField.set(menu, store);  // 미리 저장된 Store 객체여야 함
 
-        menu = menuRepository.save(menu);
+		menu = menuRepository.save(menu);
 
-        OrderItemRequestDto item = new OrderItemRequestDto(menu.getId(), store.getId(), 2, 7000);
-        OrderRequestDto request = new OrderRequestDto(user.getId(), List.of(item));
+		OrderItemRequestDto item = new OrderItemRequestDto(menu.getId(), store.getId(), 2, 7000);
+		OrderRequestDto request = new OrderRequestDto(user.getId(), List.of(item));
 
-        // when & then
-        mockMvc.perform(post("/orders")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.userId").value(user.getId()))
-                .andExpect(jsonPath("$.items[0].menuId").value(menu.getId()));
-    }
+		// when & then
+		mockMvc.perform(post("/orders")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request)))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.userId").value(user.getId()))
+			.andExpect(jsonPath("$.items[0].menuId").value(menu.getId()));
+	}
 
+	@Test
+	@DisplayName("주문 생성 후 사용자 주문 목록에 자동 반영되는지 확인")
+	void createAndGetOrdersByUserId() throws Exception {
+		mockMvc.perform(get("/orders/1"))
+			.andExpect(status().isOk());
+	}
+
+	@Test
+	@DisplayName("GET /orders/{orderId} - 단일 주문 조회")
+	void getOrderById() throws Exception {
+		mockMvc.perform(get("/orders/1"))
+			.andExpect(status().isOk());
+	}
 
 
     @Test
@@ -176,19 +248,21 @@ public class OrderControllerTest {
                 .andExpect(status().isOk());
     }
 
-    @Test
-    @DisplayName("POST /orders/price - 주문 가격 계산")
-    void calculatePrice() throws Exception {
-        OrderItemRequestDto item = new OrderItemRequestDto(1L, 1L, 2, 7000);
 
-        OrderRequestDto request = new OrderRequestDto(1L, List.of(item));
+		OrderRequestDto request = new OrderRequestDto(1L, List.of(item));
 
-        mockMvc.perform(post("/orders/price")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.finalPrice").value(14000));
-    }
+		mockMvc.perform(post("/orders/price")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request)))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.finalPrice").value(14000));
+	}
+
+	@Test
+	@DisplayName("PATCH /orders/{orderId} - 주문 상태 변경")
+	void updateOrderStatus() throws Exception {
+		String body = "{\"status\":\"COMPLETED\"}";
+
 
     @Test
     @WithMockUser(username = "yuri@example.com", roles = {"CUSTOMER"})

@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.example.outsourcing_11.domain.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -21,6 +22,11 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 		@Param("store") Store store,
 		@Param("start") LocalDateTime start,
 		@Param("now") LocalDateTime now
+
 	);
+
+	List<Order> findAllByUser(User user);
+
+	void deleteAllByUser(User user);
 }
 //

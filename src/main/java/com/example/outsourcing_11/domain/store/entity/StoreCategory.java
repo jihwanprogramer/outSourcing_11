@@ -12,5 +12,4 @@ public enum StoreCategory {
 	ETC,
 	HAMBURGER
 
-
 }
