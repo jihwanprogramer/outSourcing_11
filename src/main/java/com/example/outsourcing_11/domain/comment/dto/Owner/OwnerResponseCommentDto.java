@@ -1,12 +1,16 @@
 package com.example.outsourcing_11.domain.comment.dto.Owner;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+
+import com.example.outsourcing_11.domain.comment.entity.OwnerComment;
 
 @Getter
-@RequiredArgsConstructor
 public class OwnerResponseCommentDto {
 
-	private final String content;
+	private String content;
+
+	public OwnerResponseCommentDto(OwnerComment ownerComment) {
+		this.content = ownerComment.getContent();
+	}
 
 }

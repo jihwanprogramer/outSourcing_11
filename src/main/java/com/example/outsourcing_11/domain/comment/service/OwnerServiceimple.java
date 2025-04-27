@@ -1,7 +1,12 @@
 package com.example.outsourcing_11.domain.comment.service;
 
+import java.util.List;
+
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import com.example.outsourcing_11.common.Status;
 import com.example.outsourcing_11.domain.comment.dto.Owner.OwnerRequestCommentDto;
@@ -20,7 +25,32 @@ public class OwnerServiceimple implements OwnerService {
 
 		OwnerComment ownerComment = new OwnerComment(dto);
 		ownerCommentRepository.save(ownerComment);
-		return new OwnerResponseCommentDto(ownerComment.getContent());
+		return new OwnerResponseCommentDto(ownerComment);
+	}
+
+	@Override
+	public List<OwnerResponseCommentDto> getOwerComment(Long storeId, Long commentId) {
+
+		List<OwnerResponseCommentDto> ownerComments = ownerCommentRepository.findByStoreIdAndCommentId(storeId,
+				commentId)
+			.stream()
+			.map(OwnerResponseCommentDto::new)
+			.toList();
+
+		return ownerComments;
+	}
+
+	@Override
+	public List<OwnerResponseCommentDto> getOwerComments(Long storeId) {
+
+		PageRequest pageRequest = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createAt"));
+
+		Page<OwnerComment> ownerComment = ownerCommentRepository.findByStoreIdAndDeletedFalse(storeId,
+			pageRequest);
+
+		return ownerComment.stream()
+			.map(OwnerResponseCommentDto::new)
+			.toList();
 	}
 
 	@Override
@@ -28,7 +58,7 @@ public class OwnerServiceimple implements OwnerService {
 
 		OwnerComment ownerComment = ownerCommentRepository.findById(id).orElseThrow();
 		ownerComment.updateContent(dto.getContent());
-		return new OwnerResponseCommentDto(ownerComment.getContent());
+		return new OwnerResponseCommentDto(ownerComment);
 	}
 
 	@Override

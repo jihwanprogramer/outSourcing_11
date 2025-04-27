@@ -15,6 +15,7 @@ import com.example.outsourcing_11.domain.comment.dto.user.RequestCommentDto;
 import com.example.outsourcing_11.domain.comment.dto.user.ResponseCommentDto;
 import com.example.outsourcing_11.domain.comment.entity.Comment;
 import com.example.outsourcing_11.domain.comment.repository.CommentRepository;
+import com.example.outsourcing_11.domain.comment.repository.OwnerCommentRepository;
 import com.example.outsourcing_11.domain.order.entity.Order;
 import com.example.outsourcing_11.domain.order.entity.OrderStatus;
 import com.example.outsourcing_11.domain.order.repository.OrderRepository;
@@ -23,8 +24,9 @@ import com.example.outsourcing_11.domain.order.repository.OrderRepository;
 @RequiredArgsConstructor
 public class CommentServiceImple implements CommentService {
 
-	private static CommentRepository commentRepository;
-	private static OrderRepository orderRepository;
+	private final CommentRepository commentRepository;
+	private final OrderRepository orderRepository;
+	private final OwnerCommentRepository ownerCommentRepository;
 
 	@Override
 	public ResponseCommentDto createComment(Long orderId, Long userId, RequestCommentDto dto) {
@@ -46,14 +48,6 @@ public class CommentServiceImple implements CommentService {
 	@Override
 	public List<ResponseCommentDto> findCommentsByRatingRange(Long orderId, Long userId, int min, int max) {
 
-		Order order = orderRepository.findById(orderId)
-			.orElseThrow(() -> new CustomException("존재하지 않는 주문입니다.", HttpStatus.NOT_FOUND));
-		if (!order.getUser().equals(userId)) {
-			throw new CustomException("조회 권한이 없습니다.", HttpStatus.BAD_REQUEST);
-		}
-		if (!order.getStatus().equals(OrderStatus.COMPLETED)) {
-			throw new CustomException("배달완료가되지 않았습니다.", HttpStatus.BAD_REQUEST);
-		}
 		PageRequest pageRequest = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createAt"));
 		Page<Comment> comments = commentRepository.findByRatingBetweenAndDeletedAtIsNull(min, max, pageRequest);
 		return comments.stream().map(ResponseCommentDto::new).toList();
