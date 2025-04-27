@@ -1,11 +1,15 @@
 package com.example.outsourcing_11.order;
 
+import com.example.outsourcing_11.common.UserRole;
 import com.example.outsourcing_11.domain.menu.entity.Menu;
 import com.example.outsourcing_11.domain.menu.enums.Category;
 import com.example.outsourcing_11.domain.menu.enums.MenuStatus;
 import com.example.outsourcing_11.domain.menu.repository.MenuRepository;
 import com.example.outsourcing_11.domain.order.dto.CartItemRequestDto;
 import com.example.outsourcing_11.domain.order.dto.CartRequestDto;
+import com.example.outsourcing_11.domain.order.repository.CartRepository;
+import com.example.outsourcing_11.domain.order.repository.OrderRepository;
+import com.example.outsourcing_11.domain.store.dto.StoreRequestDto;
 import com.example.outsourcing_11.domain.store.entity.Store;
 import com.example.outsourcing_11.domain.store.entity.StoreCategory;
 import com.example.outsourcing_11.domain.store.entity.StoreStatus;
@@ -39,23 +43,38 @@ public class CartControllerTest {
     @Autowired private UserRepository userRepository;
     @Autowired private MenuRepository menuRepository;
     @Autowired private StoreRepository storeRepository;
+    @Autowired
+    private CartRepository cartRepository;
+
+    @Autowired
+    private OrderRepository orderRepository;
 
     @Test
     @DisplayName("장바구니에 항목 추가 - POST /carts/items")
     void addItemToCart() throws Exception {
-        // given: 사용자, 가게, 메뉴 생성
-        User user = userRepository.save(new User("유리", "yuri@example.com", "1234", "01011112222", "USER", "서울시"));
 
-        Store store = storeRepository.save(Store.builder()
-                .name("맥도날드")
-                .address("서울시")
-                .openTime(LocalDateTime.now())
-                .closeTime(LocalDateTime.now().plusHours(8))
-                .minimumOrderPrice(5000)
-                .status(StoreStatus.OPEN)
-                .category(StoreCategory.HAMBURGER)
-                .owner(user)
-                .build());
+        // given: 사용자, 가게, 메뉴 생성
+        User user = userRepository.save(new User(
+                "유리",
+                "yuri@example.com",
+                "1234",
+                "01011112222",
+                "서울시",
+                UserRole.CUSTOMER
+
+        ));
+
+        StoreRequestDto dto = new StoreRequestDto(
+                "맥도날드",
+                LocalDateTime.now(),
+                LocalDateTime.now().plusHours(8),
+                5000,
+                "서울시",
+                StoreCategory.HAMBURGER,
+                StoreStatus.OPEN
+        );
+
+        Store store = storeRepository.save(new Store(dto, user));
 
         Menu menu = menuRepository.save(new Menu(Category.MAIN_MENU, "치즈버거", "치즈가 가득한 버거",
                 BigDecimal.valueOf(7000), MenuStatus.AVAILABLE, store));
@@ -79,7 +98,15 @@ public class CartControllerTest {
     @Test
     @DisplayName("GET /carts/{userId} - 사용자 장바구니 조회")
     void getCartByUserId() throws Exception {
-        User user = userRepository.save(new User("유리", "yuri@example.com", "1234", "01011112222", "USER", "서울시"));
+        User user = userRepository.save(new User(
+                "유리",
+                "yuri@example.com",
+                "1234",
+                "01011112222",
+                "서울시",
+                UserRole.CUSTOMER
+
+        ));
 
         mockMvc.perform(get("/carts/" + user.getId()))
                 .andExpect(status().isOk());
@@ -88,7 +115,15 @@ public class CartControllerTest {
     @Test
     @DisplayName("POST /carts - 새로운 장바구니 생성")
     void createCart() throws Exception {
-        User user = userRepository.save(new User("유리", "yuri@example.com", "1234", "01011112222", "USER", "서울시"));
+        User user = userRepository.save(new User(
+                "유리",
+                "yuri@example.com",
+                "1234",
+                "01011112222",
+                "서울시",
+                UserRole.CUSTOMER
+
+        ));
 
         CartRequestDto request = new CartRequestDto(user.getId());
 
