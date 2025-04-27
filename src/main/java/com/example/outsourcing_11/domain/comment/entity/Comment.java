@@ -83,8 +83,9 @@ public class Comment extends Base {
 		this.rating = dto.getRating();
 	}
 
-	public void updateUserAndStore(User user, Store store) {
-		this.user = user;
-		this.store = store;
+	public void updateUserAndStore(Order order) {
+		this.user = order.getUser();
+		this.store = order.getStore();
+		this.order = order;
 	}
 }

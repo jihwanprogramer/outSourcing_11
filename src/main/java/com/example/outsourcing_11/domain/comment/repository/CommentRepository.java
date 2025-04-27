@@ -36,7 +36,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 	 * @param orderId Long orederId
 	 * @return Optional로 받아서 내보냄
 	 */
-	@Query("SELECT c FROM Comment c JOIN Fetch  Order o WHERE o.id = :orderId AND c.isDeleted = false ")
+	@Query("SELECT c FROM Comment c JOIN  c.order o WHERE o.id = :orderId AND c.isDeleted = false ORDER BY c.createdAt DESC")
 	Optional<Comment> findWithRelationsByOrderId(@Param("orderId") Long orderId);
 
 	@Query("SELECT COUNT(c) FROM Comment c JOIN c.order o JOIN o.items oi WHERE oi.menu.id = :menuId AND c.isDeleted = false")
