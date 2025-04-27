@@ -29,7 +29,7 @@ public class CustomUserDetails implements UserDetails {
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		// 권한 정보 반환 (ROLE_ 접두어 붙여줌)
-		return List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole()));
+		return List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().getRoleName()));
 	}
 
 	@Override
