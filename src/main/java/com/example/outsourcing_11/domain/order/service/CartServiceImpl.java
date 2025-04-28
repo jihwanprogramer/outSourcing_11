@@ -1,5 +1,7 @@
 package com.example.outsourcing_11.domain.order.service;
 
+import com.example.outsourcing_11.common.exception.CustomException;
+import com.example.outsourcing_11.common.exception.ErrorCode;
 import com.example.outsourcing_11.domain.menu.entity.Menu;
 import com.example.outsourcing_11.domain.menu.repository.MenuRepository;
 import com.example.outsourcing_11.domain.order.dto.CartItemRequestDto;
@@ -41,7 +43,10 @@ public class CartServiceImpl implements CartService {
     @Override
     public CartResponseDto getCartByUserId(Long userId) {
         Cart cart = cartRepository.findByUserId(userId)
-                .orElseThrow(() -> new RuntimeException("Cart not found"));
+                .orElseThrow(() -> new CustomException(
+                        ErrorCode.CART_EMPTY.getMessage(),
+                        ErrorCode.CART_EMPTY.getHttpStatus()
+                ));
 
         return CartResponseDto.builder()
                 .id(cart.getId())
@@ -61,7 +66,11 @@ public class CartServiceImpl implements CartService {
     @Override
     public CartResponseDto createCart(CartRequestDto requestDto) {
         User user = userRepository.findById(requestDto.getUserId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new CustomException(
+                        ErrorCode.USER_NOT_FOUND.getMessage(),
+                        ErrorCode.USER_NOT_FOUND.getHttpStatus()
+                ));
+
 
         Cart cart = new Cart(user);
 
@@ -76,21 +85,38 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public CartResponseDto addItemToCart(CartItemRequestDto dto) {
+        if (dto.getQuantity() <= 0) {
+            throw new CustomException(
+                    ErrorCode.INVALID_QUANTITY.getMessage(),
+                    ErrorCode.INVALID_QUANTITY.getHttpStatus()
+            );
+        }
         User user = userRepository.findById(dto.getUserId())
-                .orElseThrow(() -> new IllegalArgumentException("해당 사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new CustomException(
+                        ErrorCode.USER_NOT_FOUND.getMessage(),
+                        ErrorCode.USER_NOT_FOUND.getHttpStatus()
+                ));
 
-        Cart cart = cartRepository.findByUser(user).orElseGet(() -> cartRepository.save(new Cart(user)));
+
+        Cart cart = cartRepository.findByUser(user)
+                .orElseGet(() -> cartRepository.save(new Cart(user)));
 
         Menu menu = menuRepository.findById(dto.getMenuId())
-                .orElseThrow(() -> new IllegalArgumentException("해당 메뉴를 찾을 수 없습니다."));
+                .orElseThrow(() -> new CustomException(
+                        ErrorCode.MENU_NOT_FOUND.getMessage(),
+                        ErrorCode.MENU_NOT_FOUND.getHttpStatus()
+                ));
 
         Store store = storeRepository.findById(dto.getStoreId())
-                .orElseThrow(() -> new RuntimeException("해당 가게가 존재하지 않습니다."));
+                .orElseThrow(() -> new CustomException(
+                        ErrorCode.STORE_NOT_FOUND.getMessage(),
+                        ErrorCode.STORE_NOT_FOUND.getHttpStatus()
+                ));
+
 
         CartItem cartItem = new CartItem(cart, menu, store, dto.getQuantity());
         cart.getItems().add(cartItem);
-        cartRepository.save(cart);  // cascade로 cartItem도 저장됨
-
+        cartRepository.save(cart);
         // 반환할 응답 객체 생성
         List<CartItemResponseDto> responseItems = cart.getItems().stream()
                 .map(CartItem::toResponseDto)
@@ -101,7 +127,10 @@ public class CartServiceImpl implements CartService {
     @Transactional(readOnly = true)
     public Cart getEntityByUserId(Long userId) {
         return cartRepository.findByUserId(userId)
-                .orElseThrow(() -> new RuntimeException("장바구니가 존재하지 않습니다."));
+                .orElseThrow(() -> new CustomException(
+                        ErrorCode.CART_EMPTY.getMessage(),
+                        ErrorCode.CART_EMPTY.getHttpStatus()
+                ));
     }
 
 }

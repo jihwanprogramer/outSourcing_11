@@ -34,7 +34,9 @@ public enum ErrorCode {
 	INVALID_MENU_IN_ORDER(HttpStatus.BAD_REQUEST, "주문 항목에 유효하지 않은 메뉴가 포함되어 있습니다."), //400
 	CANNOT_CHANGE_COMPLETED_ORDER(HttpStatus.BAD_REQUEST, "이미 완료된 주문은 변경할 수 없습니다."), //400
 	CANNOT_CANCEL_COMPLETED_OR_CANCELED_ORDER(HttpStatus.BAD_REQUEST, "이미 취소되었거나 완료된 주문은 취소할 수 없습니다."), //400
-	AUTHENTICATION_REQUIRED(HttpStatus.UNAUTHORIZED, "로그인 후 이용 가능한 기능입니다."); //401
+	AUTHENTICATION_REQUIRED(HttpStatus.UNAUTHORIZED, "로그인 후 이용 가능한 기능입니다."), //401
+
+	STORE_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 가게입니다.");
 
 	private final HttpStatus httpStatus;
 	private final String message;
