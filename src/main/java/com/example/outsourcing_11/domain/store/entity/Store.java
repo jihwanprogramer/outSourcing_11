@@ -102,7 +102,7 @@ public class Store extends Base {
 		this.owner = user;
 	}
 
-	public Store(String name, String address, LocalDateTime openTime, LocalDateTime closeTime, int price,
+	public Store(String name, String address, LocalTime openTime, LocalTime closeTime, int price,
 		StoreStatus status, StoreCategory storeCategory, User user) {
 		this.name = name;
 		this.address = address;

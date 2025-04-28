@@ -4,6 +4,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -83,8 +84,8 @@ public class CommentRepositoryTest {
 			new Store(
 				"맘스 터치"
 				, "경기도 동두천시"
-				, LocalDateTime.of(2025, 4, 27, 9, 0, 0)
-				, LocalDateTime.of(2025, 4, 27, 21, 0, 0)
+				, LocalTime.of(9, 0, 0)
+				, LocalTime.of(21, 0, 0)
 				, 16000
 				, StoreStatus.OPEN
 				, StoreCategory.BURGER
@@ -168,8 +169,8 @@ public class CommentRepositoryTest {
 			new Store(
 				"맘스 터치"
 				, "경기도 동두천시"
-				, LocalDateTime.of(2025, 4, 27, 9, 0, 0)
-				, LocalDateTime.of(2025, 4, 27, 21, 0, 0)
+				, LocalTime.of(9, 0, 0)
+				, LocalTime.of(21, 0, 0)
 				, 16000
 				, StoreStatus.OPEN
 				, StoreCategory.BURGER
@@ -263,8 +264,8 @@ public class CommentRepositoryTest {
 			new Store(
 				"맘스 터치"
 				, "경기도 동두천시"
-				, LocalDateTime.of(2025, 4, 27, 9, 0, 0)
-				, LocalDateTime.of(2025, 4, 27, 21, 0, 0)
+				, LocalTime.of(9, 0, 0)
+				, LocalTime.of(21, 0, 0)
 				, 16000
 				, StoreStatus.OPEN
 				, StoreCategory.BURGER
