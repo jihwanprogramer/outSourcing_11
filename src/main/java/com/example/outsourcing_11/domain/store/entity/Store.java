@@ -17,8 +17,10 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 
 import com.example.outsourcing_11.common.Base;
 import com.example.outsourcing_11.common.Status;
@@ -29,7 +31,9 @@ import com.example.outsourcing_11.domain.user.entity.User;
 
 @Getter
 @Entity
-@RequiredArgsConstructor
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Store extends Base {
 
 	@Id

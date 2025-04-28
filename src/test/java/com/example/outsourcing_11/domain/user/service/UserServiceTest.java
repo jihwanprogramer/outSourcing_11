@@ -16,6 +16,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import com.example.outsourcing_11.common.Status;
 import com.example.outsourcing_11.common.UserRole;
+import com.example.outsourcing_11.common.exception.CustomException;
+import com.example.outsourcing_11.common.exception.ErrorCode;
 import com.example.outsourcing_11.config.security.CustomUserDetails;
 import com.example.outsourcing_11.domain.user.dto.UserResponseDto;
 import com.example.outsourcing_11.domain.user.entity.User;
@@ -30,8 +32,10 @@ public class UserServiceTest {
 
 	@InjectMocks
 	private UserService userService;
+
 	@Mock
 	private HttpServletRequest request;
+
 	@Mock
 	private JwtUtil jwtUtil;
 
@@ -39,10 +43,7 @@ public class UserServiceTest {
 	void 유저조회_성공() {
 		// given
 		Long userId = 1L;
-
 		User user = new User("test@test.com", "password", "테스트이름", UserRole.CUSTOMER);
-
-		// id는 DB에서 생성되는 거니까 테스트용으로 reflection으로 넣을 수 있음
 		ReflectionTestUtils.setField(user, "id", userId);
 		ReflectionTestUtils.setField(user, "deletedAt", null);
 
@@ -50,6 +51,7 @@ public class UserServiceTest {
 
 		// when
 		UserResponseDto result = userService.findUserById(userId);
+
 		// then
 		assertEquals(user.getEmail(), result.getEmail());
 	}
@@ -86,8 +88,11 @@ public class UserServiceTest {
 		given(userRepository.findByIdOrElseThrow(userId)).willReturn(deletedUser);
 
 		// when & then
-		assertThrows(UserNotFoundException.class, () -> {
+		CustomException exception = assertThrows(CustomException.class, () -> {
 			userService.findLoginUserById(userDetails);
 		});
+
+		// 추가: ErrorCode도 검증
+		assertEquals(ErrorCode.USER_NOT_FOUND, exception.getErrorCode());
 	}
 }
