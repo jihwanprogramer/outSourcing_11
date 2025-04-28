@@ -1,6 +1,7 @@
 package com.example.outsourcing_11.domain.store.service;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 import org.springframework.scheduling.annotation.Scheduled;
@@ -23,8 +24,8 @@ public class StoreStatusScheduler {
 		LocalDateTime now = LocalDateTime.now();
 
 		for (Store store : stores) {
-			LocalDateTime openTime = LocalDateTime.from(store.getOpenTime().toLocalTime());
-			LocalDateTime closeTime = LocalDateTime.from(store.getCloseTime().toLocalTime());
+			LocalTime openTime = store.getOpenTime();
+			LocalTime closeTime = store.getCloseTime();
 
 			store.updateStatus();
 		}

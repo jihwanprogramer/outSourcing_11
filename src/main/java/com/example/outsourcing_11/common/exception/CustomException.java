@@ -1,13 +1,15 @@
 package com.example.outsourcing_11.common.exception;
 
+import lombok.Getter;
+
 import org.springframework.http.HttpStatus;
 
+@Getter
 public class CustomException extends RuntimeException {
-	public CustomException(String message) {
-		super(message);
-	}
+	private final HttpStatus httpStatus;
 
-	public CustomException(String message, HttpStatus status) {
+	public CustomException(String message, HttpStatus httpStatus) {
 		super(message);
+		this.httpStatus = httpStatus;
 	}
 }
