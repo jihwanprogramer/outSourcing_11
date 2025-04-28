@@ -164,32 +164,22 @@ public class OrderServiceImpl implements OrderService {
             );
         }
 
-
-        // 새로운 상태로 주문 객체를 새로 생성
-        Order updated = new Order(
-            order.getUser(),
-            order.getStore(),
-            order.getOrderDate(),
-            OrderStatus.valueOf(statusUpdateDto.getStatus()),
-            order.getTotalPrice(),
-            new ArrayList<>(order.getItems()) // ✅ 리스트 복사해서 넘김
-        );
-        Order saved = orderRepository.save(updated);
+        order.changeStatus(OrderStatus.valueOf(statusUpdateDto.getStatus()));
 
         return OrderResponseDto.builder()
-            .id(saved.getId())
-            .userId(saved.getUser().getId())
-            .orderDate(saved.getOrderDate())
-            .status(saved.getStatus().name())
-            .totalPrice(saved.getTotalPrice())
-            .items(saved.getItems().stream().map(item -> new OrderItemResponseDto(
-                item.getId(),
-                item.getMenu().getId(),
-                item.getStore().getId(),
-                item.getQuantity(),
-                item.getItemPrice()
-            )).collect(Collectors.toList()))
-            .build();
+                .id(order.getId())
+                .userId(order.getUser().getId())
+                .orderDate(order.getOrderDate())
+                .status(order.getStatus().name())
+                .totalPrice(order.getTotalPrice())
+                .items(order.getItems().stream().map(item -> new OrderItemResponseDto(
+                        item.getId(),
+                        item.getMenu().getId(),
+                        item.getStore().getId(),
+                        item.getQuantity(),
+                        item.getItemPrice()
+                )).toList())
+                .build();
     }
 
     @Override
