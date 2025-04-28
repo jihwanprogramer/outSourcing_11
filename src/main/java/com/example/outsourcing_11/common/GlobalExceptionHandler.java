@@ -18,7 +18,6 @@ import com.example.outsourcing_11.common.exception.store.StoreErrorCode;
 import com.example.outsourcing_11.common.exception.store.StoreErrorResponse;
 import com.example.outsourcing_11.common.exception.user.DuplicateUserException;
 import com.example.outsourcing_11.common.exception.user.InvalidLoginException;
-import com.example.outsourcing_11.common.exception.user.InvalidUserInputException;
 import com.example.outsourcing_11.common.exception.user.UnauthorizedAccessException;
 import com.example.outsourcing_11.common.exception.user.UnauthorizedException;
 import com.example.outsourcing_11.common.exception.user.UserNotFoundException;
@@ -80,12 +79,6 @@ public class GlobalExceptionHandler {
 		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
 	}
 
-	// 사용자 입력 오류 400
-	@ExceptionHandler(InvalidUserInputException.class)
-	public ResponseEntity<String> handleInvalidUserInput(InvalidUserInputException ex) {
-		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-	}
-
 	// 유효하지않은 토큰
 	@ExceptionHandler(UnauthorizedException.class)
 	public ResponseEntity<String> handleInvalidLogin(UnauthorizedException ex) {
@@ -104,10 +97,14 @@ public class GlobalExceptionHandler {
 	// 	return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
 	// }
 
-	@ExceptionHandler(MenuNotFoundException.class)
-	public ResponseEntity<String> handleInvalidLogin(MenuNotFoundException ex) {
-		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
-	}
+    // 해당가게의 메뉴를 찾을 수 없을때 404
+    @ExceptionHandler(MenuCustomException.class)
+    public ResponseEntity<MenuErrorResponse> handleInvalidLogin(MenuCustomException ex) {
+        MenuErrorCode errorCode = ex.getErrorCode();
+        MenuErrorResponse response = new MenuErrorResponse(errorCode.getCode(), errorCode.getMessage(),
+            errorCode.getStatus());
+        return new ResponseEntity<>(response, HttpStatus.valueOf(errorCode.getStatus()));
+    }
 
 	// 모든 예외 처리 (예상하지 못한 오류)
 	@ExceptionHandler(Exception.class)
