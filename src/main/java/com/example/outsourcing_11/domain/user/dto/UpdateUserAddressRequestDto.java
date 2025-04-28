@@ -12,6 +12,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class UpdateUserAddressRequestDto {
-	@NotBlank(message = "이름은 비어 있을 수 없습니다.")
+	@NotBlank(message = "주소는 비어 있을 수 없습니다.")
 	private String newAddress;
 }
