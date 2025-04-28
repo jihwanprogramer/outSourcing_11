@@ -1,7 +1,7 @@
 package com.example.outsourcing_11.common;
 
 public enum Status {
-	EXIST(true), NON_EXIST(false);
+	EXIST(false), NON_EXIST(true);
 
 	private final boolean value;
 
@@ -15,6 +15,6 @@ public enum Status {
 
 	// boolean 값으로부터 enum 값 반환
 	public static Status fromValue(boolean value) {
-		return value ? EXIST : NON_EXIST;
+		return value ? NON_EXIST : EXIST;
 	}
 }

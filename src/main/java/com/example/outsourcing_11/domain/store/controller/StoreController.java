@@ -36,6 +36,7 @@ public class StoreController {
 	public ResponseEntity<StoreResponseDto> createStore(
 		@AuthenticationPrincipal CustomUserDetails userDetails,
 		@RequestBody StoreRequestDto requestDto) {
+
 		StoreResponseDto response = storeService.createStore(userDetails.getUser(), requestDto);
 		return ResponseEntity.ok(response);
 	}
@@ -48,9 +49,8 @@ public class StoreController {
 	}
 
 	@GetMapping("/{storeId}")
-	public ResponseEntity<StoreDetailDto> getStoreDetail(@PathVariable Long storeId) {
-		StoreDetailDto detail = storeService.getStoreDetail(storeId);
-		return ResponseEntity.ok(detail);
+	public StoreDetailDto getStoreDetail(@PathVariable Long storeId) {
+		return storeService.getStoreDetail(storeId);
 	}
 
 	@PreAuthorize("hasRole('사장님')")
@@ -63,66 +63,67 @@ public class StoreController {
 
 	@PreAuthorize("hasRole('사장님')")
 	@PutMapping("/{storeId}")
-	public ResponseEntity<Void> updateStore(
+	public ResponseEntity<String> updateStore(
 		@PathVariable Long storeId,
-		@RequestBody StoreRequestDto requestDto,
+		@RequestBody StoreRequestDto dto,
 		@AuthenticationPrincipal CustomUserDetails userDetails) {
-		storeService.updateStore(storeId, requestDto, userDetails.getUser());
-		return ResponseEntity.ok().build();
+		storeService.updateStore(storeId, dto, userDetails.getUser());
+		return ResponseEntity.ok("가게 정보를 수정하였습니다.");
 	}
 
 	@PreAuthorize("hasRole('사장님')")
 	@DeleteMapping("/{storeId}")
-	public ResponseEntity<Void> deleteStore(
+	public ResponseEntity<String> deleteStore(
 		@PathVariable Long storeId,
 		@AuthenticationPrincipal CustomUserDetails userDetails) {
 		storeService.deleteStore(storeId, userDetails.getUser());
-		return ResponseEntity.ok().build();
+		return ResponseEntity.ok("가게를 폐업하였습니다.");
 	}
 
 	@PostMapping("/{storeId}/favorite")
-	public ResponseEntity<Void> addFavorite(
+	public ResponseEntity<String> addFavorite(
 		@PathVariable Long storeId,
 		@AuthenticationPrincipal CustomUserDetails userDetails) {
 		storeService.addFavorite(storeId, userDetails.getUser());
-		return ResponseEntity.ok().build();
+		return ResponseEntity.ok("즐겨찾기가 등록되었습니다.");
 	}
 
 	@DeleteMapping("/{storeId}/favorite")
-	public ResponseEntity<Void> removeFavorite(
+	public ResponseEntity<String> removeFavorite(
 		@PathVariable Long storeId,
 		@AuthenticationPrincipal CustomUserDetails userDetails) {
 		storeService.removeFavorite(storeId, userDetails.getUser());
-		return ResponseEntity.ok().build();
+		return ResponseEntity.ok("즐겨찾기가 해제되었습니다.");
 	}
 
 	@PreAuthorize("hasRole('사장님')")
 	@PostMapping("/{storeId}/notice")
-	public ResponseEntity<Void> createNotice(
+	public ResponseEntity<String> createNotice(
 		@PathVariable Long storeId,
 		@RequestBody String content,
 		@AuthenticationPrincipal CustomUserDetails userDetails) {
 		storeService.createNotice(storeId, content, userDetails.getUser());
-		return ResponseEntity.ok().build();
+		return ResponseEntity.ok("공지사항을 등록하였습니다.");
 	}
 
 	@PreAuthorize("hasRole('사장님')")
-	@PutMapping("/notice/{noticeId}")
-	public ResponseEntity<Void> updateNotice(
+	@PutMapping("/{storeId}/notice/{noticeId}")
+	public ResponseEntity<String> updateNotice(@PathVariable Long storeId,
 		@PathVariable Long noticeId,
 		@RequestBody String content,
 		@AuthenticationPrincipal CustomUserDetails userDetails) {
-		storeService.updateNotice(noticeId, content, userDetails.getUser());
-		return ResponseEntity.ok().build();
+		storeService.updateNotice(storeId, noticeId, content, userDetails.getUser());
+		return ResponseEntity.ok("공지사항을 수정하였습니다.");
 	}
 
 	@PreAuthorize("hasRole('사장님')")
-	@DeleteMapping("/notice/{noticeId}")
-	public ResponseEntity<Void> deleteNotice(
+	@DeleteMapping("/{storeId}/notice/{noticeId}")
+	public ResponseEntity<String> deleteNotice(
+		@PathVariable Long storeId,
 		@PathVariable Long noticeId,
 		@AuthenticationPrincipal CustomUserDetails userDetails) {
-		storeService.deleteNotice(noticeId, userDetails.getUser());
-		return ResponseEntity.ok().build();
+		storeService.deleteNotice(storeId, noticeId, userDetails.getUser());
+		return ResponseEntity.ok("공지사항을 삭제하였습니다.");
 	}
 
 	@PreAuthorize("hasRole('사장님')")
