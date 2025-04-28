@@ -9,9 +9,7 @@ public interface OwnerService {
 
 	OwnerResponseCommentDto createOwerComment(Long commentId, OwnerRequestCommentDto dto);
 
-	List<OwnerResponseCommentDto> getOwnerComment(Long storeId, Long commentId);
-
-	List<OwnerResponseCommentDto> getOwnerComments(Long storeId, Long commentId);
+	List<OwnerResponseCommentDto> getOwnerComments(Long storeId);
 
 	OwnerResponseCommentDto updateOwnerComment(Long commentId, OwnerRequestCommentDto dto);
 

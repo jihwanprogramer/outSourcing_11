@@ -396,7 +396,7 @@ public class OwnerCommentServiceTest {
 
 		// 사장님 댓글 조회하고 출력
 		for (int i = 0; i < customer.size(); i++) {
-			ownerServiceimple.getOwnerComments(comments.get(i).getStore().getId(), comments.get(i).getId())
+			ownerServiceimple.getOwnerComments(comments.get(i).getStore().getId())
 				.stream()
 				.map(c -> "내용: " + c.getContent())
 				.forEach(System.out::println);
