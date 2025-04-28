@@ -1,5 +1,6 @@
 package com.example.outsourcing_11.domain.menu.repository;
 
+import com.example.outsourcing_11.common.exception.menu.MenuNotFoundException;
 import com.example.outsourcing_11.domain.menu.entity.Menu;
 import com.example.outsourcing_11.domain.menu.enums.Category;
 import org.springframework.data.domain.Pageable;
