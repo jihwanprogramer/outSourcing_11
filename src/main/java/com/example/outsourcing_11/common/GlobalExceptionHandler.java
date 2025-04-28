@@ -12,12 +12,9 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import com.example.outsourcing_11.common.exception.menu.MenuCustomException;
-import com.example.outsourcing_11.common.exception.menu.MenuErrorCode;
-import com.example.outsourcing_11.common.exception.menu.MenuErrorResponse;
-import com.example.outsourcing_11.common.exception.store.StoreCustomException;
-import com.example.outsourcing_11.common.exception.store.StoreErrorCode;
-import com.example.outsourcing_11.common.exception.store.StoreErrorResponse;
+import com.example.outsourcing_11.common.exception.CustomException;
+import com.example.outsourcing_11.common.exception.ErrorCode;
+import com.example.outsourcing_11.common.exception.ErrorResponse;
 import com.example.outsourcing_11.config.security.CustomUserDetails;
 
 @RestControllerAdvice
@@ -58,21 +55,6 @@ public class GlobalExceptionHandler {
 		return ResponseEntity.badRequest().body(errors); // 400
 	}
 
-	// // 본인 계정에만 접근 가능 403
-	// @ExceptionHandler(UnauthorizedAccessException.class)
-	// public ResponseEntity<String> handleUnauthorizedAccess(UnauthorizedAccessException ex) {
-	// 	return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
-	// }
-
-	// 해당가게의 메뉴를 찾을 수 없을때 404
-	@ExceptionHandler(MenuCustomException.class)
-	public ResponseEntity<MenuErrorResponse> handleInvalidLogin(MenuCustomException ex) {
-		MenuErrorCode errorCode = ex.getErrorCode();
-		MenuErrorResponse response = new MenuErrorResponse(errorCode.getCode(), errorCode.getMessage(),
-			errorCode.getStatus());
-		return new ResponseEntity<>(response, HttpStatus.valueOf(errorCode.getStatus()));
-	}
-
 	// 모든 예외 처리 (예상하지 못한 오류)
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<String> handleAllExceptions(Exception ex) {
@@ -80,13 +62,13 @@ public class GlobalExceptionHandler {
 	}
 
 	/**
-	 * store custom exception
+	 * custom exception
 	 */
 
-	@ExceptionHandler(StoreCustomException.class)
-	public ResponseEntity<StoreErrorResponse> handleCustomException(StoreCustomException ex) {
-		StoreErrorCode errorCode = ex.getErrorCode();
-		StoreErrorResponse response = new StoreErrorResponse(errorCode.getCode(), errorCode.getMessage(),
+	@ExceptionHandler(CustomException.class)
+	public ResponseEntity<ErrorResponse> handleCustomException(CustomException ex) {
+		ErrorCode errorCode = ex.getErrorCode();
+		ErrorResponse response = new ErrorResponse(errorCode.getCode(), errorCode.getMessage(),
 			errorCode.getStatus());
 		return new ResponseEntity<>(response, HttpStatus.valueOf(errorCode.getStatus()));
 	}

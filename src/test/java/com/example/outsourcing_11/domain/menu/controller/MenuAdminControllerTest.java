@@ -69,11 +69,11 @@ class MenuAdminControllerTest {
                 .content(objectMapper.writeValueAsString(requestDto))
                 .with(csrf().asHeader()))
             .andExpect(status().isCreated())
-            .andExpect(jsonPath("$.menuId").value(1)) // 응답 JSO N에 menuId가 1인지 확인
-            .andExpect(jsonPath("$.menuName").value("김밥")) // menuName 확인
-            .andExpect(jsonPath("$.content").value("주문시 조리")) // content 확인
-            .andExpect(jsonPath("$.category").value("MAIN_MENU")) // category 확인
-            .andExpect(jsonPath("$.menuStatus").value("AVAILABLE")); // menuStatus 확인
+            .andExpect(jsonPath("$.menuId").value(1))
+            .andExpect(jsonPath("$.menuName").value("김밥"))
+            .andExpect(jsonPath("$.content").value("주문시 조리"))
+            .andExpect(jsonPath("$.category").value("MAIN_MENU"))
+            .andExpect(jsonPath("$.menuStatus").value("AVAILABLE"));
     }
 
 

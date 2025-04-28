@@ -1,10 +1,8 @@
 package com.example.outsourcing_11.domain.menu.service;
 
 import com.example.outsourcing_11.common.Status;
-import com.example.outsourcing_11.common.exception.menu.MenuCustomException;
-import com.example.outsourcing_11.common.exception.menu.MenuErrorCode;
-import com.example.outsourcing_11.common.exception.store.StoreCustomException;
-import com.example.outsourcing_11.common.exception.store.StoreErrorCode;
+import com.example.outsourcing_11.common.exception.CustomException;
+import com.example.outsourcing_11.common.exception.ErrorCode;
 import com.example.outsourcing_11.domain.menu.dto.request.MenuSaveRequestDto;
 import com.example.outsourcing_11.domain.menu.dto.request.MenuUpdateRequestDto;
 import com.example.outsourcing_11.domain.menu.dto.response.MenuAdminResponseDto;
@@ -35,7 +33,7 @@ public class MenuAdminServiceImpl implements MenuAdminService {
         Long currentUserId = jwtUtil.extractUserId(token);
 
         Store findStore = storeRepository.findByIdAndOwnerIdAndDeletedFalse(storeId, currentUserId).
-            orElseThrow(() -> new MenuCustomException(MenuErrorCode.ONLY_MY_STORE));
+            orElseThrow(() -> new CustomException(ErrorCode.ONLY_MY_STORE));
 
         Menu menu = Menu.of(dto.getCategory(), dto.getMenuName(), dto.getContent(), dto.getPrice(), dto.getStatus(), findStore);
         menuRepository.save(menu);
@@ -59,14 +57,14 @@ public class MenuAdminServiceImpl implements MenuAdminService {
         Long currentUserId = jwtUtil.extractUserId(token);
 
         Store findStore = storeRepository.findByIdAndOwnerIdAndDeletedFalse(storeId, currentUserId)
-            .orElseThrow(() -> new MenuCustomException(MenuErrorCode.ONLY_MY_STORE));
+            .orElseThrow(() -> new CustomException(ErrorCode.ONLY_MY_STORE));
 
         Menu menu = menuRepository.finByIdOrElseThrow(menuId);
 
         if (findStore.getId().equals(menu.getStore().getId())) {
             menu.update(dto);
         } else {
-            throw new MenuCustomException(MenuErrorCode.MENU_NOT_FOUND);
+            throw new CustomException(ErrorCode.MENU_NOT_FOUND);
         }
 
         return MenuAdminResponseDto.builder()
@@ -88,13 +86,13 @@ public class MenuAdminServiceImpl implements MenuAdminService {
         Long currentUserId = jwtUtil.extractUserId(token);
 
         Store findStore = storeRepository.findByIdAndOwnerIdAndDeletedFalse(storeId, currentUserId)
-            .orElseThrow(() -> new StoreCustomException(StoreErrorCode.STORE_NOT_FOUND));
+            .orElseThrow(() -> new CustomException(ErrorCode.STORE_NOT_FOUND));
 
         Menu menu = menuRepository.findById(menuId)
-            .orElseThrow(() -> new MenuCustomException(MenuErrorCode.MENU_NOT_FOUND));
+            .orElseThrow(() -> new CustomException(ErrorCode.MENU_NOT_FOUND));
 
         if (!findStore.getId().equals(menu.getStore().getId())) {
-            throw new MenuCustomException(MenuErrorCode.MENU_NOT_FOUND);
+            throw new CustomException(ErrorCode.MENU_NOT_FOUND);
         }
 
         // 메뉴 삭제 처리

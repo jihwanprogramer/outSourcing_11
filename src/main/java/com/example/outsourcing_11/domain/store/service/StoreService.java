@@ -9,9 +9,8 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.example.outsourcing_11.common.exception.store.StoreCustomException;
-import com.example.outsourcing_11.common.exception.store.StoreErrorCode;
-import com.example.outsourcing_11.domain.comment.repository.CommentRepository;
+import com.example.outsourcing_11.common.exception.CustomException;
+import com.example.outsourcing_11.common.exception.ErrorCode;
 import com.example.outsourcing_11.domain.menu.dto.response.MenuUserResponseDto;
 import com.example.outsourcing_11.domain.menu.entity.Menu;
 import com.example.outsourcing_11.domain.menu.repository.MenuRepository;
@@ -30,7 +29,6 @@ import com.example.outsourcing_11.domain.store.repository.FavoriteRepository;
 import com.example.outsourcing_11.domain.store.repository.NoticeRepository;
 import com.example.outsourcing_11.domain.store.repository.StoreRepository;
 import com.example.outsourcing_11.domain.user.entity.User;
-import com.example.outsourcing_11.util.JwtUtil;
 
 @Service
 @RequiredArgsConstructor
@@ -38,34 +36,31 @@ public class StoreService {
 
 	private final StoreRepository storeRepository;
 	private final MenuRepository menuRepository;
-	private final CommentRepository commentRepository;
 	private final FavoriteRepository favoriteRepository;
 	private final NoticeRepository noticeRepository;
 	private final OrderRepository orderRepository;
-	private final JwtUtil jwtUtil;
 
 	private void validateOwner(Store store, User user) {
 		if (!store.getOwner().getId().equals(user.getId())) {
-			throw new StoreCustomException(StoreErrorCode.ONLY_MY_STORE); // "내 가게 아님" 오류
+			throw new CustomException(ErrorCode.ONLY_MY_STORE); // "내 가게 아님" 오류
 		}
 	}
 
 	private Store getStoreOrThrow(Long storeId) {
 		return storeRepository.findByIdAndDeletedFalse(storeId)
-			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.STORE_NOT_FOUND));
+			.orElseThrow(() -> new CustomException(ErrorCode.STORE_NOT_FOUND));
 	}
 
 	/**
 	 * 가게 생성 3개까지 제한
-	 *
 	 */
 	public StoreResponseDto createStore(User user, StoreRequestDto requestDto) {
 		int storeCount = storeRepository.countByOwnerAndStatus(user, StoreStatus.OPEN);
 		if (storeCount >= 3) {
-			throw new StoreCustomException(StoreErrorCode.LIMIT_THREE);
+			throw new CustomException(ErrorCode.LIMIT_THREE);
 		}
 		if (requestDto.getCategory() == null) {
-			throw new StoreCustomException(StoreErrorCode.KEYWORD_NOT_FOUND);
+			throw new CustomException(ErrorCode.KEYWORD_NOT_FOUND);
 		}
 
 		Store store = new Store(requestDto, user);
@@ -75,9 +70,7 @@ public class StoreService {
 	}
 
 	/**
-	 *
 	 * 고객 다건 조회
-	 *
 	 */
 	@Transactional(readOnly = true)
 	public List<StoreListDto> getStores(String keyword) {
@@ -91,11 +84,11 @@ public class StoreService {
 				stores = storeRepository.findAllByCategoryAndDeletedFalse(category);
 
 				if (stores.isEmpty()) {
-					throw new StoreCustomException(StoreErrorCode.NO_STORE_IN_CATEGORY);
+					throw new CustomException(ErrorCode.NO_STORE_IN_CATEGORY);
 				}
 
 			} catch (IllegalArgumentException e) {
-				throw new StoreCustomException(StoreErrorCode.KEYWORD_NOT_FOUND);
+				throw new CustomException(ErrorCode.KEYWORD_NOT_FOUND);
 			}
 		}
 		return stores.stream()
@@ -105,6 +98,7 @@ public class StoreService {
 
 	/**
 	 * 고객 단건 조회 - 메뉴리스트 포함
+	 *
 	 * @param storeId
 	 * @return
 	 */
@@ -129,9 +123,9 @@ public class StoreService {
 	@Transactional(readOnly = true)
 	public List<StoreResponseDto> getMyStores(User user) {
 		List<Store> stores = storeRepository.findAllByOwnerAndDeletedFalse(user);
-		//잠시만요 확인해볼꼐요
+
 		if (stores.isEmpty()) {
-			throw new StoreCustomException(StoreErrorCode.MY_STORE_NOT_FOUND); // 새로 추가
+			throw new CustomException(ErrorCode.MY_STORE_NOT_FOUND); // 새로 추가
 		}
 
 		return stores
@@ -142,13 +136,12 @@ public class StoreService {
 
 	/**
 	 * 가게 수정
-	 *
 	 */
 	@Transactional
 	public void updateStore(Long storeId, StoreRequestDto dto, User user) {
 
 		Store store = storeRepository.findByIdAndOwnerAndDeletedFalse(storeId, user)
-			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.STORE_NOT_FOUND));
+			.orElseThrow(() -> new CustomException(ErrorCode.STORE_NOT_FOUND));
 		validateOwner(store, user);
 		store.update(dto);
 
@@ -156,6 +149,7 @@ public class StoreService {
 
 	/**
 	 * 가게 삭제 - soft delete
+	 *
 	 * @param storeId
 	 * @param user
 	 */
@@ -163,7 +157,7 @@ public class StoreService {
 	public void deleteStore(Long storeId, User user) {
 		//사장님인지 아닌지 물어봄. 그러고 통과하면 그때 storeId로 묻고 , 삭제여부도 따로 묻기
 		Store store = storeRepository.findByIdAndOwnerAndDeletedFalse(storeId, user)
-			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.STORE_NOT_FOUND));
+			.orElseThrow(() -> new CustomException(ErrorCode.STORE_NOT_FOUND));
 
 		validateOwner(store, user);
 		store.softDelete();
@@ -171,6 +165,7 @@ public class StoreService {
 
 	/**
 	 * 즐겨찾기 등록
+	 *
 	 * @param storeId
 	 * @param user
 	 */
@@ -178,7 +173,7 @@ public class StoreService {
 		Store store = getStoreOrThrow(storeId);
 		boolean alreadyFavorite = favoriteRepository.existsByUserAndStore(user, store);
 		if (alreadyFavorite) {
-			throw new StoreCustomException(StoreErrorCode.ALREADY_FAVORITE);
+			throw new CustomException(ErrorCode.ALREADY_FAVORITE);
 		}
 
 		store.increaseFavorite();
@@ -188,6 +183,7 @@ public class StoreService {
 
 	/**
 	 * 즐겨찾기 해제
+	 *
 	 * @param storeId
 	 * @param user
 	 */
@@ -197,7 +193,7 @@ public class StoreService {
 		Store store = getStoreOrThrow(storeId);
 
 		Favorite favorite = favoriteRepository.findByUserIdAndStoreId(user.getId(), storeId)
-			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NON_FAVORITE));
+			.orElseThrow(() -> new CustomException(ErrorCode.NON_FAVORITE));
 		favoriteRepository.delete(favorite);
 
 		store.decreaseFavorite();
@@ -205,6 +201,7 @@ public class StoreService {
 
 	/**
 	 * 공지 등록
+	 *
 	 * @param storeId
 	 * @param content
 	 * @param user
@@ -216,7 +213,7 @@ public class StoreService {
 		validateOwner(store, user);
 
 		if (content == null || content.trim().isEmpty()) {
-			throw new StoreCustomException(StoreErrorCode.NON_CONTENT);
+			throw new CustomException(ErrorCode.NON_CONTENT);
 		}
 
 		noticeRepository.save(new Notice(store, content));
@@ -224,6 +221,7 @@ public class StoreService {
 
 	/**
 	 * 공지 수정
+	 *
 	 * @param noticeId
 	 * @param content
 	 * @param user
@@ -235,14 +233,14 @@ public class StoreService {
 		validateOwner(store, user);
 
 		Notice notice = noticeRepository.findByIdWithStore(noticeId)
-			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NO_NOTICE));
+			.orElseThrow(() -> new CustomException(ErrorCode.NO_NOTICE));
 
 		if (content == null || content.trim().isEmpty()) {
-			throw new StoreCustomException(StoreErrorCode.NON_CONTENT);
+			throw new CustomException(ErrorCode.NON_CONTENT);
 		}
 
 		if (!notice.getStore().getOwner().getId().equals(user.getId())) {
-			throw new StoreCustomException(StoreErrorCode.ONLY_MY_STORE);
+			throw new CustomException(ErrorCode.ONLY_MY_STORE);
 		}
 
 		notice.update(content);
@@ -250,6 +248,7 @@ public class StoreService {
 
 	/**
 	 * 공지 삭제
+	 *
 	 * @param noticeId
 	 * @param user
 	 */
@@ -260,13 +259,14 @@ public class StoreService {
 		validateOwner(store, user);
 
 		Notice notice = noticeRepository.findByIdWithStore(noticeId)
-			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NO_NOTICE));
+			.orElseThrow(() -> new CustomException(ErrorCode.NO_NOTICE));
 
 		noticeRepository.delete(notice);
 	}
 
 	/**
 	 * 판매량 통계
+	 *
 	 * @param storeId
 	 * @param user
 	 * @param type
@@ -275,7 +275,7 @@ public class StoreService {
 	@Transactional(readOnly = true)
 	public SalesDto getSales(Long storeId, User user, String type) {
 		Store store = storeRepository.findByIdAndOwnerAndDeletedFalse(storeId, user)
-			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.STORE_NOT_FOUND));
+			.orElseThrow(() -> new CustomException(ErrorCode.STORE_NOT_FOUND));
 
 		LocalDateTime now = LocalDateTime.now();
 		LocalDateTime start;
@@ -292,7 +292,7 @@ public class StoreService {
 				break;
 
 			default:
-				throw new StoreCustomException(StoreErrorCode.PERIOD_ERROR);
+				throw new CustomException(ErrorCode.PERIOD_ERROR);
 		}
 
 		BigDecimal totalSales = orderRepository.sumTotalPriceByStoreAndCreatedAtBetween(store, start, now);

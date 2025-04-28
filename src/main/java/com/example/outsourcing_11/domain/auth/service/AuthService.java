@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Service;
 import com.example.outsourcing_11.common.UserRole;
-import com.example.outsourcing_11.common.exception.user.UserCustomException;
-import com.example.outsourcing_11.common.exception.user.UserErrorCode;
+import com.example.outsourcing_11.common.exception.CustomException;
+import com.example.outsourcing_11.common.exception.ErrorCode;
 import com.example.outsourcing_11.config.PasswordEncoder;
 import com.example.outsourcing_11.domain.auth.dto.LoginRequestDto;
 import com.example.outsourcing_11.domain.auth.dto.SignUpRequestDto;
@@ -23,7 +23,7 @@ public class AuthService {
 
 	public SignUpResponseDto signUp(SignUpRequestDto requestDto) {
 		if (userRepository.existsByEmail(requestDto.getEmail())) {
-			throw new UserCustomException(UserErrorCode.DUPLICATE_USER);
+			throw new CustomException(ErrorCode.DUPLICATE_USER);
 		}
 
 		String encodedPassword = passwordEncoder.encode(requestDto.getPassword());
@@ -49,13 +49,13 @@ public class AuthService {
 	// 로그인 (Access Token 발급)
 	public String login(LoginRequestDto requestDto) {
 		User user = userRepository.findByEmail(requestDto.getEmail())
-			.orElseThrow(() -> new UserCustomException(UserErrorCode.USER_NOT_FOUND));
+			.orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
 		if (!passwordEncoder.matches(requestDto.getPassword(), user.getPassword())) {
-			throw new UserCustomException(UserErrorCode.INVALID_PASSWORD);
+			throw new CustomException(ErrorCode.INVALID_PASSWORD);
 		}
 		if (user.getDeletedAt() != null || user.getStatus().getValue()) {
-			throw new UserCustomException(UserErrorCode.UNAUTHORIZED_ACCESS);
+			throw new CustomException(ErrorCode.UNAUTHORIZED_ACCESS);
 		}
 
 		return jwtUtil.generateAccessToken(user.getId(), user.getName(), user.getEmail(), user.getRole().getRoleName());

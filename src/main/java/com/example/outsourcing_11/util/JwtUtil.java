@@ -5,8 +5,8 @@ import java.util.Date;
 import jakarta.servlet.http.HttpServletRequest;
 
 import org.springframework.stereotype.Component;
-import com.example.outsourcing_11.common.exception.user.UserCustomException;
-import com.example.outsourcing_11.common.exception.user.UserErrorCode;
+import com.example.outsourcing_11.common.exception.CustomException;
+import com.example.outsourcing_11.common.exception.ErrorCode;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -87,7 +87,7 @@ public class JwtUtil {
 	public String extractTokenFromRequest(HttpServletRequest request) {
 		String bearerToken = request.getHeader("Authorization");
 		if (bearerToken == null) {
-			throw new UserCustomException(UserErrorCode.AUTHORIZATION_HEADER_MISSING);
+			throw new CustomException(ErrorCode.AUTHORIZATION_HEADER_MISSING);
 		}
 		return bearerToken;
 	}

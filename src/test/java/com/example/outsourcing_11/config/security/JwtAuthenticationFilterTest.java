@@ -99,4 +99,5 @@ class JwtAuthenticationFilterTest {
 		verify(userRepository).findById(userId);
 		verify(filterChain).doFilter(request, response);
 	}
+
 }
