@@ -44,10 +44,11 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     Optional<Comment> findWithRelationsByOrderId(@Param("orderId") Long orderId);
 
     /**
-     * @param menuId
-     * @return
+     * 주문의 메뉴별 리뷰의 수를 반환
+     *
+     * @param menuId id 받기
+     * @return 개수를 반환
      */
-
     @Query("SELECT COUNT(c) FROM Comment c JOIN c.order o JOIN o.items oi WHERE oi.menu.id = :menuId AND c.isDeleted = false")
     long countByMenuId(@Param("menuId") Long menuId);
 

@@ -1,5 +1,7 @@
 package com.example.outsourcing_11.domain.order.service;
 
+import com.example.outsourcing_11.common.exception.CustomException;
+import com.example.outsourcing_11.common.exception.ErrorCode;
 import com.example.outsourcing_11.domain.menu.entity.Menu;
 import com.example.outsourcing_11.domain.menu.repository.MenuRepository;
 import com.example.outsourcing_11.domain.order.dto.*;
@@ -35,20 +37,26 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderResponseDto createOrder(OrderRequestDto requestDto) {
         User user = userRepository.findById(requestDto.getUserId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+            .orElseThrow(() -> new CustomException(
+                ErrorCode.USER_NOT_FOUND
+            ));
+
 
         List<OrderItem> items = new ArrayList<>();
         List<OrderItemResponseDto> itemResponses = new ArrayList<>();
         int totalPrice = 0;
-
         Store store = null; // ✅ 대표 store 지정
 
         for (OrderItemRequestDto dto : requestDto.getItems()) {
             Menu menu = menuRepository.findById(dto.getMenuId())
-                    .orElseThrow(() -> new RuntimeException("Menu not found"));
+                .orElseThrow(() -> new CustomException(
+                    ErrorCode.MENU_NOT_FOUND
+                ));
 
             store = storeRepository.findById(dto.getStoreId())
-                    .orElseThrow(() -> new RuntimeException("Store not found"));
+                .orElseThrow(() -> new CustomException(
+                    ErrorCode.STORE_NOT_FOUND
+                ));
 
             OrderItem item = new OrderItem();
             item.setMenu(menu);
@@ -60,81 +68,84 @@ public class OrderServiceImpl implements OrderService {
             totalPrice += dto.getItemPrice() * dto.getQuantity();
 
             itemResponses.add(OrderItemResponseDto.builder()
-                    .id(null)
-                    .menuId(dto.getMenuId())
-                    .storeId(dto.getStoreId())
-                    .quantity(dto.getQuantity())
-                    .itemPrice(dto.getItemPrice())
-                    .build());
+                .id(null)
+                .menuId(dto.getMenuId())
+                .storeId(dto.getStoreId())
+                .quantity(dto.getQuantity())
+                .itemPrice(dto.getItemPrice())
+                .build());
         }
 
         // ✅ for문 바깥에서 Order 객체 생성 (한 번만!)
         Order order = new Order(
-                user,
-                store, // ✅ 대표 store
-                LocalDateTime.now(),
-                OrderStatus.PENDING,
-                totalPrice,
-                items
+            user,
+            store, // ✅ 대표 store
+            LocalDateTime.now(),
+            OrderStatus.PENDING,
+            totalPrice,
+            items
         );
 
         orderRepository.save(order);
 
         return new OrderResponseDto(
-                order.getId(),
-                user.getId(),
-                order.getStatus().name(),     // ✅ enum → String으로 변환
-                totalPrice,
-                itemResponses,
-                order.getOrderDate()         // ✅ 마지막 파라미터!
+            order.getId(),
+            user.getId(),
+            order.getStatus().name(),     // ✅ enum → String으로 변환
+            totalPrice,
+            itemResponses,
+            order.getOrderDate()         // ✅ 마지막 파라미터!
         );
     }
+
     @Override
     public List<OrderResponseDto> getOrdersByUserId(Long userId) {
         return orderRepository.findByUserId(userId).stream()
-                .map(order -> OrderResponseDto.builder()
-                        .id(order.getId())
-                        .userId(order.getUser().getId())
-                        .orderDate(order.getOrderDate())
-                        .status(order.getStatus().name())
-                        .totalPrice(order.getTotalPrice())
-                        .items(order.getItems().stream().map(item -> new OrderItemResponseDto(
-                                item.getId(),
-                                item.getMenu().getId(),
-                                item.getStore().getId(),
-                                item.getQuantity(),
-                                item.getItemPrice()
-                        )).collect(Collectors.toList()))
-                        .build())
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public OrderResponseDto getOrderById(Long orderId) {
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("Order not found"));
-
-        return OrderResponseDto.builder()
+            .map(order -> OrderResponseDto.builder()
                 .id(order.getId())
                 .userId(order.getUser().getId())
                 .orderDate(order.getOrderDate())
                 .status(order.getStatus().name())
                 .totalPrice(order.getTotalPrice())
                 .items(order.getItems().stream().map(item -> new OrderItemResponseDto(
-                        item.getId(),
-                        item.getMenu().getId(),
-                        item.getStore().getId(),
-                        item.getQuantity(),
-                        item.getItemPrice()
+                    item.getId(),
+                    item.getMenu().getId(),
+                    item.getStore().getId(),
+                    item.getQuantity(),
+                    item.getItemPrice()
                 )).collect(Collectors.toList()))
-                .build();
+                .build())
+            .collect(Collectors.toList());
+    }
+
+    @Override
+    public OrderResponseDto getOrderById(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+            .orElseThrow(() -> new CustomException(
+                ErrorCode.ORDER_NOT_FOUND
+            ));
+
+        return OrderResponseDto.builder()
+            .id(order.getId())
+            .userId(order.getUser().getId())
+            .orderDate(order.getOrderDate())
+            .status(order.getStatus().name())
+            .totalPrice(order.getTotalPrice())
+            .items(order.getItems().stream().map(item -> new OrderItemResponseDto(
+                item.getId(),
+                item.getMenu().getId(),
+                item.getStore().getId(),
+                item.getQuantity(),
+                item.getItemPrice()
+            )).collect(Collectors.toList()))
+            .build();
     }
 
     @Override
     public PriceResponseDto calculatePrice(OrderRequestDto requestDto) {
         int totalPrice = requestDto.getItems().stream()
-                .mapToInt(item -> item.getItemPrice() * item.getQuantity())
-                .sum();
+            .mapToInt(item -> item.getItemPrice() * item.getQuantity())
+            .sum();
 
         return new PriceResponseDto(totalPrice, totalPrice);
     }
@@ -143,44 +154,59 @@ public class OrderServiceImpl implements OrderService {
     public OrderResponseDto updateOrderStatus(Long orderId, OrderStatusUpdateDto statusUpdateDto) {
         // 주문 ID로 주문 조회
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("Order not found"));
+            .orElseThrow(() -> new CustomException(
+                ErrorCode.ORDER_NOT_FOUND
+            ));
+
+        if (order.getStatus() == OrderStatus.COMPLETED) {
+            throw new CustomException(
+                ErrorCode.CANNOT_CHANGE_COMPLETED_ORDER
+            );
+        }
 
 
         // 새로운 상태로 주문 객체를 새로 생성
         Order updated = new Order(
-                order.getUser(),
-                order.getStore(),
-                order.getOrderDate(),
-                OrderStatus.valueOf(statusUpdateDto.getStatus()),
-                order.getTotalPrice(),
-                new ArrayList<>(order.getItems()) // ✅ 리스트 복사해서 넘김
+            order.getUser(),
+            order.getStore(),
+            order.getOrderDate(),
+            OrderStatus.valueOf(statusUpdateDto.getStatus()),
+            order.getTotalPrice(),
+            new ArrayList<>(order.getItems()) // ✅ 리스트 복사해서 넘김
         );
         Order saved = orderRepository.save(updated);
 
         return OrderResponseDto.builder()
-                .id(saved.getId())
-                .userId(saved.getUser().getId())
-                .orderDate(saved.getOrderDate())
-                .status(saved.getStatus().name())
-                .totalPrice(saved.getTotalPrice())
-                .items(saved.getItems().stream().map(item -> new OrderItemResponseDto(
-                        item.getId(),
-                        item.getMenu().getId(),
-                        item.getStore().getId(),
-                        item.getQuantity(),
-                        item.getItemPrice()
-                )).collect(Collectors.toList()))
-                .build();
+            .id(saved.getId())
+            .userId(saved.getUser().getId())
+            .orderDate(saved.getOrderDate())
+            .status(saved.getStatus().name())
+            .totalPrice(saved.getTotalPrice())
+            .items(saved.getItems().stream().map(item -> new OrderItemResponseDto(
+                item.getId(),
+                item.getMenu().getId(),
+                item.getStore().getId(),
+                item.getQuantity(),
+                item.getItemPrice()
+            )).collect(Collectors.toList()))
+            .build();
     }
 
     @Override
     public CancelResponseDto cancelOrder(Long orderId) {
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("Order not found")); // 여기서 에러
+            .orElseThrow(() -> new CustomException(
+                ErrorCode.ORDER_NOT_FOUND
+            ));
+
+        if (order.getStatus() == OrderStatus.CANCELLED || order.getStatus() == OrderStatus.COMPLETED) {
+            throw new CustomException(
+                ErrorCode.CANNOT_CANCEL_COMPLETED_OR_CANCELED_ORDER
+            );
+        }
 
         orderRepository.delete(order);
         return new CancelResponseDto("주문이 성공적으로 취소되었습니다.", LocalDateTime.now());
     }
-    }
-
+}
 

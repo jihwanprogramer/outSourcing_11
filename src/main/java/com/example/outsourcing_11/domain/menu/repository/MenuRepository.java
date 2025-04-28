@@ -1,7 +1,7 @@
 package com.example.outsourcing_11.domain.menu.repository;
 
-import com.example.outsourcing_11.common.exception.menu.MenuCustomException;
-import com.example.outsourcing_11.common.exception.menu.MenuErrorCode;
+import com.example.outsourcing_11.common.exception.CustomException;
+import com.example.outsourcing_11.common.exception.ErrorCode;
 import com.example.outsourcing_11.domain.menu.entity.Menu;
 import com.example.outsourcing_11.domain.menu.enums.Category;
 import com.example.outsourcing_11.domain.store.entity.Store;
@@ -17,7 +17,7 @@ import java.util.List;
 @Repository
 public interface MenuRepository extends JpaRepository<Menu, Long> {
     default Menu finByIdOrElseThrow(Long menuId) {
-        return findById(menuId).orElseThrow(() -> new MenuCustomException(MenuErrorCode.MENU_NOT_FOUND));
+        return findById(menuId).orElseThrow(() -> new CustomException(ErrorCode.MENU_NOT_FOUND));
     }
 
     @Query("""

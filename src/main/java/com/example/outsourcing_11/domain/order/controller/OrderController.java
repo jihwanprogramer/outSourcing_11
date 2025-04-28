@@ -4,7 +4,6 @@ import com.example.outsourcing_11.common.exception.CustomException;
 import com.example.outsourcing_11.common.exception.ErrorCode;
 import com.example.outsourcing_11.domain.order.dto.*;
 import com.example.outsourcing_11.domain.order.service.OrderService;
-import com.example.outsourcing_11.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +18,7 @@ public class OrderController {
 
 
     private final OrderService orderService;
+
     /**
      * 주문 생성 요청 처리
      */
@@ -26,7 +26,7 @@ public class OrderController {
     public ResponseEntity<OrderResponseDto> createOrder(@RequestBody OrderRequestDto requestDto) {
         OrderResponseDto createdOrder = orderService.createOrder(requestDto);
         if (createdOrder == null) {
-            throw new CustomException(ErrorCode.INVALID_MENU_IN_ORDER.getMessage(), ErrorCode.INVALID_MENU_IN_ORDER.getHttpStatus());
+            throw new CustomException(ErrorCode.INVALID_MENU_IN_ORDER);
         }
         return new ResponseEntity<>(createdOrder, HttpStatus.CREATED);
     }
@@ -47,7 +47,7 @@ public class OrderController {
     public ResponseEntity<OrderResponseDto> getOrder(@PathVariable Long orderId) {
         OrderResponseDto order = orderService.getOrderById(orderId);
         if (order == null) {
-            throw new CustomException(ErrorCode.ORDER_NOT_FOUND.getMessage(), ErrorCode.ORDER_NOT_FOUND.getHttpStatus());
+            throw new CustomException(ErrorCode.ORDER_NOT_FOUND);
         }
         return new ResponseEntity<>(order, HttpStatus.OK);
 
@@ -67,11 +67,11 @@ public class OrderController {
      */
     @PatchMapping("/{orderId}")
     public ResponseEntity<OrderResponseDto> updateOrderStatus(
-            @PathVariable("orderId") Long orderId, // 여기 "orderId" 명시!!
-            @RequestBody OrderStatusUpdateDto requestDto) {
+        @PathVariable("orderId") Long orderId, // 여기 "orderId" 명시!!
+        @RequestBody OrderStatusUpdateDto requestDto) {
         OrderResponseDto updatedOrder = orderService.updateOrderStatus(orderId, requestDto);
         if (updatedOrder == null) {
-            throw new CustomException(ErrorCode.CANNOT_CHANGE_COMPLETED_ORDER.getMessage(), ErrorCode.CANNOT_CHANGE_COMPLETED_ORDER.getHttpStatus());
+            throw new CustomException(ErrorCode.CANNOT_CHANGE_COMPLETED_ORDER);
         }
         return new ResponseEntity<>(updatedOrder, HttpStatus.OK);
     }
@@ -83,7 +83,7 @@ public class OrderController {
     public ResponseEntity<CancelResponseDto> cancelOrder(@PathVariable("id") Long id) {
         CancelResponseDto cancelResponse = orderService.cancelOrder(id);
         if (cancelResponse == null) {
-            throw new CustomException(ErrorCode.CANNOT_CANCEL_COMPLETED_OR_CANCELED_ORDER.getMessage(), ErrorCode.CANNOT_CANCEL_COMPLETED_OR_CANCELED_ORDER.getHttpStatus());
+            throw new CustomException(ErrorCode.CANNOT_CANCEL_COMPLETED_OR_CANCELED_ORDER);
         }
         return new ResponseEntity<>(cancelResponse, HttpStatus.OK);
     }
