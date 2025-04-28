@@ -17,6 +17,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
 	/**
 	 * commentId에 해당하는 comment 조회
+	 *
 	 * @param commentId
 	 * @return
 	 */
@@ -35,6 +36,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
 	/**
 	 * 주문에 존재하는 comment를 전부 조회 (대댓글 조회 하지 않음)
+	 *
 	 * @param orderId Long orederId
 	 * @return Optional로 받아서 내보냄
 	 */
@@ -42,7 +44,6 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 	Optional<Comment> findWithRelationsByOrderId(@Param("orderId") Long orderId);
 
 	/**
-	 *
 	 * @param menuId
 	 * @return
 	 */
@@ -54,4 +55,5 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 	// 	return findByIdAndDeletedAtIsNull(commentId).orElseThrow(() -> new RuntimeException("Temp Error"));
 	// }
 } //주석하면 다른데서 오류나던데 그렁넹ㅋㅋ
+
 
