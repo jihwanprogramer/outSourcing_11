@@ -17,6 +17,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.core.context.SecurityContextHolder;
+import com.example.outsourcing_11.common.Status;
 import com.example.outsourcing_11.domain.user.entity.User;
 import com.example.outsourcing_11.domain.user.repository.UserRepository;
 import com.example.outsourcing_11.util.JwtUtil;
@@ -44,6 +46,7 @@ class JwtAuthenticationFilterTest {
 	@BeforeEach
 	void setUp() {
 		jwtAuthenticationFilter = new JwtAuthenticationFilter(jwtUtil, userRepository);
+		SecurityContextHolder.clearContext();
 	}
 
 	@Test
@@ -78,8 +81,11 @@ class JwtAuthenticationFilterTest {
 		Long userId = 1L;
 
 		User user = mock(User.class);
+		Status status = mock(Status.class);
+
+		when(status.getValue()).thenReturn(true);
+		when(user.getStatus()).thenReturn(status);
 		when(user.getDeletedAt()).thenReturn(null);
-		when(user.getStatus().getValue()).thenReturn(true);
 
 		when(request.getHeader("Authorization")).thenReturn(token);
 		when(jwtUtil.validateToken(token)).thenReturn(true);
@@ -92,6 +98,5 @@ class JwtAuthenticationFilterTest {
 		// then
 		verify(userRepository).findById(userId);
 		verify(filterChain).doFilter(request, response);
-		// 추가로 SecurityContextHolder에 인증 객체가 설정되었는지까지 체크하면 완벽
 	}
 }

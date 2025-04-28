@@ -9,7 +9,6 @@ import static org.mockito.Mockito.verify;
 
 import java.util.Optional;
 
-import com.example.outsourcing_11.common.UserRole;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -50,6 +49,7 @@ public class AuthServiceTest {
 			.email(email)
 			.password(password)
 			.userName("신규유저")
+			.role("고객")
 			.build();  // 필요한 값만!
 
 		given(userRepository.existsByEmail(email)).willReturn(false); // 이메일 중복 아님

@@ -50,7 +50,7 @@ public class User extends Base {
 	@Column(nullable = false)
 	private String address;
 
-	@Column(name = "status", nullable = false, columnDefinition = "TINYINT(1) DEFAULT 1")
+	@Column(name = "status", nullable = false, columnDefinition = "TINYINT(1) DEFAULT 0")
 	private boolean status = Status.EXIST.getValue();
 
 	@OneToMany(mappedBy = "owner", fetch = FetchType.LAZY)
