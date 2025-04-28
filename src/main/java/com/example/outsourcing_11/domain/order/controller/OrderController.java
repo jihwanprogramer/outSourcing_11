@@ -1,9 +1,12 @@
 package com.example.outsourcing_11.domain.order.controller;
 
+import com.example.outsourcing_11.common.exception.CustomException;
+import com.example.outsourcing_11.common.exception.ErrorCode;
 import com.example.outsourcing_11.domain.order.dto.*;
 import com.example.outsourcing_11.domain.order.service.OrderService;
 import com.example.outsourcing_11.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,7 +25,10 @@ public class OrderController {
     @PostMapping
     public ResponseEntity<OrderResponseDto> createOrder(@RequestBody OrderRequestDto requestDto) {
         OrderResponseDto createdOrder = orderService.createOrder(requestDto);
-        return ResponseEntity.ok(createdOrder);
+        if (createdOrder == null) {
+            throw new CustomException(ErrorCode.INVALID_MENU_IN_ORDER.getMessage(), ErrorCode.INVALID_MENU_IN_ORDER.getHttpStatus());
+        }
+        return new ResponseEntity<>(createdOrder, HttpStatus.CREATED);
     }
 
     /**
@@ -30,6 +36,7 @@ public class OrderController {
      */
     @GetMapping("/user/{id}")
     public ResponseEntity<List<OrderResponseDto>> getOrdersByUserId(@PathVariable("id") Long id) {
+        List<OrderResponseDto> orders = orderService.getOrdersByUserId(id);
         return ResponseEntity.ok(orderService.getOrdersByUserId(id));
     }
 
@@ -38,7 +45,11 @@ public class OrderController {
      */
     @GetMapping("/{orderId}")
     public ResponseEntity<OrderResponseDto> getOrder(@PathVariable Long orderId) {
-        return ResponseEntity.ok(orderService.getOrderById(orderId));
+        OrderResponseDto order = orderService.getOrderById(orderId);
+        if (order == null) {
+            throw new CustomException(ErrorCode.ORDER_NOT_FOUND.getMessage(), ErrorCode.ORDER_NOT_FOUND.getHttpStatus());
+        }
+        return new ResponseEntity<>(order, HttpStatus.OK);
 
     }
 
@@ -47,7 +58,8 @@ public class OrderController {
      */
     @PostMapping("/price")
     public ResponseEntity<PriceResponseDto> calculatePrice(@RequestBody OrderRequestDto requestDto) {
-        return ResponseEntity.ok(orderService.calculatePrice(requestDto));
+        PriceResponseDto price = orderService.calculatePrice(requestDto);
+        return new ResponseEntity<>(price, HttpStatus.OK);
     }
 
     /**
@@ -57,7 +69,11 @@ public class OrderController {
     public ResponseEntity<OrderResponseDto> updateOrderStatus(
             @PathVariable("orderId") Long orderId, // 여기 "orderId" 명시!!
             @RequestBody OrderStatusUpdateDto requestDto) {
-        return ResponseEntity.ok(orderService.updateOrderStatus(orderId, requestDto));
+        OrderResponseDto updatedOrder = orderService.updateOrderStatus(orderId, requestDto);
+        if (updatedOrder == null) {
+            throw new CustomException(ErrorCode.CANNOT_CHANGE_COMPLETED_ORDER.getMessage(), ErrorCode.CANNOT_CHANGE_COMPLETED_ORDER.getHttpStatus());
+        }
+        return new ResponseEntity<>(updatedOrder, HttpStatus.OK);
     }
 
     /**
@@ -65,7 +81,11 @@ public class OrderController {
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<CancelResponseDto> cancelOrder(@PathVariable("id") Long id) {
-        return ResponseEntity.ok(orderService.cancelOrder(id)); // ✅ 한 번만 호출
+        CancelResponseDto cancelResponse = orderService.cancelOrder(id);
+        if (cancelResponse == null) {
+            throw new CustomException(ErrorCode.CANNOT_CANCEL_COMPLETED_OR_CANCELED_ORDER.getMessage(), ErrorCode.CANNOT_CANCEL_COMPLETED_OR_CANCELED_ORDER.getHttpStatus());
+        }
+        return new ResponseEntity<>(cancelResponse, HttpStatus.OK);
     }
 }
 

@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+import com.example.outsourcing_11.domain.store.dto.StoreResponseDto;
 import com.example.outsourcing_11.domain.store.entity.Store;
 import com.example.outsourcing_11.domain.store.entity.StoreCategory;
 import com.example.outsourcing_11.domain.store.entity.StoreStatus;
@@ -25,9 +26,11 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
 
 	Optional<Store> findByIdAndDeletedFalse(Long storeId);
 
-	List<Store> findAllByOwnerAndDeletedFalse(User user);
+	List<StoreResponseDto> findAllByOwnerAndDeletedFalse(User user);
 
 	Optional<Store> findByIdAndOwnerAndDeletedFalse(Long storeId, User user);
 
-	List<Store> findAllByOwner(User user);
+    Optional<Store> findByIdAndOwnerIdAndDeletedFalse(Long storeId, Long ownerId);
+
+    List<Store> findAllByOwner(User user);
 }
