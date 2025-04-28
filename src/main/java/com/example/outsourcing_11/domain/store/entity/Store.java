@@ -7,8 +7,10 @@ import com.example.outsourcing_11.domain.order.entity.Order;
 import com.example.outsourcing_11.domain.store.dto.StoreRequestDto;
 import com.example.outsourcing_11.domain.user.entity.User;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -16,7 +18,9 @@ import java.util.List;
 
 @Getter
 @Entity
-@RequiredArgsConstructor
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Store extends Base {
 
     @Id
@@ -61,9 +65,6 @@ public class Store extends Base {
     @Column(columnDefinition = "TEXT", name = "notice")
     private List<Notice> notices;
 
-    @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Favorite> favorites;
-
     @Column(nullable = false)
     private int favoriteCount = 0;
 
@@ -72,11 +73,14 @@ public class Store extends Base {
     }
 
     public void decreaseFavorite() {
-        this.favoriteCount--;
+        if (this.favoriteCount > 0) {
+            this.favoriteCount--;
+        }
     }
 
     @Column(columnDefinition = "TINYINT(1)")
     private boolean deleted = Status.EXIST.getValue();
+
 
     public Store(StoreRequestDto dto, User user) {
         this.name = dto.getName();

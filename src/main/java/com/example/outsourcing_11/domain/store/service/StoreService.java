@@ -13,6 +13,7 @@ import com.example.outsourcing_11.domain.store.repository.NoticeRepository;
 import com.example.outsourcing_11.domain.store.repository.StoreRepository;
 import com.example.outsourcing_11.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -287,10 +288,14 @@ public class StoreService {
         }
 
         BigDecimal totalSales = orderRepository.sumTotalPriceByStoreAndCreatedAtBetween(store, start, now);
+        Long totalCustomers = orderRepository.countDistinctUserByStoreAndCreatedAtBetween(store, start, now);
         if (totalSales == null) {
             totalSales = BigDecimal.ZERO;
         }
-        return new SalesDto(totalSales);
+        if (totalCustomers == null) {
+            totalCustomers = Long.valueOf(0);
+        }
+        return new SalesDto(totalSales, totalCustomers);
 
     }
 
@@ -298,8 +303,8 @@ public class StoreService {
      * 자동으로 상태 영업시작, 마감
      */
     @Transactional
+    @Scheduled(cron = "0 0 * * * *")
     public void updateAllStoreStatuses() {
-        System.out.println("스케줄러 돈다! " + LocalDateTime.now());
         List<Store> stores = storeRepository.findAll();
         for (Store store : stores) {
             store.updateStatus();

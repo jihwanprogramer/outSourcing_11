@@ -1,8 +1,8 @@
 package com.example.outsourcing_11.domain.auth;
 
 import com.example.outsourcing_11.common.UserRole;
-import com.example.outsourcing_11.common.exception.user.DuplicateUserException;
-import com.example.outsourcing_11.common.exception.user.InvalidLoginException;
+import com.example.outsourcing_11.common.exception.CustomException;
+import com.example.outsourcing_11.common.exception.ErrorCode;
 import com.example.outsourcing_11.config.PasswordEncoder;
 import com.example.outsourcing_11.domain.auth.dto.LoginRequestDto;
 import com.example.outsourcing_11.domain.auth.dto.SignUpRequestDto;
@@ -50,7 +50,7 @@ public class AuthServiceTest {
             .password(password)
             .userName("신규유저")
             .role("고객")
-            .build();  // 필요한 값만!
+            .build();  // 필요한 값만빌드
 
         given(userRepository.existsByEmail(email)).willReturn(false); // 이메일 중복 아님
         given(passwordEncoder.encode(password)).willReturn(encodedPassword); // 비번 인코딩 결과
@@ -99,14 +99,16 @@ public class AuthServiceTest {
         ReflectionTestUtils.setField(user, "deletedAt", null);
         given(userRepository.findByEmail(email)).willReturn(Optional.of(user));
         given(passwordEncoder.matches(rawPassword, encodedPassword)).willReturn(false);
-        // 비밀번호 불일치 설정
 
         LoginRequestDto requestDto = new LoginRequestDto(email, rawPassword);
 
         // when & then
-        assertThrows(InvalidLoginException.class, () -> {
+        CustomException exception = assertThrows(CustomException.class, () -> {
             authService.login(requestDto);
         });
+
+        // ErrorCode 검증
+        assertEquals(ErrorCode.INVALID_PASSWORD, exception.getErrorCode());
     }
 
     @Test
@@ -122,8 +124,11 @@ public class AuthServiceTest {
         SignUpRequestDto requestDto = new SignUpRequestDto("이름", email, rawPassword, "전화번호", "주소", "권한");
 
         // when & then
-        assertThrows(DuplicateUserException.class, () -> {
+        CustomException exception = assertThrows(CustomException.class, () -> {
             authService.signUp(requestDto);
         });
+
+        // ErrorCode 검증
+        assertEquals(ErrorCode.DUPLICATE_USER, exception.getErrorCode());
     }
 }
