@@ -12,10 +12,8 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Service;
 import com.example.outsourcing_11.common.UserRole;
-import com.example.outsourcing_11.common.exception.user.InvalidLoginException;
-import com.example.outsourcing_11.common.exception.user.InvalidUserInputException;
-import com.example.outsourcing_11.common.exception.user.UnauthorizedException;
-import com.example.outsourcing_11.common.exception.user.UserNotFoundException;
+import com.example.outsourcing_11.common.exception.user.UserCustomException;
+import com.example.outsourcing_11.common.exception.user.UserErrorCode;
 import com.example.outsourcing_11.config.PasswordEncoder;
 import com.example.outsourcing_11.config.security.CustomUserDetails;
 import com.example.outsourcing_11.domain.user.dto.DeleteAndUpdateUserResponseDto;
@@ -40,7 +38,7 @@ public class UserService {
 	public UserResponseDto findUserById(Long userId) {
 		User findUser = userRepository.findByIdOrElseThrow(userId);
 		if (findUser.getDeletedAt() != null || findUser.getStatus().getValue()) {
-			throw new UserNotFoundException("사용자를 찾을 수 없습니다.");
+			throw new UserCustomException(UserErrorCode.USER_NOT_FOUND);
 		}
 
 		return new UserResponseDto(findUser.getName(), findUser.getEmail(), findUser.getPhone(), findUser.getAddress(),
@@ -54,12 +52,12 @@ public class UserService {
 		User findUser = userRepository.findByIdOrElseThrow(userId);
 
 		if (findUser.getDeletedAt() != null || findUser.getStatus().getValue()) {
-			throw new UserNotFoundException("사용자를 찾을 수 없습니다.");
+			throw new UserCustomException(UserErrorCode.USER_NOT_FOUND);
 		}
 
 		if (findUser.getRole() == UserRole.OWNER) {
 			findUser = userRepository.findOwnerWithStores(userId)
-				.orElseThrow(() -> new UserNotFoundException("사장님 정보를 가져오는 데 실패했습니다."));
+				.orElseThrow(() -> new UserCustomException(UserErrorCode.USER_NOT_FOUND));
 		}
 
 		return new UserResponseDto(findUser);
@@ -75,7 +73,7 @@ public class UserService {
 
 		// 비밀번호 확인
 		if (!passwordEncoder.matches(passwordDto.getPassword(), user.getPassword())) {
-			throw new InvalidLoginException("비밀번호가 일치하지 않습니다.");
+			throw new UserCustomException(UserErrorCode.INVALID_PASSWORD);
 		}
 
 		// 쿠키 발급 (3분짜리) 삭제인증 전용쿠키
@@ -94,7 +92,7 @@ public class UserService {
 			.anyMatch(cookie -> "delete_auth".equals(cookie.getName()) && "true".equals(cookie.getValue()));
 
 		if (!valid) {
-			throw new UnauthorizedException("수정 및 삭제 인증 쿠키가 없습니다.");
+			throw new UserCustomException(UserErrorCode.UNAUTHORIZED_COOKIE);
 		}
 
 		// 유저 조회
@@ -124,7 +122,7 @@ public class UserService {
 			.anyMatch(cookie -> "delete_auth".equals(cookie.getName()) && "true".equals(cookie.getValue()));
 
 		if (!valid) {
-			throw new UnauthorizedException("수정 및 삭제 인증 쿠키가 없습니다.");
+			throw new UserCustomException(UserErrorCode.UNAUTHORIZED_COOKIE);
 		}
 
 		// 유저 조회
@@ -143,7 +141,7 @@ public class UserService {
 			.anyMatch(cookie -> "delete_auth".equals(cookie.getName()) && "true".equals(cookie.getValue()));
 
 		if (!valid) {
-			throw new UnauthorizedException("수정 및 삭제 인증 쿠키가 없습니다.");
+			throw new UserCustomException(UserErrorCode.UNAUTHORIZED_COOKIE);
 		}
 
 		// 유저 조회
@@ -151,11 +149,11 @@ public class UserService {
 		User user = userRepository.findByIdOrElseThrow(userId);
 
 		if (!passwordEncoder.matches(requestDto.getOldPassword(), user.getPassword())) { // 비번체크
-			throw new InvalidLoginException("비밀번호가 일치하지 않습니다"); // 401 반환
+			throw new UserCustomException(UserErrorCode.INVALID_PASSWORD); // 401 반환
 		}
 
 		if (passwordEncoder.matches(requestDto.getNewPassword(), user.getPassword())) {
-			throw new InvalidUserInputException("현재 비밀번호와 동일합니다"); // 400 반환
+			throw new UserCustomException(UserErrorCode.SAME_PASSWORD); // 400 반환
 		}
 		user.updatePassword(passwordEncoder.encode(requestDto.getNewPassword()));
 	}
@@ -168,7 +166,7 @@ public class UserService {
 			.anyMatch(cookie -> "delete_auth".equals(cookie.getName()) && "true".equals(cookie.getValue()));
 
 		if (!valid) {
-			throw new UnauthorizedException("수정 및 삭제 인증 쿠키가 없습니다.");
+			throw new UserCustomException(UserErrorCode.UNAUTHORIZED_COOKIE);
 		}
 
 		// 유저 삭제

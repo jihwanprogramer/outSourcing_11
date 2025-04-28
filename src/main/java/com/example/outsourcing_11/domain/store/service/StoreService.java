@@ -129,7 +129,7 @@ public class StoreService {
 	@Transactional(readOnly = true)
 	public List<StoreResponseDto> getMyStores(User user) {
 		List<Store> stores = storeRepository.findAllByOwnerAndDeletedFalse(user);
-
+		//잠시만요 확인해볼꼐요
 		if (stores.isEmpty()) {
 			throw new StoreCustomException(StoreErrorCode.MY_STORE_NOT_FOUND); // 새로 추가
 		}
