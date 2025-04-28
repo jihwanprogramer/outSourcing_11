@@ -21,12 +21,18 @@ public class CartController {
 
     private final CartService cartService;
     private final OrderService orderService;
+
     /**
      * 사용자 ID로 장바구니 조회
      */
     @GetMapping("/{userId}")
     public ResponseEntity<CartResponseDto> getCartByUserId(@PathVariable Long userId) {
-        return new ResponseEntity<>(cartService.getCartByUserId(userId), HttpStatus.OK);
+        CartResponseDto cart = cartService.getCartByUserId(userId);
+        if (cart == null || cart.getItems().isEmpty()) {
+            throw new CustomException(ErrorCode.CART_EMPTY);
+
+        }
+        return ResponseEntity.ok(cart);
     }
 
     /**
@@ -34,30 +40,45 @@ public class CartController {
      */
     @PostMapping
     public ResponseEntity<CartResponseDto> createCart(@RequestBody CartRequestDto requestDto) {
-        return new ResponseEntity<>(cartService.createCart(requestDto), HttpStatus.CREATED);
+        CartResponseDto createdCart = cartService.createCart(requestDto);
+        if (createdCart == null) {
+            throw new CustomException(ErrorCode.USER_NOT_FOUND);
+        }
+        return new ResponseEntity<>(createdCart, HttpStatus.OK);
     }
+
     /**
      * 장바구니에 항목 추가
      */
     @PostMapping("/items")
     public ResponseEntity<CartResponseDto> addItemToCart(@RequestBody CartItemRequestDto dto) {
-        return new ResponseEntity<>(cartService.addItemToCart(dto), HttpStatus.CREATED);
+        if (dto.getQuantity() <= 0) {
+            throw new CustomException(ErrorCode.INVALID_QUANTITY);
+        }
+
+        CartResponseDto responseDto = cartService.addItemToCart(dto);
+        if (responseDto == null) {
+        }
+        return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
     }
 
     @PostMapping("/{userId}/checkout")
     public ResponseEntity<OrderResponseDto> checkoutCart(@PathVariable Long userId) {
         // 1. 장바구니 가져오기
         Cart cart = cartService.getEntityByUserId(userId);
+        if (cart == null || cart.getItems().isEmpty()) {
+            throw new CustomException(ErrorCode.CART_EMPTY);
+        }
 
         // 2. 장바구니의 아이템들을 OrderItemRequestDto 리스트로 변환
         List<OrderItemRequestDto> orderItems = cart.getItems().stream()
-                .map(item -> new OrderItemRequestDto(
-                        item.getMenu().getId(),
-                        item.getStore().getId(),
-                        item.getQuantity(),
-                        item.getMenu().getPrice().intValue()
-                ))
-                .collect(Collectors.toList());
+            .map(item -> new OrderItemRequestDto(
+                item.getMenu().getId(),
+                item.getStore().getId(),
+                item.getQuantity(),
+                item.getMenu().getPrice().intValue()
+            ))
+            .collect(Collectors.toList());
 
         // 3. OrderRequestDto 만들고 주문 생성
         OrderRequestDto orderRequest = new OrderRequestDto(userId, orderItems);

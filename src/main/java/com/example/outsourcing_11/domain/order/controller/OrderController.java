@@ -1,10 +1,7 @@
 package com.example.outsourcing_11.domain.order.controller;
 
-import com.example.outsourcing_11.common.exception.CustomException;
-import com.example.outsourcing_11.common.exception.ErrorCode;
 import com.example.outsourcing_11.domain.order.dto.*;
 import com.example.outsourcing_11.domain.order.service.OrderService;
-import com.example.outsourcing_11.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +16,7 @@ public class OrderController {
 
 
     private final OrderService orderService;
+
     /**
      * 주문 생성 요청 처리
      */
@@ -57,8 +55,8 @@ public class OrderController {
      */
     @PatchMapping("/{orderId}")
     public ResponseEntity<OrderResponseDto> updateOrderStatus(
-            @PathVariable("orderId") Long orderId, // 여기 "orderId" 명시!!
-            @RequestBody OrderStatusUpdateDto requestDto) {
+        @PathVariable("orderId") Long orderId, // 여기 "orderId" 명시!!
+        @RequestBody OrderStatusUpdateDto requestDto) {
         return new ResponseEntity<>(orderService.updateOrderStatus(orderId, requestDto), HttpStatus.OK);
     }
 

@@ -1,6 +1,7 @@
 package com.example.outsourcing_11.util;
 
-import com.example.outsourcing_11.common.exception.user.UnauthorizedAccessException;
+import com.example.outsourcing_11.common.exception.CustomException;
+import com.example.outsourcing_11.common.exception.ErrorCode;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -84,7 +85,7 @@ public class JwtUtil {
     public String extractTokenFromRequest(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
         if (bearerToken == null) {
-            throw new UnauthorizedAccessException("Authorization 헤더가비었습니다..");
+            throw new CustomException(ErrorCode.AUTHORIZATION_HEADER_MISSING);
         }
         return bearerToken;
     }
