@@ -1,9 +1,11 @@
 package com.example.outsourcing_11.util;
 
+import com.example.outsourcing_11.common.exception.user.UnauthorizedAccessException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -76,5 +78,14 @@ public class JwtUtil {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    //Authorization 헤더 추출
+    public String extractTokenFromRequest(HttpServletRequest request) {
+        String bearerToken = request.getHeader("Authorization");
+        if (bearerToken == null) {
+            throw new UnauthorizedAccessException("Authorization 헤더가비었습니다..");
+        }
+        return bearerToken;
     }
 }
