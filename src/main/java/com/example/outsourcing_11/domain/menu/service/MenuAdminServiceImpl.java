@@ -1,6 +1,10 @@
 package com.example.outsourcing_11.domain.menu.service;
 
 import com.example.outsourcing_11.common.Status;
+import com.example.outsourcing_11.common.exception.menu.MenuCustomException;
+import com.example.outsourcing_11.common.exception.menu.MenuErrorCode;
+import com.example.outsourcing_11.common.exception.store.StoreCustomException;
+import com.example.outsourcing_11.common.exception.store.StoreErrorCode;
 import com.example.outsourcing_11.domain.menu.dto.request.MenuSaveRequestDto;
 import com.example.outsourcing_11.domain.menu.dto.request.MenuUpdateRequestDto;
 import com.example.outsourcing_11.domain.menu.dto.response.MenuAdminResponseDto;
@@ -8,55 +12,95 @@ import com.example.outsourcing_11.domain.menu.entity.Menu;
 import com.example.outsourcing_11.domain.menu.repository.MenuRepository;
 import com.example.outsourcing_11.domain.store.entity.Store;
 import com.example.outsourcing_11.domain.store.repository.StoreRepository;
+import com.example.outsourcing_11.util.JwtUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class MenuAdminServiceImpl implements MenuAdminService {
 
     private final MenuRepository menuRepository;
     private final StoreRepository storeRepository;
+    private final JwtUtil jwtUtil;
 
-    @Override
     @Transactional
-    public MenuAdminResponseDto createMenu(Long storeId, MenuSaveRequestDto dto) {
+    @Override
+    public MenuAdminResponseDto createMenu(Long storeId, MenuSaveRequestDto dto, HttpServletRequest request) {
+        String token = jwtUtil.extractTokenFromRequest(request);
+        Long currentUserId = jwtUtil.extractUserId(token);
 
-        Store findStore = storeRepository.finByIdOrElseThrow(storeId);
+        Store findStore = storeRepository.findByIdAndOwnerIdAndDeletedFalse(storeId, currentUserId).
+            orElseThrow(() -> new MenuCustomException(MenuErrorCode.ONLY_MY_STORE));
+
         Menu menu = Menu.of(dto.getCategory(), dto.getMenuName(), dto.getContent(), dto.getPrice(), dto.getStatus(), findStore);
         menuRepository.save(menu);
 
-        return new MenuAdminResponseDto(menu);
+        return MenuAdminResponseDto.builder()
+            .menuId(menu.getId())
+            .storeId(findStore.getId())
+            .category(menu.getCategory())
+            .menuName(menu.getName())
+            .content(menu.getContent())
+            .menuStatus(menu.getStatus())
+            .createdAt(menu.getCreatedAt())
+            .build();
     }
 
-    @Override
     @Transactional
-    public MenuAdminResponseDto updateMenu(Long storeId, Long menuId, MenuUpdateRequestDto dto) {
-        Store findStore = storeRepository.finByIdOrElseThrow(storeId);
+    @Override
+    public MenuAdminResponseDto updateMenu(Long storeId, Long menuId, MenuUpdateRequestDto dto, HttpServletRequest request) {
+
+        String token = jwtUtil.extractTokenFromRequest(request);
+        Long currentUserId = jwtUtil.extractUserId(token);
+
+        Store findStore = storeRepository.findByIdAndOwnerIdAndDeletedFalse(storeId, currentUserId)
+            .orElseThrow(() -> new MenuCustomException(MenuErrorCode.ONLY_MY_STORE));
+
         Menu menu = menuRepository.finByIdOrElseThrow(menuId);
 
         if (findStore.getId().equals(menu.getStore().getId())) {
             menu.update(dto);
         } else {
-            throw new RuntimeException("해당 가게에 입력하신 메뉴가 없습니다");
+            throw new MenuCustomException(MenuErrorCode.MENU_NOT_FOUND);
         }
 
-        return new MenuAdminResponseDto(menu);
+        return MenuAdminResponseDto.builder()
+            .menuId(menu.getId())
+            .storeId(findStore.getId())
+            .category(menu.getCategory())
+            .menuName(menu.getName())
+            .content(menu.getContent())
+            .menuStatus(menu.getStatus())
+            .createdAt(menu.getCreatedAt())
+            .build();
     }
 
-    @Override
     @Transactional
-    public void delete(Long storeId, Long menuId) {
-        Menu menu = menuRepository.finByIdOrElseThrow(menuId);
+    @Override
+    public void delete(Long storeId, Long menuId, HttpServletRequest request) {
 
-        if (storeId.equals(menu.getStore().getId())) {
-            menu.updateDeleteStatus(Status.NON_EXIST.getValue());
-            menu.timeWhenDeleted();
-            menuRepository.save(menu);
-        } else {
-            throw new RuntimeException("해당 가게에 입력하신 메뉴가 없습니다");
+        String token = jwtUtil.extractTokenFromRequest(request);
+        Long currentUserId = jwtUtil.extractUserId(token);
+
+        Store findStore = storeRepository.findByIdAndOwnerIdAndDeletedFalse(storeId, currentUserId)
+            .orElseThrow(() -> new StoreCustomException(StoreErrorCode.STORE_NOT_FOUND));
+
+        Menu menu = menuRepository.findById(menuId)
+            .orElseThrow(() -> new MenuCustomException(MenuErrorCode.MENU_NOT_FOUND));
+
+        if (!findStore.getId().equals(menu.getStore().getId())) {
+            throw new MenuCustomException(MenuErrorCode.MENU_NOT_FOUND);
         }
+
+        // 메뉴 삭제 처리
+        menu.updateDeleteStatus(Status.NON_EXIST.getValue());
+        menu.timeWhenDeleted();
+        menuRepository.save(menu);
 
     }
 }
