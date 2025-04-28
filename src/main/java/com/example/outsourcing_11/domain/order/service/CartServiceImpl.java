@@ -13,9 +13,9 @@ import com.example.outsourcing_11.domain.store.entity.Store;
 import com.example.outsourcing_11.domain.store.repository.StoreRepository;
 import com.example.outsourcing_11.domain.user.entity.User;
 import com.example.outsourcing_11.domain.user.repository.UserRepository;
-import org.springframework.transaction.annotation.Transactional; // ✅ 수정된 import
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
@@ -41,13 +41,13 @@ public class CartServiceImpl implements CartService {
     @Override
     public CartResponseDto getCartByUserId(Long userId) {
         Cart cart = cartRepository.findByUserId(userId)
-                .orElseThrow(() -> new RuntimeException("Cart not found"));
+            .orElseThrow(() -> new RuntimeException("Cart not found"));
 
         return CartResponseDto.builder()
-                .id(cart.getId())
-                .userId(cart.getUser().getId())
-                .items(Collections.emptyList()) // 실제 CartItemResponseDto 리스트 매핑 필요
-                .build();
+            .id(cart.getId())
+            .userId(cart.getUser().getId())
+            .items(Collections.emptyList()) // 실제 CartItemResponseDto 리스트 매핑 필요
+            .build();
     }
 
     /**
@@ -61,31 +61,31 @@ public class CartServiceImpl implements CartService {
     @Override
     public CartResponseDto createCart(CartRequestDto requestDto) {
         User user = userRepository.findById(requestDto.getUserId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+            .orElseThrow(() -> new RuntimeException("User not found"));
 
         Cart cart = new Cart(user);
 
         Cart saved = cartRepository.save(cart);
 
         return CartResponseDto.builder()
-                .id(saved.getId())
-                .userId(saved.getUser().getId())
-                .items(Collections.emptyList()) // CartItemResponseDto 리스트 매핑 필요
-                .build();
+            .id(saved.getId())
+            .userId(saved.getUser().getId())
+            .items(Collections.emptyList()) // CartItemResponseDto 리스트 매핑 필요
+            .build();
     }
 
     @Override
     public CartResponseDto addItemToCart(CartItemRequestDto dto) {
         User user = userRepository.findById(dto.getUserId())
-                .orElseThrow(() -> new IllegalArgumentException("해당 사용자를 찾을 수 없습니다."));
+            .orElseThrow(() -> new IllegalArgumentException("해당 사용자를 찾을 수 없습니다."));
 
         Cart cart = cartRepository.findByUser(user).orElseGet(() -> cartRepository.save(new Cart(user)));
 
         Menu menu = menuRepository.findById(dto.getMenuId())
-                .orElseThrow(() -> new IllegalArgumentException("해당 메뉴를 찾을 수 없습니다."));
+            .orElseThrow(() -> new IllegalArgumentException("해당 메뉴를 찾을 수 없습니다."));
 
         Store store = storeRepository.findById(dto.getStoreId())
-                .orElseThrow(() -> new RuntimeException("해당 가게가 존재하지 않습니다."));
+            .orElseThrow(() -> new RuntimeException("해당 가게가 존재하지 않습니다."));
 
         CartItem cartItem = new CartItem(cart, menu, store, dto.getQuantity());
         cart.getItems().add(cartItem);
@@ -93,15 +93,15 @@ public class CartServiceImpl implements CartService {
 
         // 반환할 응답 객체 생성
         List<CartItemResponseDto> responseItems = cart.getItems().stream()
-                .map(CartItem::toResponseDto)
-                .toList();
+            .map(CartItem::toResponseDto)
+            .toList();
         return new CartResponseDto(cart.getId(), user.getId(), responseItems);
     }
 
     @Transactional(readOnly = true)
     public Cart getEntityByUserId(Long userId) {
         return cartRepository.findByUserId(userId)
-                .orElseThrow(() -> new RuntimeException("장바구니가 존재하지 않습니다."));
+            .orElseThrow(() -> new RuntimeException("장바구니가 존재하지 않습니다."));
     }
 
 }
