@@ -50,7 +50,7 @@ public class AuthServiceTest {
 			.password(password)
 			.userName("신규유저")
 			.role("고객")
-			.build();  // 필요한 값만!
+			.build();  // 필요한 값만빌드
 
 		given(userRepository.existsByEmail(email)).willReturn(false); // 이메일 중복 아님
 		given(passwordEncoder.encode(password)).willReturn(encodedPassword); // 비번 인코딩 결과
@@ -107,7 +107,7 @@ public class AuthServiceTest {
 			authService.login(requestDto);
 		});
 
-		// 추가: ErrorCode 검증
+		// ErrorCode 검증
 		assertEquals(ErrorCode.INVALID_PASSWORD, exception.getErrorCode());
 	}
 
@@ -128,7 +128,7 @@ public class AuthServiceTest {
 			authService.signUp(requestDto);
 		});
 
-		// 추가: ErrorCode 검증
+		// ErrorCode 검증
 		assertEquals(ErrorCode.DUPLICATE_USER, exception.getErrorCode());
 	}
 }
