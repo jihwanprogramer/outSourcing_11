@@ -22,4 +22,5 @@ class SecurityConfigTest {
 		// then
 		assertNotNull(filter);
 	}
+
 }

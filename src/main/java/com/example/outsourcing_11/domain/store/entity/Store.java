@@ -78,9 +78,6 @@ public class Store extends Base {
 	@Column(columnDefinition = "TEXT", name = "notice")
 	private List<Notice> notices;
 
-	@OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<Favorite> favorites;
-
 	@Column(nullable = false)
 	private int favoriteCount = 0;
 
@@ -89,7 +86,9 @@ public class Store extends Base {
 	}
 
 	public void decreaseFavorite() {
-		this.favoriteCount--;
+		if (this.favoriteCount > 0) {
+			this.favoriteCount--;
+		}
 	}
 
 	@Column(columnDefinition = "TINYINT(1)")

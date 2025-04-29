@@ -1,4 +1,4 @@
-package com.example.outsourcing_11.domain.menu.order;
+package com.example.outsourcing_11.domain.order;
 
 import com.example.outsourcing_11.common.UserRole;
 import com.example.outsourcing_11.domain.menu.entity.Menu;

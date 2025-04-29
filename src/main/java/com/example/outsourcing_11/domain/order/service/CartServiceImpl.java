@@ -63,6 +63,11 @@ public class CartServiceImpl implements CartService {
         User user = userRepository.findById(requestDto.getUserId())
             .orElseThrow(() -> new RuntimeException("User not found"));
 
+        // ✅ 이미 Cart가 존재하는지 확인
+        if (cartRepository.findByUser(user).isPresent()) {
+            throw new RuntimeException("이미 장바구니가 존재합니다.");  // 또는 CustomException 사용
+        }
+
         Cart cart = new Cart(user);
 
         Cart saved = cartRepository.save(cart);

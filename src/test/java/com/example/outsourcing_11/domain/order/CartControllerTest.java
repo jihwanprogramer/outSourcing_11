@@ -1,4 +1,4 @@
-package com.example.outsourcing_11.domain.menu.order;
+package com.example.outsourcing_11.domain.order;
 
 import com.example.outsourcing_11.common.UserRole;
 import com.example.outsourcing_11.domain.menu.entity.Menu;
@@ -49,6 +49,8 @@ public class CartControllerTest {
     @Test
     @DisplayName("장바구니에 항목 추가 - POST /carts/items")
     void addItemToCart() throws Exception {
+
+
         // given: 사용자, 가게, 메뉴 생성
         User user = userRepository.save(new User("유리", "yuri@example.com", "1234", "01011112222", "USER", UserRole.CUSTOMER));
 

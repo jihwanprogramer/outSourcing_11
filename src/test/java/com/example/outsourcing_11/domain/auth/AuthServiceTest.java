@@ -131,4 +131,5 @@ public class AuthServiceTest {
 		// ErrorCode 검증
 		assertEquals(ErrorCode.DUPLICATE_USER, exception.getErrorCode());
 	}
+
 }
