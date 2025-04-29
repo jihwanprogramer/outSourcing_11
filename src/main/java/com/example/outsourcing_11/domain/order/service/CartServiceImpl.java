@@ -68,7 +68,6 @@ public class CartServiceImpl implements CartService {
             throw new RuntimeException("이미 장바구니가 존재합니다.");  // 또는 CustomException 사용
         }
 
-
         Cart cart = new Cart(user);
 
         Cart saved = cartRepository.save(cart);

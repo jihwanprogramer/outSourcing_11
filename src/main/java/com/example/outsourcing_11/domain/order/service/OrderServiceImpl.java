@@ -164,22 +164,23 @@ public class OrderServiceImpl implements OrderService {
             );
         }
 
+
         order.changeStatus(OrderStatus.valueOf(statusUpdateDto.getStatus()));
 
         return OrderResponseDto.builder()
-                .id(order.getId())
-                .userId(order.getUser().getId())
-                .orderDate(order.getOrderDate())
-                .status(order.getStatus().name())
-                .totalPrice(order.getTotalPrice())
-                .items(order.getItems().stream().map(item -> new OrderItemResponseDto(
-                        item.getId(),
-                        item.getMenu().getId(),
-                        item.getStore().getId(),
-                        item.getQuantity(),
-                        item.getItemPrice()
-                )).toList())
-                .build();
+            .id(order.getId())
+            .userId(order.getUser().getId())
+            .orderDate(order.getOrderDate())
+            .status(order.getStatus().name())
+            .totalPrice(order.getTotalPrice())
+            .items(order.getItems().stream().map(item -> new OrderItemResponseDto(
+                item.getId(),
+                item.getMenu().getId(),
+                item.getStore().getId(),
+                item.getQuantity(),
+                item.getItemPrice()
+            )).toList())
+            .build();
     }
 
     @Override

@@ -16,15 +16,15 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RequestMapping("/stores/{storeId}/Comment")
+@RequestMapping("/stores/{storeId}/comments")
 @RestController
 @RequiredArgsConstructor
-public class OwnerCommentContoroller {
+public class OwnerCommentController {
 
     private final OwnerServiceimple ownerServiceimple;
     private final UserService userService;
 
-    @PostMapping("/{commentId}/Owner-reply")
+    @PostMapping("/{commentId}/ownerReplys")
     public ResponseEntity<OwnerResponseCommentDto> createOwnerComment(
         @AuthenticationPrincipal CustomUserDetails userDetails,
         @PathVariable Long commentId,
@@ -38,7 +38,7 @@ public class OwnerCommentContoroller {
     }
 
     //사장님 대댓글 전부 조회
-    @GetMapping("/{commentId}/Owner-reply")
+    @GetMapping("/{commentId}/ownerReplys")
     public ResponseEntity<List<OwnerResponseCommentDto>> getOwnerComments(
         @PathVariable Long storeId,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
@@ -50,7 +50,7 @@ public class OwnerCommentContoroller {
         return new ResponseEntity<>(ownerServiceimple.getOwnerComments(storeId), HttpStatus.OK);
     }
 
-    @PutMapping("/{commentId}/Owner-reply")
+    @PutMapping("/{commentId}/ownerReplys")
     public ResponseEntity<OwnerResponseCommentDto> updateOwnerComment(
         @PathVariable Long commentId,
         @AuthenticationPrincipal CustomUserDetails userDetails,
@@ -62,7 +62,7 @@ public class OwnerCommentContoroller {
         return new ResponseEntity<>(ownerServiceimple.updateOwnerComment(commentId, dto), HttpStatus.OK);
     }
 
-    @DeleteMapping("/{commentId}/Owner-reply")
+    @DeleteMapping("/{commentId}/ownerReplys")
     public ResponseEntity<Void> deleteOwnerComment(
         @AuthenticationPrincipal CustomUserDetails userDetails,
         @PathVariable Long commentId) {

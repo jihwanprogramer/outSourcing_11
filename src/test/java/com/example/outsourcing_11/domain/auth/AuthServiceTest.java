@@ -46,11 +46,11 @@ public class AuthServiceTest {
         String encodedPassword = "encoded1234";
 
         SignUpRequestDto requestDto = SignUpRequestDto.builder()
-                .email(email)
-                .password(password)
-                .userName("신규유저")
-                .role("고객")
-                .build();  // 필요한 값만빌드
+            .email(email)
+            .password(password)
+            .userName("신규유저")
+            .role("고객")
+            .build();  // 필요한 값만빌드
 
         given(userRepository.existsByEmail(email)).willReturn(false); // 이메일 중복 아님
         given(passwordEncoder.encode(password)).willReturn(encodedPassword); // 비번 인코딩 결과
@@ -77,7 +77,7 @@ public class AuthServiceTest {
         given(userRepository.findByEmail(email)).willReturn(Optional.of(user));
         given(passwordEncoder.matches(rawPassword, encodedPassword)).willReturn(true);  // 비번 일치
         given(jwtUtil.generateAccessToken(user.getId(), user.getName(), user.getEmail(), user.getRole().getRoleName()))
-                .willReturn(expectedToken);
+            .willReturn(expectedToken);
 
         LoginRequestDto requestDto = new LoginRequestDto(email, rawPassword);
 
