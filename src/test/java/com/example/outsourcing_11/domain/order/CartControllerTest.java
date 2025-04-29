@@ -54,16 +54,16 @@ public class CartControllerTest {
         // given: 사용자, 가게, 메뉴 생성
         User user = userRepository.save(new User("유리", "yuri@example.com", "1234", "01011112222", "USER", UserRole.CUSTOMER));
 
-        Store store = storeRepository.save(Store.builder()
-            .name("맥도날드")
-            .address("서울시")
-            .openTime(LocalTime.of(9, 0, 0))
-            .closeTime(LocalTime.of(21, 0, 0))
-            .minimumOrderPrice(5000)
-            .status(StoreStatus.OPEN)
-            .category(StoreCategory.HAMBURGER)
-            .owner(user)
-            .build());
+        Store store = storeRepository.save(new Store(
+                "맥도날드",
+                "서울시",
+                LocalTime.of(9, 0, 0),
+                LocalTime.of(21, 0, 0),
+                5000,
+                StoreStatus.OPEN,
+                StoreCategory.HAMBURGER,
+                user
+        ));
 
         Menu menu = menuRepository.save(new Menu(Category.MAIN_MENU, "치즈버거", "치즈가 가득한 버거",
             BigDecimal.valueOf(7000), MenuStatus.AVAILABLE, store));
