@@ -13,9 +13,24 @@
 <p><strong>회원가입, 로그인, 메뉴 관리, 가게 관리, 주문, 리뷰</strong> 등 다양한 기능을 설계하고 직접 구현하여<br>
 백엔드 협업 및 RESTful API 설계 경험을 쌓는 데 집중했습니다.</p>
 
-<p>📌 [적용화면 캡처 삽입 예정]</p>
 
 <hr>
+<h2>🙌 팀원 역할 분담</h2>
+<table border="1">
+  <thead>
+    <tr><th>이름</th><th>담당 역할</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>김석진</td><td>회원(User) 기능 개발</td></tr>
+    <tr><td>김지환</td><td>메뉴(Menu) 기능 개발</td></tr>
+    <tr><td>정은세</td><td>가게(Store) 기능 개발</td></tr>
+    <tr><td>김형진</td><td>리뷰(Review) 기능 개발</td></tr>
+    <tr><td>남유리</td><td>주문(Order) 기능 개발</td></tr>
+  </tbody>
+</table>
+
+<hr>
+
 
 <h2>🎯 개발 목표</h2>
 <ul>
@@ -190,32 +205,31 @@ src/
 
 <hr>
 
-<h2>🖼️ 적용 화면 (추후 캡처 추가 예정)</h2>
+
+<h2>🖼️ 적용 화면</h2>
 <ul>
-  <li>회원가입/로그인 API 테스트 화면</li>
-  <li>메뉴 등록 및 조회 API 테스트 화면</li>
-  <li>가게 등록 및 조회 API 테스트 화면</li>
-  <li>주문 생성 및 조회 API 테스트 화면</li>
-  <li>리뷰 작성 및 조회 API 테스트 화면</li>
+  <b>로그인 및 토큰 발급</b><br>
+  @PreAuthorize 와 @AuthenticationPrincipal 어노테이션을 사용하여,
+  유저의 정보(사장님/고객) 정보까지 담긴 로그인세션을 쉽게 받아올 수 있습니다.<br>
+  
+  <img src="https://github.com/user-attachments/assets/0add50da-9e29-4b2f-9b8b-582fe8e0a65a" width="400px">
+  <img src="https://github.com/user-attachments/assets/296dfa04-2462-41a5-b1fe-b03b34a2edd5" width="400px">
+
+  <b>장바구니에 담긴 물품 결제</b><br>
+  <img src="https://github.com/user-attachments/assets/f6d669d4-11a8-4410-9f3d-3095035dd014" width="400px">
+
+  <b>메뉴 등록</b><br>
+  <img src="https://github.com/user-attachments/assets/a3c9b198-8bef-43c3-b151-bd8419b5f4b0" width="400px">
+
+  <b>사장님의 가게 매출, 고객수 월간 조회</b><br>
+  <img src="https://github.com/user-attachments/assets/bb11d44c-c7c9-44ce-a338-9bf9c6a854bf" width="400px">
+
+  <b>사장님 리뷰 댓글 API 테스트</b><br>
+  <img src="https://github.com/user-attachments/assets/6bfb1f58-fade-4f1f-b416-292e1263c8d7" width="400px">
 </ul>
 
 <hr>
 
-<h2>🙌 팀원 역할 분담</h2>
-<table border="1">
-  <thead>
-    <tr><th>이름</th><th>담당 역할</th></tr>
-  </thead>
-  <tbody>
-    <tr><td>김석진</td><td>회원(User) 기능 개발</td></tr>
-    <tr><td>김지환</td><td>메뉴(Menu) 기능 개발</td></tr>
-    <tr><td>정은세</td><td>가게(Store) 기능 개발</td></tr>
-    <tr><td>김형진</td><td>리뷰(Review) 기능 개발</td></tr>
-    <tr><td>남유리</td><td>주문(Order) 기능 개발</td></tr>
-  </tbody>
-</table>
-
-<hr>
 
 <h2>📝 느낀 점</h2>
 <blockquote>
