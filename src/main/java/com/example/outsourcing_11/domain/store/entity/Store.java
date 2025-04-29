@@ -20,7 +20,6 @@ import java.util.List;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class Store extends Base {
 
     @Id

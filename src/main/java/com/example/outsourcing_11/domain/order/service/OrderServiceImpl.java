@@ -37,26 +37,18 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderResponseDto createOrder(OrderRequestDto requestDto) {
         User user = userRepository.findById(requestDto.getUserId())
-                .orElseThrow(() -> new CustomException(
-                        ErrorCode.USER_NOT_FOUND
-                ));
-
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         List<OrderItem> items = new ArrayList<>();
-        List<OrderItemResponseDto> itemResponses = new ArrayList<>();
         int totalPrice = 0;
-        Store store = null; // ✅ 대표 store 지정
+        Store store = null; // 대표 store 지정
 
         for (OrderItemRequestDto dto : requestDto.getItems()) {
             Menu menu = menuRepository.findById(dto.getMenuId())
-                    .orElseThrow(() -> new CustomException(
-                            ErrorCode.MENU_NOT_FOUND
-                    ));
+                    .orElseThrow(() -> new CustomException(ErrorCode.MENU_NOT_FOUND));
 
             store = storeRepository.findById(dto.getStoreId())
-                    .orElseThrow(() -> new CustomException(
-                            ErrorCode.STORE_NOT_FOUND
-                    ));
+                    .orElseThrow(() -> new CustomException(ErrorCode.STORE_NOT_FOUND));
 
             OrderItem item = new OrderItem();
             item.setMenu(menu);
@@ -66,35 +58,39 @@ public class OrderServiceImpl implements OrderService {
             items.add(item);
 
             totalPrice += dto.getItemPrice() * dto.getQuantity();
-
-            itemResponses.add(OrderItemResponseDto.builder()
-                    .id(null)
-                    .menuId(dto.getMenuId())
-                    .storeId(dto.getStoreId())
-                    .quantity(dto.getQuantity())
-                    .itemPrice(dto.getItemPrice())
-                    .build());
         }
 
-        // ✅ for문 바깥에서 Order 객체 생성 (한 번만!)
+        // Order 생성 및 저장
         Order order = new Order(
                 user,
-                store, // ✅ 대표 store
+                store,
                 LocalDateTime.now(),
                 OrderStatus.PENDING,
                 totalPrice,
                 items
         );
 
-        orderRepository.save(order);
+        orderRepository.save(order); // ✅ 이 시점에 OrderItem들도 저장되고 id 부여됨
 
+        // 저장된 OrderItem들로 itemResponses 만들기
+        List<OrderItemResponseDto> itemResponses = order.getItems().stream()
+                .map(savedItem -> new OrderItemResponseDto(
+                        savedItem.getId(), // ✅ 이제 실제 id
+                        savedItem.getMenu().getId(),
+                        savedItem.getStore().getId(),
+                        savedItem.getQuantity(),
+                        savedItem.getItemPrice()
+                ))
+                .collect(Collectors.toList());
+
+        // 최종 OrderResponseDto 반환
         return new OrderResponseDto(
                 order.getId(),
                 user.getId(),
-                order.getStatus().name(),     // ✅ enum → String으로 변환
+                order.getStatus().name(),
                 totalPrice,
                 itemResponses,
-                order.getOrderDate()         // ✅ 마지막 파라미터!
+                order.getOrderDate()
         );
     }
 
