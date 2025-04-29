@@ -51,4 +51,5 @@ public class OwnerComment extends Base {
 	public void updateComment(Comment comment) {
 		this.comment = comment;
 	}
+
 }
