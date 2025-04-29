@@ -2,6 +2,7 @@ package com.example.outsourcing_11.domain.order.controller;
 
 import com.example.outsourcing_11.domain.order.dto.*;
 import com.example.outsourcing_11.domain.order.service.OrderService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +22,7 @@ public class OrderController {
      * 주문 생성 요청 처리
      */
     @PostMapping
-    public ResponseEntity<OrderResponseDto> createOrder(@RequestBody OrderRequestDto requestDto) {
+    public ResponseEntity<OrderResponseDto> createOrder(@RequestBody @Valid OrderRequestDto requestDto) {
         return new ResponseEntity<>(orderService.createOrder(requestDto), HttpStatus.CREATED);
     }
 
@@ -45,8 +46,9 @@ public class OrderController {
     /**
      * 주문 가격 계산
      */
+
     @PostMapping("/price")
-    public ResponseEntity<PriceResponseDto> calculatePrice(@RequestBody OrderRequestDto requestDto) {
+    public ResponseEntity<PriceResponseDto> calculatePrice(@RequestBody @Valid OrderRequestDto requestDto) {
         return new ResponseEntity<>(orderService.calculatePrice(requestDto), HttpStatus.OK);
     }
 
@@ -55,8 +57,8 @@ public class OrderController {
      */
     @PatchMapping("/{orderId}")
     public ResponseEntity<OrderResponseDto> updateOrderStatus(
-        @PathVariable("orderId") Long orderId, // 여기 "orderId" 명시!!
-        @RequestBody OrderStatusUpdateDto requestDto) {
+            @PathVariable("orderId") Long orderId,
+            @RequestBody @Valid OrderStatusUpdateDto requestDto) {
         return new ResponseEntity<>(orderService.updateOrderStatus(orderId, requestDto), HttpStatus.OK);
     }
 

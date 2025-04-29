@@ -6,6 +6,7 @@ import com.example.outsourcing_11.domain.order.dto.*;
 import com.example.outsourcing_11.domain.order.entity.Cart;
 import com.example.outsourcing_11.domain.order.service.CartService;
 import com.example.outsourcing_11.domain.order.service.OrderService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,7 +40,7 @@ public class CartController {
      * 새로운 장바구니 생성
      */
     @PostMapping
-    public ResponseEntity<CartResponseDto> createCart(@RequestBody CartRequestDto requestDto) {
+    public ResponseEntity<CartResponseDto> createCart(@RequestBody @Valid CartRequestDto requestDto) {
         CartResponseDto createdCart = cartService.createCart(requestDto);
         if (createdCart == null) {
             throw new CustomException(ErrorCode.USER_NOT_FOUND);
@@ -51,7 +52,7 @@ public class CartController {
      * 장바구니에 항목 추가
      */
     @PostMapping("/items")
-    public ResponseEntity<CartResponseDto> addItemToCart(@RequestBody CartItemRequestDto dto) {
+    public ResponseEntity<CartResponseDto> addItemToCart(@RequestBody @Valid CartItemRequestDto dto) {
         if (dto.getQuantity() <= 0) {
             throw new CustomException(ErrorCode.INVALID_QUANTITY);
         }
