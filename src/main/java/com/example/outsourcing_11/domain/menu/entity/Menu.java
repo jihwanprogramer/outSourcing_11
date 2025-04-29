@@ -36,12 +36,11 @@ public class Menu extends Base {
     @Column(nullable = false)
     private MenuStatus status;
 
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "storeId")
     private Store store;
 
-    @Column(columnDefinition = "TINYINT(1) DEFAULT 1")
+    @Column(columnDefinition = "TINYINT(1)")
     private boolean isDeleted = Status.EXIST.getValue();
 
     public void updateDeleteStatus(boolean isDeleted) {
@@ -53,10 +52,10 @@ public class Menu extends Base {
     }
 
     //정적 생성자 (캡슐화)
-    public static Menu of(Category category, String name, String content, BigDecimal price, MenuStatus status, Store store) {
-        Menu menu = new Menu(category, name, content, price, status, store);
+    public static Menu of(Category category, String name, String content, BigDecimal price, MenuStatus status,
+                          Store store) {
 
-        return menu;
+        return new Menu(category, name, content, price, status, store);
     }
 
     public Menu(Category category, String name, String content, BigDecimal price, MenuStatus status, Store store) {
@@ -69,11 +68,16 @@ public class Menu extends Base {
     }
 
     public void update(MenuUpdateRequestDto dto) {
-        if (dto.getCategory() != null) this.category = dto.getCategory();
-        if (dto.getMenuName() != null) this.name = dto.getMenuName();
-        if (dto.getContent() != null) this.content = dto.getContent();
-        if (dto.getPrice() != null) this.price = dto.getPrice();
-        if (dto.getStatus() != null) this.status = dto.getStatus();
+        if (dto.getCategory() != null)
+            this.category = dto.getCategory();
+        if (dto.getMenuName() != null)
+            this.name = dto.getMenuName();
+        if (dto.getContent() != null)
+            this.content = dto.getContent();
+        if (dto.getPrice() != null)
+            this.price = dto.getPrice();
+        if (dto.getStatus() != null)
+            this.status = dto.getStatus();
     }
 
 }

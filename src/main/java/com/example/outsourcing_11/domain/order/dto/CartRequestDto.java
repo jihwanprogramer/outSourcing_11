@@ -1,5 +1,8 @@
 package com.example.outsourcing_11.domain.order.dto;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.List;
 
 public class CartRequestDto {
@@ -14,6 +17,11 @@ public class CartRequestDto {
         return items;
     }
 
+
+    @JsonCreator
+    public CartRequestDto(@JsonProperty("userId") Long userId) {
+        this.userId = userId;
+    }
 
 
 }

@@ -1,9 +1,12 @@
 package com.example.outsourcing_11.domain.order.entity;
 
 import com.example.outsourcing_11.domain.menu.entity.Menu;
+import com.example.outsourcing_11.domain.order.dto.CartItemResponseDto;
 import com.example.outsourcing_11.domain.store.entity.Store;
 import jakarta.persistence.*;
+import lombok.Getter;
 
+@Getter
 @Entity
 @Table(name = "cart_items")
 public class CartItem {
@@ -28,5 +31,22 @@ public class CartItem {
     @Column(name = "quantity", nullable = false)
     private int quantity;
 
-    // 생성자, getter, setter
+    protected CartItem() {
+    }
+
+    public CartItem(Cart cart, Menu menu, Store store, int quantity) {
+        this.cart = cart;
+        this.menu = menu;
+        this.store = store;
+        this.quantity = quantity;
+    }
+    public CartItemResponseDto toResponseDto() {
+        return new CartItemResponseDto(
+                this.id,
+                this.menu.getId(),
+                this.store.getId(),
+                this.quantity
+        );
+    }
+
 }

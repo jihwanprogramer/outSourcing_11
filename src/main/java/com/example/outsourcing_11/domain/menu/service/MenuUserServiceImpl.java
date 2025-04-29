@@ -1,5 +1,7 @@
 package com.example.outsourcing_11.domain.menu.service;
 
+import com.example.outsourcing_11.domain.comment.repository.CommentRepository;
+import com.example.outsourcing_11.domain.menu.dto.response.MenuUserResponseDto;
 import com.example.outsourcing_11.domain.menu.entity.Menu;
 import com.example.outsourcing_11.domain.menu.enums.Category;
 import com.example.outsourcing_11.domain.menu.repository.MenuRepository;
@@ -15,12 +17,21 @@ import org.springframework.transaction.annotation.Transactional;
 public class MenuUserServiceImpl implements MenuUserService {
 
     private final MenuRepository menuRepository;
+    private final CommentRepository commentRepository;
 
     @Override
     @Transactional
-    public Slice<Menu> findCursorMenuBySize(Category categoryCursor, Long lastId, int size) {
+    public Slice<MenuUserResponseDto> findCursorMenuBySize(Long storeId, Category categoryCursor, Long lastId, int size) {
         Pageable pageable = PageRequest.of(0, size);
-        return menuRepository.findByCursorMenuBySize(categoryCursor, lastId, pageable);
+        Slice<Menu> menuSlice = menuRepository.findByCursorMenuBySize(storeId, categoryCursor, lastId, pageable);
 
+        return menuSlice.map(menu -> {
+            long commentCount = commentRepository.countByMenuId(menu.getId());
+            return new MenuUserResponseDto(menu, commentCount);
+        });
     }
+
 }
+
+
+
