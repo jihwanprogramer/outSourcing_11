@@ -52,7 +52,7 @@ public class CartControllerTest {
 
 
         // given: 사용자, 가게, 메뉴 생성
-        User user = userRepository.save(new User("유리", "yuri@example.com", "1234", "01011112222", "USER", UserRole.CUSTOMER));
+        User user = userRepository.save(new User("유리", "yuriuser112@example.com", "1234", "01011112222", "USER", UserRole.CUSTOMER));
 
         Store store = storeRepository.save(new Store(
                 "맥도날드",
@@ -88,7 +88,7 @@ public class CartControllerTest {
     @Test
     @DisplayName("GET /carts/{userId} - 사용자 장바구니 조회")
     void getCartByUserId() throws Exception {
-        User user = userRepository.save(new User("유리", "yuri@example.com", "1234", "01011112222", "USER", UserRole.CUSTOMER));
+        User user = userRepository.save(new User("유리", "yuriuser112@example.com", "1234", "01011112222", "USER", UserRole.CUSTOMER));
 
         mockMvc.perform(get("/carts/" + user.getId()))
             .andExpect(status().isOk());
@@ -97,7 +97,7 @@ public class CartControllerTest {
     @Test
     @DisplayName("POST /carts - 새로운 장바구니 생성")
     void createCart() throws Exception {
-        User user = userRepository.save(new User("유리", "yuri@example.com", "1234", "01011112222", "USER", UserRole.CUSTOMER));
+        User user = userRepository.save(new User("유리", "yuriuser112@example.com", "1234", "01011112222", "USER", UserRole.CUSTOMER));
 
         CartRequestDto request = new CartRequestDto(user.getId());
 

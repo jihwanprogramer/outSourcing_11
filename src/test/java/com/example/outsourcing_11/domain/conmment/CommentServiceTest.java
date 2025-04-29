@@ -60,14 +60,14 @@ public class CommentServiceTest {
         //given
 
         //User Owner
-        User owner = new User("시바", "siba@test.com", "test@1er3", "010-1111-2222", "서울시 강남구", UserRole.OWNER);
+        User owner = new User("시바", "siba@test2.com", "test@1er3", "010-1111-2222", "서울시 강남구", UserRole.OWNER);
         //User Customer
         List<User> customer = List.of(
-            new User("유리", "test1@test.com", "test@1er3", "010-1111-2222", "서울시 강남구", UserRole.CUSTOMER),
-            new User("형진", "test2@test.com", "test@1er3", "010-1111-2222", "서울시 강남구", UserRole.CUSTOMER),
-            new User("지환", "test3@test.com", "test@1er3", "010-1111-2222", "서울시 강남구", UserRole.CUSTOMER),
-            new User("석진", "test4@test.com", "test@1er3", "010-1111-2222", "서울시 강남구", UserRole.CUSTOMER),
-            new User("은세", "test5@test.com", "test@1er3", "010-1111-2222", "서울시 강남구", UserRole.CUSTOMER)
+                new User("유리", "test1842u35@test.com", "test@1er3", "010-1111-2222", "서울시 강남구", UserRole.CUSTOMER),
+                new User("형진", "test2fnjg@test.com", "test@1er3", "010-1111-2222", "서울시 강남구", UserRole.CUSTOMER),
+                new User("지환", "test3wk23@test.com", "test@1er3", "010-1111-2222", "서울시 강남구", UserRole.CUSTOMER),
+                new User("석진", "test445@test.com", "test@1er3", "010-1111-2222", "서울시 강남구", UserRole.CUSTOMER),
+                new User("은세", "test5648@test.com", "test@1er3", "010-1111-2222", "서울시 강남구", UserRole.CUSTOMER)
         );
         userRepository.save(owner);
         userRepository.saveAll(customer);
@@ -75,15 +75,15 @@ public class CommentServiceTest {
 
         //Store store
         List<Store> stores = List.of(
-            new Store(
-                "맘스 터치"
-                , "경기도 동두천시"
-                , LocalTime.of(9, 0, 0)
-                , LocalTime.of(21, 0, 0)
-                , 16000
-                , StoreStatus.OPEN
-                , StoreCategory.BURGER
-                , owner)
+                new Store(
+                        "맘스 터치"
+                        , "경기도 동두천시"
+                        , LocalTime.of(9, 0, 0)
+                        , LocalTime.of(21, 0, 0)
+                        , 16000
+                        , StoreStatus.OPEN
+                        , StoreCategory.BURGER
+                        , owner)
         );
         storeRepository.saveAll(stores);
         storeRepository.flush();
@@ -93,15 +93,15 @@ public class CommentServiceTest {
         BigDecimal bigDecimal3 = new BigDecimal(1500);
 
         List<Menu> menus = List.of(
-            new Menu(Category.MAIN_MENU, "싸이 버거", " 맛있는 치킨이 들어있는 버거", bigDecimal1, MenuStatus.AVAILABLE, stores.get(0)),
-            new Menu(Category.DRINK, "제로 콜리", "펩시 라임맛 제로 콜리!", bigDecimal2, MenuStatus.AVAILABLE, stores.get(0)),
-            new Menu(Category.SIDE_MENU, "감자 튀김", "영원한 햄버거 단짝 감자 튀김", bigDecimal3, MenuStatus.AVAILABLE, stores.get(0))
+                new Menu(Category.MAIN_MENU, "싸이 버거", " 맛있는 치킨이 들어있는 버거", bigDecimal1, MenuStatus.AVAILABLE, stores.get(0)),
+                new Menu(Category.DRINK, "제로 콜리", "펩시 라임맛 제로 콜리!", bigDecimal2, MenuStatus.AVAILABLE, stores.get(0)),
+                new Menu(Category.SIDE_MENU, "감자 튀김", "영원한 햄버거 단짝 감자 튀김", bigDecimal3, MenuStatus.AVAILABLE, stores.get(0))
         );
         menuRepository.saveAll(menus);
         menuRepository.flush();
         List<OrderItem> items = new ArrayList<>();
         Order order = new Order(customer.get(1), stores.get(0), LocalDateTime.now(), OrderStatus.COMPLETED, 8000,
-            items);
+                items);
         Random randomMenu = new Random();
         for (int j = 0; j < 3; j++) {
             int menuNum = randomMenu.nextInt(0, 3);
@@ -124,12 +124,12 @@ public class CommentServiceTest {
         //given
         Comment Updatecomment = new Comment("맛없습니다..", null, 1);
         RequestCommentDto requestCommentDto = new RequestCommentDto(Updatecomment.getContent(), comment.getRating(),
-            Updatecomment.getImageUrl());
+                Updatecomment.getImageUrl());
 
         //when - 수정 작업
         System.out.println(order.getId());
         ResponseCommentDto getComment = commentServiceImple.updateComment(order.getId(),
-            comment.getUser().getId(), comment.getId(), requestCommentDto);
+                comment.getUser().getId(), comment.getId(), requestCommentDto);
         //then
         assertThat(getComment).isNotNull();
 
@@ -146,14 +146,14 @@ public class CommentServiceTest {
         //given
 
         //User Owner
-        User owner = new User("시바", "siba@test.com", "test@1er3", "010-1111-2222", "서울시 강남구", UserRole.OWNER);
+        User owner = new User("시바", "siba3@test.com", "test@1er3", "010-1111-2222", "서울시 강남구", UserRole.OWNER);
         //User Customer
         List<User> customer = List.of(
-            new User("유리", "test1@test.com", "test@1er3", "010-1111-2222", "서울시 강남구", UserRole.CUSTOMER),
-            new User("형진", "test2@test.com", "test@1er3", "010-1111-2222", "서울시 강남구", UserRole.CUSTOMER),
-            new User("지환", "test3@test.com", "test@1er3", "010-1111-2222", "서울시 강남구", UserRole.CUSTOMER),
-            new User("석진", "test4@test.com", "test@1er3", "010-1111-2222", "서울시 강남구", UserRole.CUSTOMER),
-            new User("은세", "test5@test.com", "test@1er3", "010-1111-2222", "서울시 강남구", UserRole.CUSTOMER)
+                new User("유리", "test1@test123.com", "test@1er3", "010-1111-2222", "서울시 강남구", UserRole.CUSTOMER),
+                new User("형진", "test2@test325.com", "test@1er3", "010-1111-2222", "서울시 강남구", UserRole.CUSTOMER),
+                new User("지환", "test3@test657.com", "test@1er3", "010-1111-2222", "서울시 강남구", UserRole.CUSTOMER),
+                new User("석진", "test4@test809.com", "test@1er3", "010-1111-2222", "서울시 강남구", UserRole.CUSTOMER),
+                new User("은세", "test5@test98.com", "test@1er3", "010-1111-2222", "서울시 강남구", UserRole.CUSTOMER)
         );
         userRepository.save(owner);
         userRepository.saveAll(customer);
@@ -161,15 +161,15 @@ public class CommentServiceTest {
 
         //Store store
         List<Store> stores = List.of(
-            new Store(
-                "맘스 터치"
-                , "경기도 동두천시"
-                , LocalTime.of(9, 0, 0)
-                , LocalTime.of(21, 0, 0)
-                , 16000
-                , StoreStatus.OPEN
-                , StoreCategory.BURGER
-                , owner)
+                new Store(
+                        "맘스 터치"
+                        , "경기도 동두천시"
+                        , LocalTime.of(9, 0, 0)
+                        , LocalTime.of(21, 0, 0)
+                        , 16000
+                        , StoreStatus.OPEN
+                        , StoreCategory.BURGER
+                        , owner)
         );
         storeRepository.saveAll(stores);
         storeRepository.flush();
@@ -179,15 +179,15 @@ public class CommentServiceTest {
         BigDecimal bigDecimal3 = new BigDecimal(1500);
 
         List<Menu> menus = List.of(
-            new Menu(Category.MAIN_MENU, "싸이 버거", " 맛있는 치킨이 들어있는 버거", bigDecimal1, MenuStatus.AVAILABLE, stores.get(0)),
-            new Menu(Category.DRINK, "제로 콜리", "펩시 라임맛 제로 콜리!", bigDecimal2, MenuStatus.AVAILABLE, stores.get(0)),
-            new Menu(Category.SIDE_MENU, "감자 튀김", "영원한 햄버거 단짝 감자 튀김", bigDecimal3, MenuStatus.AVAILABLE, stores.get(0))
+                new Menu(Category.MAIN_MENU, "싸이 버거", " 맛있는 치킨이 들어있는 버거", bigDecimal1, MenuStatus.AVAILABLE, stores.get(0)),
+                new Menu(Category.DRINK, "제로 콜리", "펩시 라임맛 제로 콜리!", bigDecimal2, MenuStatus.AVAILABLE, stores.get(0)),
+                new Menu(Category.SIDE_MENU, "감자 튀김", "영원한 햄버거 단짝 감자 튀김", bigDecimal3, MenuStatus.AVAILABLE, stores.get(0))
         );
         menuRepository.saveAll(menus);
         menuRepository.flush();
         List<OrderItem> items = new ArrayList<>();
         Order order = new Order(customer.get(1), stores.get(0), LocalDateTime.now(), OrderStatus.COMPLETED, 8000,
-            items);
+                items);
         Random randomMenu = new Random();
         for (int j = 0; j < 3; j++) {
             int menuNum = randomMenu.nextInt(0, 3);
@@ -210,14 +210,14 @@ public class CommentServiceTest {
         //given
         // Comment Updatecomment = new Comment("맛없습니다..", null, 1);
         // RequestCommentDto requestCommentDto = new RequestCommentDto(Updatecomment.getContent(), comment.getRating(),
-        // 	Updatecomment.getImageUrl());
+        //     Updatecomment.getImageUrl());
 
         //when&then
         System.out.println(order.getId());
         System.out.println(comment.getUser().getId());
         System.out.println(order.getId());
         assertThatCode(() -> commentServiceImple.deleteComment(order.getId(), comment.getUser().getId(),
-            comment.getId())).doesNotThrowAnyException();
+                comment.getId())).doesNotThrowAnyException();
 
     }
 }

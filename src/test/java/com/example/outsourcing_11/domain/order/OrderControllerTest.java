@@ -68,11 +68,11 @@ public class OrderControllerTest {
     @Test
     @Transactional
     @Rollback(false) // ✅ 이거 추가하면 실제 DB에 남음
-    @WithMockUser(username = "yuri@example.com", roles = {"CUSTOMER"})
+    @WithMockUser(username = "yuriuser112@example.com", roles = {"CUSTOMER"})
     @DisplayName("POST /orders - 주문 생성")
     void createOrder() throws Exception {
         // ✅ 중복 유저 정리 (Store 먼저 삭제 → User 삭제)
-        userRepository.findByEmail("yuri@example.com").ifPresent(user -> {
+        userRepository.findByEmail("yuriuser112@example.com").ifPresent(user -> {
 
             // 1. CartItem 삭제
             List<Cart> carts = cartRepository.findAllByUser(user);
@@ -119,13 +119,13 @@ public class OrderControllerTest {
             // 3. 마지막으로 유저 삭제
             userRepository.delete(user);
         });
-        userRepository.findByEmail("yuri@example.com")
+        userRepository.findByEmail("yuriuser112@example.com")
                 .ifPresent(userRepository::delete);
 
         // given
         User user = new User(
                 "유리",                   // name
-                "yuri@example.com",       // email
+                "yuri121112@example.com",       // email
                 "1234",                   // password
                 "01011112222",            // phone
                 "서울시",                 // address
@@ -180,21 +180,21 @@ public class OrderControllerTest {
         mockMvc.perform(post("/orders")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.userId").value(user.getId()))
                 .andExpect(jsonPath("$.items[0].menuId").value(menu.getId()));
     }
 
 
     @Test
-    @WithMockUser(username = "yuri@example.com", roles = {"CUSTOMER"})
+    @WithMockUser(username = "yuriuser112@example.com", roles = {"CUSTOMER"})
     @DisplayName("유저 주문 조회 테스트")
     void createAndGetOrdersByUserId() throws Exception {
         // ✅ 테스트용 유저 저장 (username과 @WithMockUser 일치시켜야 인증 성공)
-        User user = userRepository.findByEmail("yuri@example.com")
+        User user = userRepository.findByEmail("yuriuser112@example.com")
             .orElseGet(() -> userRepository.save(new User(
                 "유리",
-                "yuri@example.com",
+                "yuri11112@example.com",
                 "1234",
                 "01011112222",
                 "서울시",
@@ -208,14 +208,14 @@ public class OrderControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "yuri@example.com", roles = {"CUSTOMER"})
+    @WithMockUser(username = "yuriuser112@example.com", roles = {"CUSTOMER"})
     @DisplayName("GET /orders/{orderId} - 단일 주문 조회")
     void getOrderById() throws Exception {
         // ✅ 테스트용 유저 저장 (username과 @WithMockUser 일치시켜야 인증 성공)
         User user = userRepository.findByEmail("yuri@example.com")
             .orElseGet(() -> userRepository.save(new User(
                 "유리",
-                "yuri@example.com",
+                "yuriuser112@example.com",
                 "1234",
                 "01011112222",
                 "서울시",
@@ -243,7 +243,7 @@ public class OrderControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "yuri@example.com", roles = {"CUSTOMER"})
+    @WithMockUser(username = "yuriuser112@example.com", roles = {"CUSTOMER"})
     @DisplayName("PATCH /orders/{orderId} - 주문 상태 변경")
     void updateOrderStatus() throws Exception {
         String body = "{\"status\":\"COMPLETED\"}";
@@ -256,7 +256,7 @@ public class OrderControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "yuri@example.com", roles = {"CUSTOMER"})
+    @WithMockUser(username = "yuriuser112@example.com", roles = {"CUSTOMER"})
     @DisplayName("DELETE /orders/{id} - 주문 취소")
     void cancelOrder() throws Exception {
         mockMvc.perform(delete("/orders/10"))

@@ -63,14 +63,14 @@ public class OwnerCommentServiceTest {
         //기본 셋팅
 
         //User Owner
-        User owner = new User("시바", "siba@test.com", "test@1er3", "010-1111-2222", "서울시 강남구", UserRole.OWNER);
+        User owner = new User("시바", "siba4554@test.com", "test@1er3", "010-1111-2222", "서울시 강남구", UserRole.OWNER);
         //User Customer
         List<User> customer = List.of(
-            new User("유리", "test1@test.com", "test@1er3", "010-1111-2222", "서울시 강남구", UserRole.CUSTOMER),
-            new User("형진", "test2@test.com", "test@1er3", "010-1111-2222", "서울시 강남구", UserRole.CUSTOMER),
-            new User("지환", "test3@test.com", "test@1er3", "010-1111-2222", "서울시 강남구", UserRole.CUSTOMER),
-            new User("석진", "test4@test.com", "test@1er3", "010-1111-2222", "서울시 강남구", UserRole.CUSTOMER),
-            new User("은세", "test5@test.com", "test@1er3", "010-1111-2222", "서울시 강남구", UserRole.CUSTOMER)
+                new User("유리", "test1@test.com", "test@1er3", "010-1111-2222", "서울시 강남구", UserRole.CUSTOMER),
+                new User("형진", "test2@test.com", "test@1er3", "010-1111-2222", "서울시 강남구", UserRole.CUSTOMER),
+                new User("지환", "test3@test.com", "test@1er3", "010-1111-2222", "서울시 강남구", UserRole.CUSTOMER),
+                new User("석진", "test4@test.com", "test@1er3", "010-1111-2222", "서울시 강남구", UserRole.CUSTOMER),
+                new User("은세", "test5@test.com", "test@1er3", "010-1111-2222", "서울시 강남구", UserRole.CUSTOMER)
         );
         userRepository.save(owner);
         userRepository.saveAll(customer);
@@ -139,14 +139,14 @@ public class OwnerCommentServiceTest {
         //기본 셋팅
 
         //User Owner
-        User owner = new User("시바", "siba@test.com", "test@1er3", "010-1111-2222", "서울시 강남구", UserRole.OWNER);
+        User owner = new User("시바", "siba4365322@test.com", "test@1er3", "010-1111-2222", "서울시 강남구", UserRole.OWNER);
         //User Customer
         List<User> customer = List.of(
-            new User("유리", "test1@test.com", "test@1er3", "010-1111-2222", "서울시 강남구", UserRole.CUSTOMER),
-            new User("형진", "test2@test.com", "test@1er3", "010-1111-2222", "서울시 강남구", UserRole.CUSTOMER),
-            new User("지환", "test3@test.com", "test@1er3", "010-1111-2222", "서울시 강남구", UserRole.CUSTOMER),
-            new User("석진", "test4@test.com", "test@1er3", "010-1111-2222", "서울시 강남구", UserRole.CUSTOMER),
-            new User("은세", "test5@test.com", "test@1er3", "010-1111-2222", "서울시 강남구", UserRole.CUSTOMER)
+                new User("유리", "test1O11@test.com", "test@1er3", "010-1111-2222", "서울시 강남구", UserRole.CUSTOMER),
+                new User("형진", "test2O11@test.com", "test@1er3", "010-1111-2222", "서울시 강남구", UserRole.CUSTOMER),
+                new User("지환", "test3O11@test.com", "test@1er3", "010-1111-2222", "서울시 강남구", UserRole.CUSTOMER),
+                new User("석진", "test4O11@test.com", "test@1er3", "010-1111-2222", "서울시 강남구", UserRole.CUSTOMER),
+                new User("은세", "test5O11@test.com", "test@1er3", "010-1111-2222", "서울시 강남구", UserRole.CUSTOMER)
         );
         userRepository.save(owner);
         userRepository.saveAll(customer);
@@ -304,14 +304,14 @@ public class OwnerCommentServiceTest {
         //기본 셋팅
 
         //User Owner
-        User owner = new User("시바", "siba@test.com", "test@1er3", "010-1111-2222", "서울시 강남구", UserRole.OWNER);
+        User owner = new User("시바", "sibawewve@test.com", "test@1er3", "010-1111-2222", "서울시 강남구", UserRole.OWNER);
         //User Customer
         List<User> customer = List.of(
-            new User("유리", "test1@test.com", "test@1er3", "010-1111-2222", "서울시 강남구", UserRole.CUSTOMER),
-            new User("형진", "test2@test.com", "test@1er3", "010-1111-2222", "서울시 강남구", UserRole.CUSTOMER),
-            new User("지환", "test3@test.com", "test@1er3", "010-1111-2222", "서울시 강남구", UserRole.CUSTOMER),
-            new User("석진", "test4@test.com", "test@1er3", "010-1111-2222", "서울시 강남구", UserRole.CUSTOMER),
-            new User("은세", "test5@test.com", "test@1er3", "010-1111-2222", "서울시 강남구", UserRole.CUSTOMER)
+                new User("유리", "test1O666@test.com", "test@1er3", "010-1111-2222", "서울시 강남구", UserRole.CUSTOMER),
+                new User("형진", "test2O66@test.com", "test@1er3", "010-1111-2222", "서울시 강남구", UserRole.CUSTOMER),
+                new User("지환", "test3O666@test.com", "test@1er3", "010-1111-2222", "서울시 강남구", UserRole.CUSTOMER),
+                new User("석진", "test4O777@test.com", "test@1er3", "010-1111-2222", "서울시 강남구", UserRole.CUSTOMER),
+                new User("은세", "test5O888@test.com", "test@1er3", "010-1111-2222", "서울시 강남구", UserRole.CUSTOMER)
         );
         userRepository.save(owner);
         userRepository.saveAll(customer);
