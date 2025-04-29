@@ -15,6 +15,7 @@ import com.example.outsourcing_11.domain.user.entity.User;
 import com.example.outsourcing_11.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
@@ -62,6 +63,11 @@ public class CartServiceImpl implements CartService {
         User user = userRepository.findById(requestDto.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
+        // ✅ 이미 Cart가 존재하는지 확인
+        if (cartRepository.findByUser(user).isPresent()) {
+            throw new RuntimeException("이미 장바구니가 존재합니다.");  // 또는 CustomException 사용
+        }
+
         Cart cart = new Cart(user);
 
         Cart saved = cartRepository.save(cart);
@@ -95,6 +101,12 @@ public class CartServiceImpl implements CartService {
                 .map(CartItem::toResponseDto)
                 .toList();
         return new CartResponseDto(cart.getId(), user.getId(), responseItems);
+    }
+
+    @Transactional(readOnly = true)
+    public Cart getEntityByUserId(Long userId) {
+        return cartRepository.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("장바구니가 존재하지 않습니다."));
     }
 
 }

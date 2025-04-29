@@ -1,270 +1,314 @@
 package com.example.outsourcing_11.domain.store.service;
 
+import com.example.outsourcing_11.common.exception.CustomException;
+import com.example.outsourcing_11.common.exception.ErrorCode;
+import com.example.outsourcing_11.domain.menu.dto.response.MenuUserResponseDto;
+import com.example.outsourcing_11.domain.menu.entity.Menu;
+import com.example.outsourcing_11.domain.menu.repository.MenuRepository;
+import com.example.outsourcing_11.domain.order.repository.OrderRepository;
+import com.example.outsourcing_11.domain.store.dto.*;
+import com.example.outsourcing_11.domain.store.entity.*;
+import com.example.outsourcing_11.domain.store.repository.FavoriteRepository;
+import com.example.outsourcing_11.domain.store.repository.NoticeRepository;
+import com.example.outsourcing_11.domain.store.repository.StoreRepository;
+import com.example.outsourcing_11.domain.user.entity.User;
+import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import lombok.RequiredArgsConstructor;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import com.example.outsourcing_11.common.exception.store.StoreCustomException;
-import com.example.outsourcing_11.common.exception.store.StoreErrorCode;
-import com.example.outsourcing_11.domain.order.repository.OrderRepository;
-import com.example.outsourcing_11.domain.store.dto.MenuDto;
-import com.example.outsourcing_11.domain.store.dto.SalesDto;
-import com.example.outsourcing_11.domain.store.dto.StoreDetailDto;
-import com.example.outsourcing_11.domain.store.dto.StoreListDto;
-import com.example.outsourcing_11.domain.store.dto.StoreRequestDto;
-import com.example.outsourcing_11.domain.store.dto.StoreResponseDto;
-import com.example.outsourcing_11.domain.store.entity.Favorite;
-import com.example.outsourcing_11.domain.store.entity.Notice;
-import com.example.outsourcing_11.domain.store.entity.Store;
-import com.example.outsourcing_11.domain.store.entity.StoreCategory;
-import com.example.outsourcing_11.domain.store.entity.StoreStatus;
-import com.example.outsourcing_11.domain.store.repository.FavoriteRepository;
-import com.example.outsourcing_11.domain.store.repository.NoticeRepository;
-import com.example.outsourcing_11.domain.store.repository.StoreRepository;
-import com.example.outsourcing_11.domain.user.entity.User;
-import com.example.outsourcing_11.domain.user.repository.UserRepository;
-import com.example.outsourcing_11.util.JwtUtil;
-
 @Service
 @RequiredArgsConstructor
 public class StoreService {
 
-	private final StoreRepository storeRepository;
-	private final UserRepository userRepository;
-	private final FavoriteRepository favoriteRepository;
-	private final NoticeRepository noticeRepository;
-	private final OrderRepository orderRepository;
-	private final JwtUtil jwtUtil;
+    private final StoreRepository storeRepository;
+    private final MenuRepository menuRepository;
+    private final FavoriteRepository favoriteRepository;
+    private final NoticeRepository noticeRepository;
+    private final OrderRepository orderRepository;
 
-	/**
-	 * 가게 생성 3개까지 제한
-	 *
-	 */
-	public StoreResponseDto createStore(User user, StoreRequestDto requestDto) {
-		int storeCount = storeRepository.countByOwnerAndStatus(user, StoreStatus.OPEN);
-		if (storeCount >= 3) {
-			throw new StoreCustomException(StoreErrorCode.LIMIT_THREE);
-		}
+    private void validateOwner(Store store, User user) {
+        if (!store.getOwner().getId().equals(user.getId())) {
+            throw new CustomException(ErrorCode.ONLY_MY_STORE); // "내 가게 아님" 오류
+        }
+    }
 
-		Store store = new Store(requestDto, user);
+    private Store getStoreOrThrow(Long storeId) {
+        return storeRepository.findByIdAndDeletedFalse(storeId)
+            .orElseThrow(() -> new CustomException(ErrorCode.STORE_NOT_FOUND));
+    }
 
-		return new StoreResponseDto(storeRepository.save(store));
+    /**
+     * 가게 생성 3개까지 제한
+     */
+    public StoreResponseDto createStore(User user, StoreRequestDto requestDto) {
+        int storeCount = storeRepository.countByOwnerAndStatus(user, StoreStatus.OPEN);
+        if (storeCount >= 3) {
+            throw new CustomException(ErrorCode.LIMIT_THREE);
+        }
+        if (requestDto.getCategory() == null) {
+            throw new CustomException(ErrorCode.KEYWORD_NOT_FOUND);
+        }
 
-	}
+        Store store = new Store(requestDto, user);
 
-	/**
-	 *
-	 * 고객 다건 조회
-	 *
-	 */
-	@Transactional(readOnly = true)
-	public List<StoreListDto> getStores(String keyword) {
-		List<Store> stores;
+        return new StoreResponseDto(storeRepository.save(store));
 
-		if (keyword == null) {
-			stores = storeRepository.findAllByDeletedFalse();
-		} else {
-			try {
-				StoreCategory category = StoreCategory.valueOf(keyword);
-				stores = storeRepository.findAllByCategoryAndDeletedFalse(category);
-			} catch (IllegalArgumentException e) {
-				throw new StoreCustomException(StoreErrorCode.KEYWORD_NOT_FOUND);
-			}
-		}
-		return stores.stream()
-			.map(StoreListDto::new)
-			.collect(Collectors.toList());
-	}
+    }
 
-	/**
-	 * 고객 단건 조회 - 메뉴리스트 포함
-	 * @param storeId
-	 * @return
-	 */
-	@Transactional(readOnly = true)
-	public StoreDetailDto getStoreDetail(Long storeId) {
-		Store store = storeRepository.findByIdAndDeletedFalse(storeId)
-			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.STORE_NOT_FOUND));
+    /**
+     * 고객 다건 조회
+     */
+    @Transactional(readOnly = true)
+    public List<StoreListDto> getStores(String keyword) {
+        List<Store> stores;
 
-		List<MenuDto> menus = store.getMenus().stream()
-			.filter(menu -> !menu.isDeleted())
-			.map(MenuDto::new)
-			.collect(Collectors.toList());
-		return new StoreDetailDto(store, menus);
-	}
+        if (keyword == null) {
+            stores = storeRepository.findAllByDeletedFalse();
+        } else {
+            try {
+                StoreCategory category = StoreCategory.valueOf(keyword);
+                stores = storeRepository.findAllByCategoryAndDeletedFalse(category);
 
-	/**
-	 * 내 가게 조회
-	 *
-	 * @return
-	 */
-	@Transactional(readOnly = true)
-	public List<StoreResponseDto> getMyStores(User user) {
-		return storeRepository.findAllByOwnerAndDeletedFalse(user)
-			.stream()
-			.map(StoreResponseDto::new)
-			.collect(Collectors.toList());
-	}
+                if (stores.isEmpty()) {
+                    throw new CustomException(ErrorCode.NO_STORE_IN_CATEGORY);
+                }
 
-	/**
-	 * 가게 수정
-	 * @param storeId
-	 * @param requestDto
-	 * @param user
-	 */
-	public void updateStore(Long storeId, StoreRequestDto requestDto, User user) {
+            } catch (IllegalArgumentException e) {
+                throw new CustomException(ErrorCode.KEYWORD_NOT_FOUND);
+            }
+        }
+        return stores.stream()
+            .map(StoreListDto::new)
+            .collect(Collectors.toList());
+    }
 
-		Store store = storeRepository.findByIdAndOwnerAndDeletedFalse(storeId, user)
-			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.STORE_NOT_FOUND));
+    /**
+     * 고객 단건 조회 - 메뉴리스트 포함
+     *
+     * @param storeId
+     * @return
+     */
+    @Transactional(readOnly = true)
+    public StoreDetailDto getStoreDetail(Long storeId) {
+        Store store = getStoreOrThrow(storeId);
 
-		store.update(requestDto);
+        List<Menu> menus = menuRepository.findByStoreAndDeletedAtIsNull(store);
 
-	}
+        List<MenuUserResponseDto> menuDtos = menus.stream()
+            .map(menu -> new MenuUserResponseDto(menu, 0))  // commentCount는 일단 0으로
+            .toList();
 
-	/**
-	 * 가게 삭제 - soft delete
-	 * @param storeId
-	 * @param user
-	 */
-	public void deleteStore(Long storeId, User user) {
-		Store store = storeRepository.findByIdAndOwnerAndDeletedFalse(storeId, user)
-			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.STORE_NOT_FOUND));
-		store.softDelete();
-	}
+        return new StoreDetailDto(store, menuDtos);
+    }
 
-	/**
-	 * 즐겨찾기 등록
-	 * @param storeId
-	 * @param user
-	 */
-	public void addFavorite(Long storeId, User user) {
-		Store store = storeRepository.findByIdAndDeletedFalse(storeId)
-			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.STORE_NOT_FOUND));
+    /**
+     * 내 가게 조회
+     *
+     * @return
+     */
+    @Transactional(readOnly = true)
+    public List<StoreResponseDto> getMyStores(User user) {
+        List<Store> stores = storeRepository.findAllByOwnerAndDeletedFalse(user);
 
-		boolean alreadyFavorite = favoriteRepository.existsByUserAndStore(user, store);
-		if (alreadyFavorite) {
-			throw new StoreCustomException(StoreErrorCode.ALREADY_FAVORITE);
-		}
+        if (stores.isEmpty()) {
+            throw new CustomException(ErrorCode.MY_STORE_NOT_FOUND); // 새로 추가
+        }
 
-		favoriteRepository.save(new Favorite(user, store));
-	}
+        return stores
+            .stream()
+            .map(StoreResponseDto::new)
+            .collect(Collectors.toList());
+    }
 
-	/**
-	 * 즐겨찾기 해제
-	 * @param storeId
-	 * @param user
-	 */
-	public void removeFavorite(Long storeId, User user) {
-		Favorite favorite = favoriteRepository.findByUserIdAndStoreId(user.getId(), storeId)
-			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NON_FAVORITE));
+    /**
+     * 가게 수정
+     */
+    @Transactional
+    public void updateStore(Long storeId, StoreRequestDto dto, User user) {
 
-		favoriteRepository.delete(favorite);
-	}
+        Store store = storeRepository.findByIdAndOwnerAndDeletedFalse(storeId, user)
+            .orElseThrow(() -> new CustomException(ErrorCode.STORE_NOT_FOUND));
+        validateOwner(store, user);
+        store.update(dto);
 
-	/**
-	 * 공지 등록
-	 * @param storeId
-	 * @param content
-	 * @param user
-	 */
-	public void createNotice(Long storeId, String content, User user) {
-		Store store = storeRepository.findByIdAndOwnerAndDeletedFalse(storeId, user)
-			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.STORE_NOT_FOUND));
+    }
 
-		if (content == null || content.trim().isEmpty()) {
-			throw new StoreCustomException(StoreErrorCode.NON_CONTENT);
-		}
+    /**
+     * 가게 삭제 - soft delete
+     *
+     * @param storeId
+     * @param user
+     */
+    @Transactional
+    public void deleteStore(Long storeId, User user) {
+        //사장님인지 아닌지 물어봄. 그러고 통과하면 그때 storeId로 묻고 , 삭제여부도 따로 묻기
+        Store store = storeRepository.findByIdAndOwnerAndDeletedFalse(storeId, user)
+            .orElseThrow(() -> new CustomException(ErrorCode.STORE_NOT_FOUND));
 
-		noticeRepository.save(new Notice(store, content));
-	}
+        validateOwner(store, user);
+        store.softDelete();
+    }
 
-	/**
-	 * 공지 수정
-	 * @param noticeId
-	 * @param content
-	 * @param user
-	 */
-	public void updateNotice(Long noticeId, String content, User user) {
+    /**
+     * 즐겨찾기 등록
+     *
+     * @param storeId
+     * @param user
+     */
+    public void addFavorite(Long storeId, User user) {
+        Store store = getStoreOrThrow(storeId);
+        boolean alreadyFavorite = favoriteRepository.existsByUserAndStore(user, store);
+        if (alreadyFavorite) {
+            throw new CustomException(ErrorCode.ALREADY_FAVORITE);
+        }
 
-		Notice notice = noticeRepository.findByIdWithStore(noticeId)
-			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NO_NOTICE));
+        store.increaseFavorite();
 
-		if (content == null || content.trim().isEmpty()) {
-			throw new StoreCustomException(StoreErrorCode.NON_CONTENT);
-		}
+        favoriteRepository.save(new Favorite(user, store));
+    }
 
-		if (!notice.getStore().getOwner().getId().equals(user.getId())) {
-			throw new StoreCustomException(StoreErrorCode.ONLY_MY_STORE);
-		}
+    /**
+     * 즐겨찾기 해제
+     *
+     * @param storeId
+     * @param user
+     */
+    @Transactional
+    public void removeFavorite(Long storeId, User user) {
 
-		notice.update(content);
-	}
+        Store store = getStoreOrThrow(storeId);
 
-	/**
-	 * 공지 삭제
-	 * @param noticeId
-	 * @param user
-	 */
-	public void deleteNotice(Long noticeId, User user) {
-		Notice notice = noticeRepository.findByIdWithStore(noticeId)
-			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NO_NOTICE));
+        Favorite favorite = favoriteRepository.findByUserIdAndStoreId(user.getId(), storeId)
+            .orElseThrow(() -> new CustomException(ErrorCode.NON_FAVORITE));
+        favoriteRepository.delete(favorite);
 
-		if (!notice.getStore().getOwner().getId().equals(user.getId())) {
-			throw new StoreCustomException(StoreErrorCode.ONLY_MY_STORE);
-		}
+        store.decreaseFavorite();
+    }
 
-		noticeRepository.delete(notice);
-	}
+    /**
+     * 공지 등록
+     *
+     * @param storeId
+     * @param content
+     * @param user
+     */
 
-	/**
-	 * 판매량 통계
-	 * @param storeId
-	 * @param user
-	 * @param type
-	 * @return
-	 */
-	@Transactional(readOnly = true)
-	public SalesDto getSales(Long storeId, User user, String type) {
-		Store store = storeRepository.findByIdAndOwnerAndDeletedFalse(storeId, user)
-			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.STORE_NOT_FOUND));
+    public void createNotice(Long storeId, String content, User user) {
+        Store store = getStoreOrThrow(storeId);
 
-		LocalDateTime now = LocalDateTime.now();
-		LocalDateTime start;
+        validateOwner(store, user);
 
-		switch (type.toLowerCase()) {
-			case "daily":
-				start = now.toLocalDate().atStartOfDay();
-				break;
-			case "weekly":
-				start = now.minusWeeks(1);
-				break;
-			case "monthly":
-				start = now.minusMonths(1);
-				break;
+        if (content == null || content.trim().isEmpty()) {
+            throw new CustomException(ErrorCode.NON_CONTENT);
+        }
 
-			default:
-				throw new StoreCustomException(StoreErrorCode.PERIOD_ERROR);
-		}
+        noticeRepository.save(new Notice(store, content));
+    }
 
-		BigDecimal totalSales = orderRepository.sumTotalPriceByStoreAndCreatedAtBetween(store, start, now);
-		return new SalesDto(totalSales);
+    /**
+     * 공지 수정
+     *
+     * @param noticeId
+     * @param content
+     * @param user
+     */
+    @Transactional
+    public void updateNotice(Long storeId, Long noticeId, String content, User user) {
 
-	}
+        Store store = getStoreOrThrow(storeId);
+        validateOwner(store, user);
 
-	/**
-	 * 자동으로 상태 영업시작, 마감
-	 */
-	@Transactional
-	public void updateAllStoreStatuses() {
-		List<Store> stores = storeRepository.findAll();
-		for (Store store : stores) {
-			store.updateStatus();
-		}
-		storeRepository.saveAll(stores);
-	}
+        Notice notice = noticeRepository.findByIdWithStore(noticeId)
+            .orElseThrow(() -> new CustomException(ErrorCode.NO_NOTICE));
+
+        if (content == null || content.trim().isEmpty()) {
+            throw new CustomException(ErrorCode.NON_CONTENT);
+        }
+
+        if (!notice.getStore().getOwner().getId().equals(user.getId())) {
+            throw new CustomException(ErrorCode.ONLY_MY_STORE);
+        }
+
+        notice.update(content);
+    }
+
+    /**
+     * 공지 삭제
+     *
+     * @param noticeId
+     * @param user
+     */
+    @Transactional
+    public void deleteNotice(Long storeId, Long noticeId, User user) {
+
+        Store store = getStoreOrThrow(storeId);
+        validateOwner(store, user);
+
+        Notice notice = noticeRepository.findByIdWithStore(noticeId)
+            .orElseThrow(() -> new CustomException(ErrorCode.NO_NOTICE));
+
+        noticeRepository.delete(notice);
+    }
+
+    /**
+     * 판매량 통계
+     *
+     * @param storeId
+     * @param user
+     * @param type
+     * @return
+     */
+    @Transactional(readOnly = true)
+    public SalesDto getSales(Long storeId, User user, String type) {
+        Store store = storeRepository.findByIdAndOwnerAndDeletedFalse(storeId, user)
+            .orElseThrow(() -> new CustomException(ErrorCode.STORE_NOT_FOUND));
+
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime start;
+
+        switch (type.toLowerCase()) {
+            case "daily":
+                start = now.toLocalDate().atStartOfDay();
+                break;
+            case "weekly":
+                start = now.minusWeeks(1);
+                break;
+            case "monthly":
+                start = now.minusMonths(1);
+                break;
+
+            default:
+                throw new CustomException(ErrorCode.PERIOD_ERROR);
+        }
+
+        BigDecimal totalSales = orderRepository.sumTotalPriceByStoreAndCreatedAtBetween(store, start, now);
+        Long totalCustomers = orderRepository.countDistinctUserByStoreAndCreatedAtBetween(store, start, now);
+        if (totalSales == null) {
+            totalSales = BigDecimal.ZERO;
+        }
+        if (totalCustomers == null) {
+            totalCustomers = Long.valueOf(0);
+        }
+        return new SalesDto(totalSales, totalCustomers);
+
+    }
+
+    /**
+     * 자동으로 상태 영업시작, 마감
+     */
+    @Transactional
+    @Scheduled(cron = "0 0 * * * *")
+    public void updateAllStoreStatuses() {
+        List<Store> stores = storeRepository.findAll();
+        for (Store store : stores) {
+            store.updateStatus();
+        }
+        storeRepository.saveAll(stores);
+    }
 }

@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class DeleteUserResponseDto {
+public class DeleteAndUpdateUserResponseDto {
 	private String message;
 	private LocalDateTime deletedAt;
 }

@@ -1,11 +1,15 @@
 package com.example.outsourcing_11.domain.order.service;
 
+import com.example.outsourcing_11.common.exception.CustomException;
+import com.example.outsourcing_11.common.exception.ErrorCode;
+import com.example.outsourcing_11.domain.menu.entity.Menu;
 import com.example.outsourcing_11.domain.menu.repository.MenuRepository;
 import com.example.outsourcing_11.domain.order.dto.*;
 import com.example.outsourcing_11.domain.order.entity.Order;
 import com.example.outsourcing_11.domain.order.entity.OrderItem;
 import com.example.outsourcing_11.domain.order.entity.OrderStatus;
 import com.example.outsourcing_11.domain.order.repository.OrderRepository;
+import com.example.outsourcing_11.domain.store.entity.Store;
 import com.example.outsourcing_11.domain.store.repository.StoreRepository;
 import com.example.outsourcing_11.domain.user.entity.User;
 import com.example.outsourcing_11.domain.user.repository.UserRepository;
@@ -32,62 +36,62 @@ public class OrderServiceImpl implements OrderService {
      */
     @Override
     public OrderResponseDto createOrder(OrderRequestDto requestDto) {
-        // 사용자 정보 조회
         User user = userRepository.findById(requestDto.getUserId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        List<OrderItem> items = new ArrayList<>(); // 주문 항목 리스트
-        List<OrderItemResponseDto> itemResponses = new ArrayList<>(); // 응답용 DTO 리스트
-        int totalPrice = 0;  // 총 주문 가격 계산용
+        List<OrderItem> items = new ArrayList<>();
+        int totalPrice = 0;
+        Store store = null; // 대표 store 지정
 
-        // 요청된 각 주문 항목 처리
         for (OrderItemRequestDto dto : requestDto.getItems()) {
+            Menu menu = menuRepository.findById(dto.getMenuId())
+                    .orElseThrow(() -> new CustomException(ErrorCode.MENU_NOT_FOUND));
+
+            store = storeRepository.findById(dto.getStoreId())
+                    .orElseThrow(() -> new CustomException(ErrorCode.STORE_NOT_FOUND));
+
             OrderItem item = new OrderItem();
-            item.setMenu(menuRepository.findById(dto.getMenuId())
-                    .orElseThrow(() -> new RuntimeException("Menu not found")));
-            item.setStore(storeRepository.findById(dto.getStoreId())
-                    .orElseThrow(() -> new RuntimeException("Store not found")));
+            item.setMenu(menu);
+            item.setStore(store);
             item.setQuantity(dto.getQuantity());
             item.setItemPrice(dto.getItemPrice());
-
-            // 총 주문 금액 계산
-            totalPrice += dto.getItemPrice() * dto.getQuantity();
             items.add(item);
 
-            // 응답용 DTO 생성
-            itemResponses.add(OrderItemResponseDto.builder()
-                    .id(null)
-                    .menuId(dto.getMenuId())
-                    .storeId(dto.getStoreId())
-                    .quantity(dto.getQuantity())
-                    .itemPrice(dto.getItemPrice())
-                    .build());
+            totalPrice += dto.getItemPrice() * dto.getQuantity();
         }
 
-// ✅ 여기서 totalPrice 계산 완료 후 생성
-        // 주문 객체 생성 (생성자에서 totalPrice까지 포함)
-        Order order = new Order(user, LocalDateTime.now(), OrderStatus.PENDING, totalPrice, items);
+        // Order 생성 및 저장
+        Order order = new Order(
+                user,
+                store,
+                LocalDateTime.now(),
+                OrderStatus.PENDING,
+                totalPrice,
+                items
+        );
 
-        // 각 주문 항목에 주문 연결
-        for (OrderItem item : items) {
-            item.setOrder(order);
-        }
+        orderRepository.save(order);
 
-        // 주문에 항목들 추가
-        order.getItems().addAll(items);
+        // 저장된 OrderItem들로 itemResponses 만들기
+        List<OrderItemResponseDto> itemResponses = order.getItems().stream()
+                .map(savedItem -> new OrderItemResponseDto(
+                        savedItem.getId(),
+                        savedItem.getMenu().getId(),
+                        savedItem.getStore().getId(),
+                        savedItem.getQuantity(),
+                        savedItem.getItemPrice()
+                ))
+                .collect(Collectors.toList());
 
-        // DB에 주문 저장
-        Order saved = orderRepository.save(order);
-
-        // 저장된 주문 정보를 기반으로 응답 DTO 구성
-        return OrderResponseDto.builder()
-                .id(saved.getId())
-                .userId(saved.getUser().getId())
-                .orderDate(saved.getOrderDate())
-                .status(saved.getStatus().name())
-                .totalPrice(saved.getTotalPrice())
-                .items(itemResponses)
-                .build();
+        // 최종 OrderResponseDto 반환
+        return new OrderResponseDto(
+                order.getId(),
+                user.getId(),
+                order.getStatus().name(),
+                totalPrice,
+                itemResponses,
+                order.getOrderDate()
+        );
     }
 
     @Override
@@ -113,7 +117,9 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderResponseDto getOrderById(Long orderId) {
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("Order not found"));
+                .orElseThrow(() -> new CustomException(
+                        ErrorCode.ORDER_NOT_FOUND
+                ));
 
         return OrderResponseDto.builder()
                 .id(order.getId())
@@ -144,52 +150,50 @@ public class OrderServiceImpl implements OrderService {
     public OrderResponseDto updateOrderStatus(Long orderId, OrderStatusUpdateDto statusUpdateDto) {
         // 주문 ID로 주문 조회
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("Order not found"));
+                .orElseThrow(() -> new CustomException(
+                        ErrorCode.ORDER_NOT_FOUND
+                ));
 
-        // 새로운 상태로 주문 객체를 새로 생성
-        Order updated = new Order(
-                order.getUser(),
-                order.getOrderDate(),
-                OrderStatus.valueOf(statusUpdateDto.getStatus()),
-                order.getTotalPrice(),
-                order.getItems()
-        );
+        if (order.getStatus() == OrderStatus.COMPLETED) {
+            throw new CustomException(
+                    ErrorCode.CANNOT_CHANGE_COMPLETED_ORDER
+            );
+        }
 
-        Order saved = orderRepository.save(updated);
+
+        order.changeStatus(OrderStatus.valueOf(statusUpdateDto.getStatus()));
 
         return OrderResponseDto.builder()
-                .id(saved.getId())
-                .userId(saved.getUser().getId())
-                .orderDate(saved.getOrderDate())
-                .status(saved.getStatus().name())
-                .totalPrice(saved.getTotalPrice())
-                .items(saved.getItems().stream().map(item -> new OrderItemResponseDto(
+                .id(order.getId())
+                .userId(order.getUser().getId())
+                .orderDate(order.getOrderDate())
+                .status(order.getStatus().name())
+                .totalPrice(order.getTotalPrice())
+                .items(order.getItems().stream().map(item -> new OrderItemResponseDto(
                         item.getId(),
                         item.getMenu().getId(),
                         item.getStore().getId(),
                         item.getQuantity(),
                         item.getItemPrice()
-                )).collect(Collectors.toList()))
+                )).toList())
                 .build();
     }
 
     @Override
     public CancelResponseDto cancelOrder(Long orderId) {
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("Order not found"));
+                .orElseThrow(() -> new CustomException(
+                        ErrorCode.ORDER_NOT_FOUND
+                ));
 
-        // 주문 취소 상태로 새 객체 생성
-        Order cancelled = new Order(
-                order.getUser(),
-                order.getOrderDate(),
-                OrderStatus.CANCELLED,
-                order.getTotalPrice(),
-                order.getItems()
-        );
+        if (order.getStatus() == OrderStatus.CANCELLED || order.getStatus() == OrderStatus.COMPLETED) {
+            throw new CustomException(
+                    ErrorCode.CANNOT_CANCEL_COMPLETED_OR_CANCELED_ORDER
+            );
+        }
 
-        orderRepository.save(cancelled);
-
+        orderRepository.delete(order);
         return new CancelResponseDto("주문이 성공적으로 취소되었습니다.", LocalDateTime.now());
     }
-
 }
+

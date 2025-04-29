@@ -4,7 +4,9 @@ import com.example.outsourcing_11.domain.menu.entity.Menu;
 import com.example.outsourcing_11.domain.order.dto.CartItemResponseDto;
 import com.example.outsourcing_11.domain.store.entity.Store;
 import jakarta.persistence.*;
+import lombok.Getter;
 
+@Getter
 @Entity
 @Table(name = "cart_items")
 public class CartItem {

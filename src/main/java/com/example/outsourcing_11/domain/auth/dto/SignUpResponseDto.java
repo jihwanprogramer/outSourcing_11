@@ -20,4 +20,8 @@ public class SignUpResponseDto {
 	private String role;
 	private LocalDateTime createAt;
 
+	public SignUpResponseDto(String userName, String email) {
+		this.userName = userName;
+		this.email = email;
+	}
 }
